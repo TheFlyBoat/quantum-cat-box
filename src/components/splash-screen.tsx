@@ -503,10 +503,12 @@ export function SplashScreen({ onComplete }: { onComplete?: () => void }) {
     }
     return window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
   });
-  const particles = useMemo(
-    () => generateParticles(prefersReducedMotion ? 12 : 36),
-    [prefersReducedMotion],
-  );
+  const [particles, setParticles] = useState<Particle[]>([]);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setParticles(generateParticles(prefersReducedMotion ? 12 : 36));
+  }, [prefersReducedMotion]);
 
   useEffect(() => {
     if (typeof window === 'undefined' || !window.matchMedia) {
