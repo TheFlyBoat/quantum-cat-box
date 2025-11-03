@@ -99,16 +99,12 @@ const Carousel = React.forwardRef<
     )
 
     React.useEffect(() => {
-      if (!api || !setApi) {
+      if (!api) {
         return
       }
 
-      setApi(api)
-    }, [api, setApi])
-
-    React.useEffect(() => {
-      if (!api) {
-        return
+      if (setApi) {
+        setApi(api)
       }
 
       onSelect(api)
@@ -116,9 +112,10 @@ const Carousel = React.forwardRef<
       api.on("select", onSelect)
 
       return () => {
-        api?.off("select", onSelect)
+        api.off("reInit", onSelect)
+        api.off("select", onSelect)
       }
-    }, [api, onSelect])
+    }, [api, setApi, onSelect])
 
     return (
       <CarouselContext.Provider

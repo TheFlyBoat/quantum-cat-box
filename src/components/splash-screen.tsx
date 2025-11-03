@@ -515,7 +515,6 @@ export function SplashScreen({ onComplete }: { onComplete?: () => void }) {
     const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
     const updateMotionPreference = () => setPrefersReducedMotion(mediaQuery.matches);
 
-    updateMotionPreference();
     mediaQuery.addEventListener?.('change', updateMotionPreference);
 
     return () => mediaQuery.removeEventListener?.('change', updateMotionPreference);
