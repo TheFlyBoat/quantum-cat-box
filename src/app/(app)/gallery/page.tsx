@@ -1,9 +1,9 @@
 
 'use client';
 
-<<<<<<< HEAD
 import Image from 'next/image';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import catData from '@/lib/cat-data.json';
 import { useCatCollection } from '@/context/cat-collection-context';
 import {
@@ -41,27 +41,11 @@ import { cn } from '@/lib/utils';
 import { CatProfileDialog } from '@/components/cat-profile-dialog';
 import { useAuth } from '@/context/auth-context';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-=======
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import catData from '@/lib/cat-data.json';
-import { useCatCollection } from '@/context/cat-collection-context';
-import { Lock } from 'lucide-react';
-import { GingerCatIcon, GhostCatIcon, ShadowCatIcon, BonesCatIcon, IdentityCrisisCatIcon, AltCat, BreuCatIcon, ZumbiCatIcon, BlizzardCatIcon, VoodooCatIcon, SleepyCatIcon, HologramCatIcon, GravityCatIcon, GlitchCatIcon } from '@/components/cats';
-import { useState } from 'react';
-import { CatDiarySheet } from '@/components/cat-diary-sheet';
-import { Badge } from '@/components/ui/badge';
-import { cn } from '@/lib/utils';
-import { CatProfileDialog } from '@/components/cat-profile-dialog';
->>>>>>> 957e37b3f48dbd57181f2e1cae07716037534a68
 
 const catComponentMap: { [key: string]: React.ComponentType<{ className?: string }> } = {
     'ginger': GingerCatIcon,
     'ghost': GhostCatIcon,
-<<<<<<< HEAD
     'paradox': ParadoxCatIcon,
-=======
-    'paradox': GlitchCatIcon,
->>>>>>> 957e37b3f48dbd57181f2e1cae07716037534a68
     'shadow': ShadowCatIcon,
     'bones': BonesCatIcon,
     'identity-crisis': IdentityCrisisCatIcon,
@@ -73,7 +57,6 @@ const catComponentMap: { [key: string]: React.ComponentType<{ className?: string
     'sleepy': SleepyCatIcon,
     'hologram': HologramCatIcon,
     'gravity': GravityCatIcon,
-<<<<<<< HEAD
     'vampy': VampyCatIcon,
     'wonder': WonderCatIcon,
     'glitch': GlitchCatIcon,
@@ -87,10 +70,9 @@ const catComponentMap: { [key: string]: React.ComponentType<{ className?: string
     'shark': SharkCatIcon,
     'sneeky': SneekyCatIcon,
     'snowball': SnowballCatIcon,
-=======
-    'glitch': GlitchCatIcon,
->>>>>>> 957e37b3f48dbd57181f2e1cae07716037534a68
 };
+
+
 
 export default function GalleryPage() {
     const allCats = catData.cats as {id: string, name: string, description: string, type: string, tagline: string, strength: string, weakness: string}[];
@@ -108,7 +90,6 @@ export default function GalleryPage() {
     const { isUnlocked } = useCatCollection();
     const [selectedCat, setSelectedCat] = useState<any | null>(null);
     const [diaryCat, setDiaryCat] = useState<any | null>(null);
-<<<<<<< HEAD
     const { storageMode, maybeShowLoginPrompt } = useAuth();
 
     useEffect(() => {
@@ -116,17 +97,12 @@ export default function GalleryPage() {
             maybeShowLoginPrompt('gallery');
         }
     }, [storageMode, maybeShowLoginPrompt]);
-=======
->>>>>>> 957e37b3f48dbd57181f2e1cae07716037534a68
 
     const handleCatClick = (cat: any) => {
         if (isUnlocked(cat.id)) {
             setSelectedCat(cat);
-<<<<<<< HEAD
         } else if (storageMode === 'local') {
             maybeShowLoginPrompt('gallery');
-=======
->>>>>>> 957e37b3f48dbd57181f2e1cae07716037534a68
         }
     }
 
@@ -135,7 +111,6 @@ export default function GalleryPage() {
         setDiaryCat(cat);
     }
 
-<<<<<<< HEAD
     const renderLockedSilhouette = () => (
         <div className="relative flex h-full w-full items-center justify-center">
             <Image
@@ -143,29 +118,34 @@ export default function GalleryPage() {
                 alt="Locked cat silhouette"
                 width={164}
                 height={148}
-                className="h-32 w-32 opacity-80"
+                className="h-24 w-24 opacity-80 transition duration-300 group-hover:opacity-100 sm:h-28 sm:w-28"
                 priority={false}
             />
         </div>
     );
 
-=======
->>>>>>> 957e37b3f48dbd57181f2e1cae07716037534a68
     return (
-        <div className="w-full space-y-6">
-            <Card>
-                <CardHeader>
-<<<<<<< HEAD
-                    <CardTitle className="font-headline text-3xl text-primary">Cat Collection</CardTitle>
-=======
-                    <CardTitle className="text-lg">Cat Collection</CardTitle>
->>>>>>> 957e37b3f48dbd57181f2e1cae07716037534a68
-                </CardHeader>
-                <CardContent className="space-y-4">
+        <Card>
+            <CardHeader>
+                <CardTitle className="page-title text-primary">Gallery</CardTitle>
+            </CardHeader>
+            <CardContent>
+                <Tabs defaultValue="Alive" className="w-full">
+                    <TabsList className="grid w-full grid-cols-3 rounded-full bg-muted/40 p-1 text-[11px] font-semibold uppercase tracking-wide">
+                        {groupOrder.map(groupName => (
+                            <TabsTrigger key={groupName} value={groupName} className={cn(
+                                {
+                                    'bg-green-200 text-green-800 dark:bg-green-800 dark:text-green-200': groupName === 'Alive',
+                                    'bg-red-200 text-red-800 dark:bg-red-800 dark:text-red-200': groupName === 'Dead',
+                                    'bg-purple-200 text-purple-800 dark:bg-purple-800 dark:text-purple-200': groupName === 'Paradox',
+                                },
+                                'px-2 py-1 data-[state=active]:bg-background data-[state=active]:text-foreground'
+                            )}>{groupName}</TabsTrigger>
+                        ))}
+                    </TabsList>
                     {groupOrder.map(groupName => (
-                        <div key={groupName}>
-                            <h3 className="text-sm font-semibold text-muted-foreground mb-2">{groupName} Cats</h3>
-                            <div className="grid grid-cols-3 gap-4">
+                        <TabsContent key={groupName} value={groupName}>
+                            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
                                 {catGroups[groupName]?.map((cat) => {
                                     const unlocked = isUnlocked(cat.id);
                                     const CatComponent = catComponentMap[cat.id];
@@ -173,55 +153,92 @@ export default function GalleryPage() {
                                         <Card 
                                             key={cat.id} 
                                             className={cn(
-                                                "overflow-hidden aspect-square flex flex-col",
+                                                "group flex aspect-[3/4] flex-col overflow-hidden rounded-2xl border transition-colors duration-300",
                                                 unlocked ? 'cursor-pointer hover:border-primary' : 'cursor-default'
                                             )}
                                             onClick={() => handleCatClick(cat)}
                                         >
                                             <CardContent className={cn(
-                                                "p-2 flex-grow h-full flex items-center justify-center relative",
-                                                unlocked ? "bg-gradient-to-br from-primary/20 via-background to-background" : "bg-muted/50"
+                                                "flex flex-1 items-center justify-center bg-background/70 p-3 transition-colors duration-300",
+                                                unlocked ? "bg-gradient-to-br from-primary/15 via-background to-background" : "bg-muted/60 group-hover:bg-muted/50"
                                             )}>
-                                                {unlocked && CatComponent ? (
-<<<<<<< HEAD
-                                                    <TooltipProvider delayDuration={150}>
-                                                        <Tooltip>
-                                                            <TooltipTrigger asChild>
-                                                                <div className="h-full w-full">
-                                                                    <CatComponent className="h-full w-full" />
-                                                                </div>
-                                                            </TooltipTrigger>
-                                                            <TooltipContent side="top" className="font-medium">
-                                                                {cat.name}
-                                                            </TooltipContent>
-                                                        </Tooltip>
-                                                    </TooltipProvider>
-                                                ) : (
-                                                    renderLockedSilhouette()
-=======
-                                                    <>
-                                                        <CatComponent className="w-full h-full" />
-                                                        <Badge variant="secondary" className="absolute top-2 right-2">{cat.type}</Badge>
-                                                    </>
-                                                ) : CatComponent ? (
-                                                    <CatComponent className="w-full h-full silhouette" />
-                                                ) : (
-                                                    <Lock className="w-6 h-6 text-muted-foreground" />
->>>>>>> 957e37b3f48dbd57181f2e1cae07716037534a68
-                                                )}
+                                                {(() => {
+                                                    const isLocked = !unlocked;
+                                                    const catPreview = (
+                                                        <div className="flex h-full w-full items-center justify-center">
+                                                            <CatComponent
+                                                                className={cn(
+                                                                    "h-[88px] w-[88px] transition duration-500 ease-out sm:h-[96px] sm:w-[96px]",
+                                                                    isLocked && "grayscale saturate-0 opacity-60 group-hover:grayscale-0 group-hover:saturate-100 group-hover:opacity-100"
+                                                                )}
+                                                            />
+                                                        </div>
+                                                    );
+
+                                                    if (unlocked && CatComponent) {
+                                                        return (
+                                                            <TooltipProvider delayDuration={150}>
+                                                                <Tooltip>
+                                                                    <TooltipTrigger asChild>
+                                                                        <div className="h-full w-full">
+                                                                            {catPreview}
+                                                                        </div>
+                                                                    </TooltipTrigger>
+                                                                    <TooltipContent side="top" className="font-medium">
+                                                                        {cat.name}
+                                                                    </TooltipContent>
+                                                                </Tooltip>
+                                                            </TooltipProvider>
+                                                        );
+                                                    }
+
+                                                    if (!CatComponent) {
+                                                        return renderLockedSilhouette();
+                                                    }
+
+                                                    return (
+                                                        <TooltipProvider delayDuration={150}>
+                                                            <Tooltip>
+                                                                <TooltipTrigger asChild>
+                                                                    <div className="h-full w-full flex items-center justify-center">
+                                                                        <Image
+                                                                            src="/favicon.svg"
+                                                                            alt="Locked cat placeholder"
+                                                                            width={96}
+                                                                            height={96}
+                                                                            className="h-20 w-20 opacity-60 transition duration-300 group-hover:opacity-100"
+                                                                        />
+                                                                    </div>
+                                                                </TooltipTrigger>
+                                                                <TooltipContent side="top" className="font-medium">
+                                                                    {cat.name}
+                                                                </TooltipContent>
+                                                            </Tooltip>
+                                                        </TooltipProvider>
+                                                    );
+                                                })()}
                                             </CardContent>
-                                            <CardFooter className="p-2 justify-center bg-background/50">
-                                                <p className="text-sm font-bold text-center">{unlocked ? cat.name : '???'}</p>
+                                            <CardFooter className="bg-background/60 p-2 text-center">
+                                                {unlocked ? (
+                                                    cat.id === 'vampy' ? (
+                                                        <span className="sr-only">{cat.name}</span>
+                                                    ) : (
+                                                        <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                                                            {cat.name}
+                                                        </p>
+                                                    )
+                                                ) : (
+                                                    <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">???</p>
+                                                )}
                                             </CardFooter>
                                         </Card>
                                     )
                                 })}
                             </div>
-                        </div>
+                        </TabsContent>
                     ))}
-                </CardContent>
-            </Card>
-
+                </Tabs>
+            </CardContent>
             {selectedCat && (
                 <CatProfileDialog
                     cat={selectedCat}
@@ -237,6 +254,6 @@ export default function GalleryPage() {
                     onOpenChange={(isOpen) => !isOpen && setDiaryCat(null)}
                 />
             )}
-        </div>
+        </Card>
     );
 }

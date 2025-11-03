@@ -1,66 +1,39 @@
-
 'use client';
 
 import * as React from 'react';
-<<<<<<< HEAD
-import { useState, useEffect, useCallback } from 'react';
-import { useRouter, usePathname } from 'next/navigation';
-import { useBadges } from '@/context/badge-context';
-=======
-import { useState, useEffect } from 'react';
-import { useAuth } from '@/context/auth-context';
-import { useBadges } from '@/context/badge-context';
-import { usePoints } from '@/context/points-context';
->>>>>>> 957e37b3f48dbd57181f2e1cae07716037534a68
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import { cn } from '@/lib/utils';
-import { playSound } from '@/lib/audio';
 import { CelebrationCard } from '@/components/celebration-card';
-import { AppHeader } from '@/components/layout/app-header';
-import { AppFooter } from '@/components/layout/app-footer';
-import { ControlPanel } from '@/components/layout/control-panel';
-<<<<<<< HEAD
-import { badgeImageMap, defaultBadgeImage } from '@/lib/badge-images';
-import badgeData from '@/lib/badge-data.json';
-import { CelebrationState, DialogTab } from '@/lib/types';
 import { LoginPrompt } from '@/components/auth/login-prompt';
 import { LoginModal } from '@/components/auth/login-modal';
-import { useAuth } from '@/context/auth-context';
+import { useBadges } from '@/context/badge-context';
+import { badgeImageMap, defaultBadgeImage } from '@/lib/badge-images';
+import badgeData from '@/lib/badge-data.json';
+import Image from 'next/image';
+import { AppHeader } from '@/components/layout/app-header';
+import { cn } from '@/lib/utils';
+import { FloatingMenu } from '@/components/layout/sidebar';
+import { InfiniteBoxGame, type InfiniteBoxGameResult } from '@/components/infinite-box-game';
+import { usePoints } from '@/context/points-context';
 import { useToast } from '@/hooks/use-toast';
+
+const APP_VERSION = process.env.NEXT_PUBLIC_APP_VERSION ?? 'v0.2.0';
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
     const { celebrationBadgeId } = useBadges();
-    const { loginSuccess, acknowledgeLoginSuccess, storageMode } = useAuth();
+    const [celebrationContent, setCelebrationContent] = React.useState<{ title: string; badgeName: string; description: string; icon?: React.ReactNode } | null>(null);
+    const [celebrationState, setCelebrationState] = React.useState('idle');
+    const [hiddenGameOpen, setHiddenGameOpen] = React.useState(false);
+    const [versionTapCount, setVersionTapCount] = React.useState(0);
+    const versionTapResetRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
+
+    const { addPoints } = usePoints();
     const { toast } = useToast();
 
-    const router = useRouter();
-    const pathname = usePathname();
-=======
-import { NicknameDialog } from '@/components/auth/nickname-dialog';
-import { badgeComponentMap } from '@/lib/badge-components';
-import badgeData from '@/lib/badge-data.json';
-import { CelebrationState, DialogTab } from '@/lib/types';
-import { Rocket } from 'lucide-react';
-
-export default function AppLayout({ children }: { children: React.ReactNode }) {
-    const { showNicknamePrompt, setShowNicknamePrompt } = useAuth();
-    const { lastUnlockedBadgeId } = useBadges();
-    const { addPoints } = usePoints();
->>>>>>> 957e37b3f48dbd57181f2e1cae07716037534a68
-
-    const [controlPanelOpen, setControlPanelOpen] = useState(false);
-    const [activeTab, setActiveTab] = useState<DialogTab>('settings');
-    const [celebrationState, setCelebrationState] = useState<CelebrationState>('idle');
-    const [celebrationContent, setCelebrationContent] = useState<{ title: string; description: string; icon?: React.ReactNode } | null>(null);
-    const [revealedCatId, setRevealedCatId] = useState<string | null>(null);
-
-<<<<<<< HEAD
-    const closeCelebration = useCallback(() => {
+    const closeCelebration = React.useCallback(() => {
         setCelebrationState('finished');
         setCelebrationContent(null);
     }, []);
 
-    useEffect(() => {
+    React.useEffect(() => {
         if (!celebrationBadgeId) return;
 
         const badge = badgeData.badges.find(b => b.id === celebrationBadgeId);
@@ -70,10 +43,17 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
         const applyCelebration = () => {
             setCelebrationContent({
-                title: `Badge Unlocked: ${badge.name}!`,
+                title: 'Badge Unlocked',
+                badgeName: badge.name,
                 description: badge.description,
                 icon: badgeImage ? (
-                    <img src={badgeImage} alt={`${badge.name} badge icon`} className="w-16 h-16" />
+                    <Image
+                        src={badgeImage}
+                        alt={`${badge.name} badge icon`}
+                        width={64}
+                        height={64}
+                        className="w-16 h-16"
+                    />
                 ) : undefined
             });
             setCelebrationState('celebrating');
@@ -88,143 +68,99 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         const timeoutId = setTimeout(closeCelebration, 4000);
         return () => clearTimeout(timeoutId);
     }, [celebrationBadgeId, closeCelebration]);
-=======
-    useEffect(() => {
-        if (lastUnlockedBadgeId) {
-            const badge = badgeData.badges.find(b => b.id === lastUnlockedBadgeId);
-            if (badge) {
-                const BadgeComponent = badgeComponentMap[badge.icon] || badgeComponentMap.default;
-                setCelebrationContent({
-                    title: `Badge Unlocked: ${badge.name}!`,
-                    description: badge.description,
-                    icon: <BadgeComponent className="w-16 h-16" />
-                });
-                setCelebrationState('celebrating');
-                setTimeout(() => setCelebrationState('finished'), 4000);
+
+    const celebrationInProgress = celebrationState === 'celebrating' || celebrationState === 'spotlight';
+
+    const handleVersionClick = React.useCallback(() => {
+        setVersionTapCount(prev => {
+            const next = prev + 1;
+
+            if (versionTapResetRef.current) {
+                clearTimeout(versionTapResetRef.current);
             }
-        }
-    }, [lastUnlockedBadgeId]);
 
-    const handleNicknameSet = (nickname: string) => {
-        setShowNicknamePrompt(false);
-        setCelebrationContent({
-            title: `Welcome, ${nickname}!`,
-            description: "Your quantum journey begins now.",
-            icon: <Rocket className="h-16 w-16 text-primary" />
-        });
-        setCelebrationState('celebrating');
-        playSound('celebration-magic');
+            versionTapResetRef.current = setTimeout(() => {
+                setVersionTapCount(0);
+                versionTapResetRef.current = null;
+            }, 1200);
 
-        setTimeout(() => {
-            setCelebrationState('spotlight');
-            const homePageElement = document.getElementById('home-page-container');
-            if (homePageElement) {
-                const boxElement = homePageElement.querySelector('[aria-label="Open the quantum cat box"]');
-                if (boxElement) {
-                    boxElement.classList.add('animate-shake');
-                    playSound('box-shake');
-                    setTimeout(() => boxElement.classList.remove('animate-shake'), 400);
+            if (next >= 3) {
+                if (versionTapResetRef.current) {
+                    clearTimeout(versionTapResetRef.current);
+                    versionTapResetRef.current = null;
                 }
+                setVersionTapCount(0);
+                setHiddenGameOpen(true);
             }
-            setTimeout(() => setCelebrationState('finished'), 1000);
-        }, 3000);
-    };
->>>>>>> 957e37b3f48dbd57181f2e1cae07716037534a68
 
-    const openControlPanel = (tab: DialogTab) => {
-        setActiveTab(tab);
-        setControlPanelOpen(true);
-        playSound('click-2');
-    };
+            return next >= 3 ? 0 : next;
+        });
+    }, []);
 
-<<<<<<< HEAD
-    useEffect(() => {
-        if (loginSuccess && storageMode === 'cloud') {
+    React.useEffect(() => {
+        return () => {
+            if (versionTapResetRef.current) {
+                clearTimeout(versionTapResetRef.current);
+            }
+        };
+    }, []);
+
+    const handleHiddenGameComplete = React.useCallback((result: InfiniteBoxGameResult) => {
+        if (result.pointsAwarded > 0) {
+            addPoints(result.pointsAwarded);
             toast({
-                title: 'Your cats are safe!',
-                description: 'You can now continue your collection on any device. Keep in this universe alternative.',
+                title: 'Infinite Box complete!',
+                description: `You earned ${result.pointsAwarded} Fish Points.`,
             });
-            acknowledgeLoginSuccess();
+        } else {
+            toast({
+                title: 'Infinite Box complete!',
+                description: 'No bonus points this time, but the quantum cat is impressed.',
+            });
         }
-    }, [loginSuccess, storageMode, toast, acknowledgeLoginSuccess]);
+        setHiddenGameOpen(false);
+    }, [addPoints, toast]);
 
-    const celebrationInProgress = celebrationState === 'celebrating' || celebrationState === 'spotlight';
+    const handleHiddenGameDismiss = React.useCallback(() => {
+        setHiddenGameOpen(false);
+    }, []);
 
-    const isMenuPage = pathname === '/gallery' || pathname === '/awards' || pathname === '/customize';
-
-    const handleBackdropClick = useCallback(() => {
-        if (isMenuPage) {
-            router.push('/home');
-        }
-    }, [isMenuPage, router]);
-
-=======
-    const celebrationInProgress = celebrationState === 'celebrating' || celebrationState === 'spotlight';
-
->>>>>>> 957e37b3f48dbd57181f2e1cae07716037534a68
     return (
-        <div className={cn(
-            "relative flex min-h-svh flex-col items-center justify-center p-4 transition-colors duration-500 bg-background",
-            celebrationInProgress && "bg-black",
-            celebrationState === 'spotlight' && "spotlight-container"
-<<<<<<< HEAD
-        )} onClick={handleBackdropClick}>
-=======
-        )}>
-            <NicknameDialog 
-                isOpen={showNicknamePrompt} 
-                onOpenChange={setShowNicknamePrompt} 
-                onNicknameSet={handleNicknameSet} 
-            />
-
->>>>>>> 957e37b3f48dbd57181f2e1cae07716037534a68
+        <div className={cn("relative min-h-screen w-full bg-background", celebrationInProgress && "bg-black")}>
+            <div className="mx-auto flex min-h-screen w-full max-w-[360px] flex-col items-center px-0 py-10 sm:px-4">
+                <main className="relative w-full rounded-[32px] border border-border/40 bg-card/95 px-4 pb-10 pt-6 shadow-[0_25px_70px_-35px_rgba(79,70,229,0.45)] backdrop-blur-sm sm:px-6 sm:pb-12 sm:pt-8">
+                    <AppHeader />
+                    <div className="mt-6 flex w-full flex-col gap-6">
+                        {children}
+                    </div>
+                    <FloatingMenu />
+                    <button
+                        type="button"
+                        onClick={handleVersionClick}
+                        className="absolute bottom-4 right-4 text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground transition hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                        aria-label={`App version ${APP_VERSION}`}
+                    >
+                        {APP_VERSION}
+                    </button>
+                </main>
+            </div>
             {celebrationState === 'celebrating' && celebrationContent && (
                 <CelebrationCard
                     title={celebrationContent.title}
+                    badgeName={celebrationContent.badgeName}
                     description={celebrationContent.description}
                     icon={celebrationContent.icon}
-<<<<<<< HEAD
                     onClose={closeCelebration}
-=======
->>>>>>> 957e37b3f48dbd57181f2e1cae07716037534a68
                 />
             )}
-
-            <Card className={cn(
-                "relative w-full max-w-sm rounded-2xl shadow-lg overflow-hidden transition-all duration-500",
-                "dark:border-primary/50 dark:shadow-primary/20",
-                "bg-card",
-                celebrationInProgress && 'border-transparent bg-transparent shadow-none'
-<<<<<<< HEAD
-            )} onClick={(event) => event.stopPropagation()}>
-=======
-            )}>
->>>>>>> 957e37b3f48dbd57181f2e1cae07716037534a68
-                <CardHeader className={cn("p-4 transition-opacity duration-300", celebrationInProgress && "opacity-0")}>
-                    <AppHeader />
-                </CardHeader>
-                <CardContent id="home-page-container" className="flex flex-col items-center justify-center text-center p-6 pt-0">
-                    {React.cloneElement(children as React.ReactElement, { setRevealedCatId })}
-                </CardContent>
-                <div className={cn("p-4 flex justify-between items-center transition-opacity duration-300", celebrationInProgress && "opacity-0")}>
-                    <AppFooter 
-                        onSettingsClick={() => openControlPanel('settings')} 
-                        onInfoClick={() => openControlPanel('info')} 
-                    />
-                </div>
-            </Card>
-
-            <ControlPanel 
-                isOpen={controlPanelOpen} 
-                onOpenChange={setControlPanelOpen} 
-                activeTab={activeTab} 
-                onTabChange={setActiveTab} 
-            />
-<<<<<<< HEAD
             <LoginPrompt />
             <LoginModal />
-=======
->>>>>>> 957e37b3f48dbd57181f2e1cae07716037534a68
+            {hiddenGameOpen && (
+                <InfiniteBoxGame
+                    onComplete={handleHiddenGameComplete}
+                    onDismiss={handleHiddenGameDismiss}
+                />
+            )}
         </div>
     );
 }

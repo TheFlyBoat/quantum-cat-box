@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import React from 'react';
 import { cn } from '@/lib/utils';
 import { StandardCat } from './shared/standard-cat';
@@ -69,13 +68,13 @@ const PARADOX_STYLES = `
         100% { opacity: 0; }
     }
 
-    .paradox-alive-1 { z-index: 3; --transform-initial: translateX(10%) scale(0.5); --transform-final: translateX(25%) scale(0.7); animation-delay: 0s; }
-    .paradox-alive-2 { z-index: 2; --transform-initial: translateX(20%) scale(0.5); --transform-final: translateX(45%) scale(0.6); animation-delay: 0.4s; }
-    .paradox-alive-3 { z-index: 1; --transform-initial: translateX(30%) scale(0.5); --transform-final: translateX(65%) scale(0.5); animation-delay: 0.8s; }
+    .paradox-alive-1 { z-index: 3; --transform-initial: translateX(12%) scale(0.5); --transform-final: translateX(35%) scale(0.72); animation-delay: 0s; }
+    .paradox-alive-2 { z-index: 2; --transform-initial: translateX(24%) scale(0.5); --transform-final: translateX(58%) scale(0.62); animation-delay: 0.4s; }
+    .paradox-alive-3 { z-index: 1; --transform-initial: translateX(36%) scale(0.5); --transform-final: translateX(78%) scale(0.52); animation-delay: 0.8s; }
 
-    .paradox-dead-1 { z-index: 3; --transform-initial: translateX(-10%) scale(0.5); --transform-final: translateX(-25%) scale(0.7); animation-delay: 0s; }
-    .paradox-dead-2 { z-index: 2; --transform-initial: translateX(-20%) scale(0.5); --transform-final: translateX(-45%) scale(0.6); animation-delay: 0.4s; }
-    .paradox-dead-3 { z-index: 1; --transform-initial: translateX(-30%) scale(0.5); --transform-final: translateX(-65%) scale(0.5); animation-delay: 0.8s; }
+    .paradox-dead-1 { z-index: 3; --transform-initial: translateX(-12%) scale(0.5); --transform-final: translateX(-35%) scale(0.72); animation-delay: 0s; }
+    .paradox-dead-2 { z-index: 2; --transform-initial: translateX(-24%) scale(0.5); --transform-final: translateX(-58%) scale(0.62); animation-delay: 0.4s; }
+    .paradox-dead-3 { z-index: 1; --transform-initial: translateX(-36%) scale(0.5); --transform-final: translateX(-78%) scale(0.52); animation-delay: 0.8s; }
 
     .paradox-alive-1 {
         animation: paradox-shadow-appear 12s infinite, paradox-alive-1-anim 1s infinite ease-in-out 2s;
@@ -173,15 +172,5 @@ export const ParadoxCatIcon: React.FC<{ className?: string }> = ({ className }) 
     <div className={cn('relative cat paradox', className)}>
         <style>{PARADOX_STYLES}</style>
         <ParadoxFigure {...PARADOX_BASE_PROPS} />
-=======
-
-import { cn } from "@/lib/utils";
-import { GlitchCatIcon } from "./glitch-cat-icon";
-
-
-export const ParadoxCatIcon = ({ className }: { className?: string }) => (
-    <div className={cn("relative cat-container", className)}>
-        <GlitchCatIcon className="w-full h-full" />
->>>>>>> 957e37b3f48dbd57181f2e1cae07716037534a68
     </div>
 );

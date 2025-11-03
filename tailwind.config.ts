@@ -18,14 +18,9 @@ export default {
     },
     extend: {
       fontFamily: {
-<<<<<<< HEAD
-        body: ['"Nunito"', 'sans-serif'],
-        headline: ['"Patrick Hand"', 'sans-serif'],
-        fortune: ['"Quicksand"', 'sans-serif'],
-=======
-        body: ['"Patrick Hand"', 'sans-serif'],
-        headline: ['"Patrick Hand"', 'sans-serif'],
->>>>>>> 957e37b3f48dbd57181f2e1cae07716037534a68
+        body: ['var(--font-body)', 'sans-serif'],
+        headline: ['var(--font-headline)', 'sans-serif'],
+        fortune: ['var(--font-fortune)', 'sans-serif'],
         code: ['monospace'],
       },
       colors: {
@@ -291,7 +286,6 @@ export default {
           '0%': { opacity: '1', transform: 'scale(1) translateY(0)' },
           '100%': { opacity: '0', transform: 'scale(0.5) translateY(20px)' },
         },
-<<<<<<< HEAD
         'celebration-glow': {
           '0%, 100%': { opacity: '0.35', transform: 'scale(0.96)' },
           '50%': { opacity: '0.85', transform: 'scale(1.03)' },
@@ -321,8 +315,6 @@ export default {
           '0%, 100%': { transform: 'scale(1)', 'box-shadow': '0 0 22px rgba(94,234,212,0.35)' },
           '50%': { transform: 'scale(1.08)', 'box-shadow': '0 0 48px rgba(129,140,248,0.55)' },
         },
-=======
->>>>>>> 957e37b3f48dbd57181f2e1cae07716037534a68
         'hue-rotate': {
             '0%': { filter: 'hue-rotate(0deg)' },
             '100%': { filter: 'hue-rotate(360deg)' },
@@ -370,7 +362,6 @@ export default {
         'cartoon-bounce': 'cartoon-bounce 0.4s ease-out forwards',
         'celebration-in': 'celebration-in 0.5s ease-out forwards',
         'celebration-out': 'celebration-out 0.5s ease-in forwards',
-<<<<<<< HEAD
         'celebration-glow': 'celebration-glow 4s ease-in-out infinite',
         'celebration-float': 'celebration-float 6s ease-in-out infinite',
         'celebration-pulse': 'celebration-pulse 3s ease-in-out infinite',
@@ -378,8 +369,6 @@ export default {
         'quantum-glitter': 'quantum-glitter 4s ease-in-out infinite',
         'quantum-collapse': 'quantum-collapse 0.7s ease-in forwards',
         'quantum-core': 'quantum-core 3s ease-in-out infinite',
-=======
->>>>>>> 957e37b3f48dbd57181f2e1cae07716037534a68
         'hue-rotate': 'hue-rotate 5s linear infinite',
       },
     },

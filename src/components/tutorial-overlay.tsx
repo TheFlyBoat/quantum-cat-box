@@ -4,7 +4,11 @@
 import { ArrowDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
-export function TutorialOverlay({ reduceMotion }: { reduceMotion: boolean }) {
+/**
+ * A component that displays a tutorial overlay.
+ * @param onDismiss A function to call when the overlay is dismissed.
+ */
+export function TutorialOverlay({ onDismiss }: { onDismiss: () => void }) {
     return (
         <div className={cn("absolute top-0 flex flex-col items-center", !reduceMotion && "animate-bounce")}>
             <span className="text-sm font-semibold text-accent">Tap the box to begin!</span>

@@ -13,11 +13,7 @@
         },
         {
             "id": "ghost",
-<<<<<<< HEAD
-            "name": "Boo Cat",
-=======
             "name": "Ghost Cat",
->>>>>>> 957e37b3f48dbd57181f2e1cae07716037534a68
             "description": "A spectral cat, a remnant of a quantum state that has collapsed into non-existence. Unlocked by observing a 'dead' outcome.",
             "type": "Dead",
             "points": 2,
@@ -47,11 +43,7 @@
         },
         {
             "id": "identity-crisis",
-<<<<<<< HEAD
-            "name": "Dog",
-=======
             "name": "Identity Crisis Cat",
->>>>>>> 957e37b3f48dbd57181f2e1cae07716037534a68
             "description": "This cat is... having a moment. It seems to be borrowing parts from other cats. Unlocked by observing an 'alive' outcome.",
             "type": "Alive",
             "points": 1,
@@ -71,11 +63,7 @@
         },
         {
             "id": "breu",
-<<<<<<< HEAD
-            "name": "Void",
-=======
-            "name": "Breu",
->>>>>>> 957e37b3f48dbd57181f2e1cae07716037534a68
+            "name": "Dudu Cat",
             "description": "A cat born of shadow. Its presence is mysterious and calming.",
             "type": "Alive",
             "points": 1,
@@ -85,11 +73,7 @@
         },
         {
             "id": "zumbi",
-<<<<<<< HEAD
-            "name": "Zombo Cat",
-=======
-            "name": "Zumbi Cat",
->>>>>>> 957e37b3f48dbd57181f2e1cae07716037534a68
+            "name": "Zombie Cat",
             "description": "A cat that has defied the bounds of life and death, lurching back into a state of quantum undeath. What has science done?",
             "type": "Dead",
             "points": 2,
@@ -99,11 +83,7 @@
         },
         {
             "id": "blizzard",
-<<<<<<< HEAD
             "name": "Duke Cat",
-=======
-            "name": "Blizzard Cat",
->>>>>>> 957e37b3f48dbd57181f2e1cae07716037534a68
             "description": "A fluffy Siamese cat that seems to carry a perpetual winter with it. Its fur is as white as snow, with points as dark as a winter night.",
             "type": "Alive",
             "points": 1,
@@ -133,7 +113,7 @@
         },
         {
             "id": "hologram",
-            "name": "Hologram Cat",
+            "name": "Glitch Cat",
             "description": "A flickering, translucent cat made of pure light. It phases in and out of reality, leaving behind trails of colorful data.",
             "type": "Paradox",
             "points": 5,
@@ -143,11 +123,7 @@
         },
         {
             "id": "gravity",
-<<<<<<< HEAD
             "name": "Newton Cat",
-=======
-            "name": "Gravity Cat",
->>>>>>> 957e37b3f48dbd57181f2e1cae07716037534a68
             "description": "This cat has a tenuous relationship with the laws of physics, often finding itself floating upside down.",
             "type": "Alive",
             "points": 1,
@@ -167,14 +143,13 @@
         },
         {
             "id": "glitch",
-            "name": "Glitch Cat",
+            "name": "Holo Cat",
             "description": "A cat made of unstable code and corrupted data. It flickers with a digital energy that seems to warp the space around it.",
             "type": "Paradox",
             "points": 5,
             "tagline": "The Digital Anomaly",
             "strength": "Can literally 'debug' itself from any tricky situation.",
             "weakness": "Prone to crashing. Do not ask it to divide by zero."
-<<<<<<< HEAD
         },
         {
             "id": "vampy",
@@ -228,7 +203,7 @@
         },
         {
             "id": "catankhamun",
-            "name": "Catankhamun",
+            "name": "Mummy Cat",
             "description": "A regal, bandaged guardian resurrected from ancient probabilities. Gold glints from every wrap as it patrols millennia of mysteries.",
             "type": "Dead",
             "points": 2,
@@ -295,8 +270,6 @@
             "tagline": "The Retro Resolution",
             "strength": "Debugs corrupted timelines at 8-bit speed.",
             "weakness": "Crashes if asked to render 4K emotions."
-=======
->>>>>>> 957e37b3f48dbd57181f2e1cae07716037534a68
         }
     ],
     "outcomes": {
@@ -309,15 +282,11 @@
                 {"id": "blizzard", "rarity": 10},
                 {"id": "breu", "rarity": 10},
                 {"id": "sleepy", "rarity": 10},
-<<<<<<< HEAD
                 {"id": "gravity", "rarity": 10},
                 {"id": "wonder", "rarity": 10},
                 {"id": "domino", "rarity": 10},
                 {"id": "sneeky", "rarity": 10},
                 {"id": "snowball", "rarity": 10}
-=======
-                {"id": "gravity", "rarity": 10}
->>>>>>> 957e37b3f48dbd57181f2e1cae07716037534a68
             ]
         },
         "dead": {
@@ -326,14 +295,10 @@
                 {"id": "ghost", "rarity": 10},
                 {"id": "bones", "rarity": 10},
                 {"id": "zumbi", "rarity": 10},
-<<<<<<< HEAD
                 {"id": "voodoo", "rarity": 10},
                 {"id": "vampy", "rarity": 10},
                 {"id": "catankhamun", "rarity": 10},
                 {"id": "shark", "rarity": 10}
-=======
-                {"id": "voodoo", "rarity": 10}
->>>>>>> 957e37b3f48dbd57181f2e1cae07716037534a68
             ]
         },
         "paradox": {
@@ -342,16 +307,12 @@
                 {"id": "alt", "rarity": 10},
                 {"id": "hologram", "rarity": 10},
                 {"id": "paradox", "rarity": 10},
-<<<<<<< HEAD
                 {"id": "glitch", "rarity": 10},
                 {"id": "anomaly", "rarity": 10},
                 {"id": "cloud", "rarity": 10},
                 {"id": "cosmic", "rarity": 10},
                 {"id": "mystic", "rarity": 10},
                 {"id": "pixel", "rarity": 10}
-=======
-                {"id": "glitch", "rarity": 10}
->>>>>>> 957e37b3f48dbd57181f2e1cae07716037534a68
             ]
         }
     }

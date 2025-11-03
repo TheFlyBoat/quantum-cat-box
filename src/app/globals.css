@@ -5,7 +5,6 @@
 
 @layer base {
   :root {
-<<<<<<< HEAD
     --background: 266 58% 97%; /* Lavender mist */
     --foreground: 258 32% 18%;
 
@@ -24,35 +23,12 @@
     --muted: 28 86% 89%; /* Soft orange */
     --muted-foreground: 24 55% 32%;
 
-    --accent: 102 60% 70%; /* Lime green */
-    --accent-foreground: 120 33% 18%;
-=======
-    --background: 54 43% 94%; /* #F2F0E4 */
-    --foreground: 20 14% 4%;
-
-    --card: 54 43% 94%;
-    --card-foreground: 20 14% 4%;
-
-    --popover: 0 0% 100%;
-    --popover-foreground: 20 14% 4%;
-
-    --primary: 260 80% 65%;
-    --primary-foreground: 0 0% 98%;
-
-    --secondary: 48 20% 85%;
-    --secondary-foreground: 20 14% 4%;
-
-    --muted: 48 20% 85%;
-    --muted-foreground: 20 14% 35%;
-
-    --accent: 260 80% 65%;
-    --accent-foreground: 0 0% 98%;
->>>>>>> 957e37b3f48dbd57181f2e1cae07716037534a68
+    --accent: 28 88% 66%; /* Vibrant orange */
+    --accent-foreground: 24 68% 24%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
 
-<<<<<<< HEAD
     --border: 262 35% 82%;
     --input: 262 35% 82%;
     --ring: 262 67% 63%;
@@ -62,71 +38,44 @@
     --chart-3: 335 72% 72%;
     --chart-4: 28 86% 64%;
     --chart-5: 278 34% 50%;
-=======
-    --border: 48 20% 80%;
-    --input: 48 20% 80%;
-    --ring: 260 80% 65%;
->>>>>>> 957e37b3f48dbd57181f2e1cae07716037534a68
 
     --radius: 0.8rem;
   }
 
   .dark {
-<<<<<<< HEAD
-    --background: 255 45% 8%;
-    --foreground: 258 32% 96%;
+    --background: 222 31% 9%; /* Midnight slate */
+    --foreground: 220 20% 94%;
 
-    --card: 255 38% 12%;
-    --card-foreground: 258 32% 96%;
+    --card: 222 28% 13%;
+    --card-foreground: 220 20% 94%;
 
-    --popover: 255 38% 12%;
-    --popover-foreground: 258 32% 96%;
+    --popover: 222 28% 13%;
+    --popover-foreground: 220 20% 94%;
 
-    --primary: 262 67% 65%;
+    --primary: 268 74% 72%; /* Electric lilac */
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 335 55% 32%;
-    --secondary-foreground: 335 100% 90%;
+    --secondary: 13 74% 58%; /* Vibrant coral */
+    --secondary-foreground: 18 100% 95%;
 
-    --muted: 28 60% 24%;
-    --muted-foreground: 28 96% 85%;
+    --muted: 222 22% 22%; /* Cool graphite */
+    --muted-foreground: 222 14% 70%;
 
-    --accent: 102 55% 40%;
-    --accent-foreground: 120 40% 94%;
+    --accent: 28 92% 58%; /* Ember orange */
+    --accent-foreground: 24 92% 92%;
 
-    --destructive: 0 62.8% 30.6%;
+    --destructive: 0 70% 46%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 262 35% 24%;
-    --input: 262 35% 24%;
-    --ring: 262 67% 65%;
+    --border: 222 24% 24%;
+    --input: 222 24% 24%;
+    --ring: 268 74% 72%;
 
-    --chart-1: 262 67% 65%;
-    --chart-2: 102 55% 48%;
-    --chart-3: 335 60% 42%;
-    --chart-4: 28 70% 40%;
-    --chart-5: 280 40% 55%;
-=======
-    --background: 220 10% 4%;
-    --foreground: 0 0% 98%;
-    --card: 220 10% 6%;
-    --card-foreground: 0 0% 98%;
-    --popover: 220 10% 6%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 260 100% 75%;
-    --primary-foreground: 0 0% 98%;
-    --secondary: 220 10% 12%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 220 10% 12%;
-    --muted-foreground: 0 0% 70%;
-    --accent: 260 100% 75%;
-    --accent-foreground: 0 0% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 220 10% 16%;
-    --input: 220 10% 16%;
-    --ring: 260 100% 75%;
->>>>>>> 957e37b3f48dbd57181f2e1cae07716037534a68
+    --chart-1: 268 74% 72%;
+    --chart-2: 161 55% 52%;
+    --chart-3: 13 74% 58%;
+    --chart-4: 200 65% 55%;
+    --chart-5: 43 86% 58%;
   }
 
   .reduce-motion * {
@@ -143,6 +92,18 @@
   }
   body {
     @apply bg-background text-foreground;
+  }
+
+  .page-title {
+    @apply text-3xl font-headline;
+  }
+
+  .section-title {
+    @apply text-xl font-headline;
+  }
+
+  .body-text {
+    @apply text-base font-body;
   }
   
   .bg-paws-pattern {
@@ -172,7 +133,6 @@
 
   .particle {
     position: absolute;
-<<<<<<< HEAD
     pointer-events: none;
     border-radius: var(--particle-radius, 9999px);
     background: var(--particle-color, hsl(var(--primary)));
@@ -182,12 +142,6 @@
     box-shadow: 0 0 0 rgba(255, 255, 255, 0.2);
     will-change: transform, opacity;
     animation: particle-animation var(--particle-duration, 1100ms) ease-out forwards;
-=======
-    border-radius: 50%;
-    background: hsl(var(--primary));
-    opacity: 0;
-    animation: particle-animation 1s ease-out forwards;
->>>>>>> 957e37b3f48dbd57181f2e1cae07716037534a68
   }
   
   .silhouette {
@@ -197,25 +151,16 @@
 
   @keyframes particle-animation {
     0% {
-<<<<<<< HEAD
       transform: translate(0, 0) scale(0.6) rotate(var(--particle-rotation, 0deg));
       opacity: 1;
     }
     100% {
       transform: translate(var(--tx), var(--ty)) scale(1.35) rotate(var(--particle-rotation, 0deg));
-=======
-      transform: scale(0.5) translate(0, 0);
-      opacity: 1;
-    }
-    100% {
-      transform: scale(1.2) translate(var(--tx), var(--ty));
->>>>>>> 957e37b3f48dbd57181f2e1cae07716037534a68
       opacity: 0;
     }
   }
 }
 
-<<<<<<< HEAD
 @layer utilities {
   @keyframes splash-cat-pop {
     0% {
@@ -320,15 +265,20 @@
   .vampy-cat-form {
     position: absolute;
     left: 50%;
-    bottom: -6%;
-    width: min(88%, 250px);
+    bottom: -14%;
+    width: min(108%, 280px);
+    max-height: 110%;
     transform: translate(-50%, 0);
     animation: vampy-main-anim 12s infinite ease-in-out;
   }
 
+  .vampy-cat-form svg {
+    display: block;
+  }
+
   .vampy-bat-form {
     position: absolute;
-    top: 0;
+    top: -4%;
     left: 0;
     width: 100%;
     height: 100%;
@@ -611,6 +561,3 @@
     }
   }
 }
-=======
-    
->>>>>>> 957e37b3f48dbd57181f2e1cae07716037534a68

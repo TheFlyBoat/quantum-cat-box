@@ -1,15 +1,19 @@
 
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
-<<<<<<< HEAD
 import type { CatOutcome } from '@/lib/types';
 
 export interface RevealHistoryEntry {
   id: string;
   type: CatOutcome;
 }
-=======
->>>>>>> 957e37b3f48dbd57181f2e1cae07716037534a68
+
+export interface UserSettings {
+  soundEnabled?: boolean;
+  vibrationEnabled?: boolean;
+  volume?: number;
+  reduceMotion?: boolean;
+}
 
 export interface UserData {
   nickname?: string;
@@ -17,43 +21,37 @@ export interface UserData {
   streak?: number;
   totalObservations?: number;
   unlockedBadges?: string[];
-  unlockedSkins?: string[];
-  selectedSkin?: 'default' | 'shiny' | 'cardboard';
+    selectedSkin?: 'default' | 'carbon' | 'cardboard' | 'black-wooden' | 'special-xk6' | 'stone';
+    unlockedSkins?: ('default' | 'carbon' | 'cardboard' | 'black-wooden' | 'special-xk6' | 'stone')[];
   unlockedCats?: string[];
   diary?: { [catId: string]: { messages: string[]; count: number } };
   points?: number;
-<<<<<<< HEAD
   revealHistory?: RevealHistoryEntry[];
   shareCount?: number;
+  settings?: UserSettings;
 }
 
 export const defaultUserData: UserData = {
-=======
-}
-
-const defaultUserData: UserData = {
->>>>>>> 957e37b3f48dbd57181f2e1cae07716037534a68
   nickname: undefined,
   lastObservationDate: undefined,
   streak: 0,
   totalObservations: 0,
   unlockedBadges: [],
-  unlockedSkins: ['default', 'shiny'],
-  selectedSkin: 'default',
+      unlockedSkins: ['default', 'carbon'],  selectedSkin: 'default',
   unlockedCats: [],
   diary: {},
   points: 0,
-<<<<<<< HEAD
   revealHistory: [],
   shareCount: 0,
+  settings: {
+    soundEnabled: true,
+    vibrationEnabled: true,
+    volume: 0.5,
+    reduceMotion: false,
+  },
 };
 
 export async function saveUserData(userId: string, data: Partial<UserData>): Promise<void> {
-=======
-};
-
-export async function saveUserData(userId: string, data: UserData): Promise<void> {
->>>>>>> 957e37b3f48dbd57181f2e1cae07716037534a68
   try {
     const userDocRef = doc(db, 'users', userId);
     await setDoc(userDocRef, data, { merge: true });
@@ -62,7 +60,6 @@ export async function saveUserData(userId: string, data: UserData): Promise<void
   }
 }
 
-<<<<<<< HEAD
 export async function resetUserData(userId: string): Promise<void> {
   try {
     const userDocRef = doc(db, 'users', userId);
@@ -72,8 +69,6 @@ export async function resetUserData(userId: string): Promise<void> {
   }
 }
 
-=======
->>>>>>> 957e37b3f48dbd57181f2e1cae07716037534a68
 export async function loadUserData(userId: string): Promise<UserData> {
   try {
     const userDocRef = doc(db, 'users', userId);

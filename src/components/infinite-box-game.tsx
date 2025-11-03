@@ -53,7 +53,7 @@ type IconEffect = 'apple' | 'tree' | 'atom' | 'neutral';
 
 type IconConfig = {
   id: string;
-  icon: React.ComponentType<{ className?: string }>;
+  icon: React.ComponentType<{ className?: string; strokeWidth?: number | string }>;
   effect: IconEffect;
   color: string;
   label: string;
@@ -88,6 +88,12 @@ const getRandomIcon = (excludeId?: string): IconConfig => {
   return pool[Math.floor(Math.random() * pool.length)];
 };
 
+/**
+ * A mini-game where the user has to click on icons to collect points.
+ * This component has a lot of complex logic for the game mechanics, timing, and scoring.
+ * @param onComplete A function to call when the game is completed.
+ * @param onDismiss A function to call when the game is dismissed.
+ */
 export function InfiniteBoxGame({ onComplete, onDismiss }: InfiniteBoxGameProps) {
   const [timeLeft, setTimeLeft] = useState(TOTAL_TIME_MS);
   const [totalClicks, setTotalClicks] = useState(0);

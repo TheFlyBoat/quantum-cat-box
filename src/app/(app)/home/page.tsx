@@ -1,19 +1,10 @@
-<<<<<<< HEAD
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-=======
-
-'use client';
-
-import { useEffect, useState } from 'react';
->>>>>>> 957e37b3f48dbd57181f2e1cae07716037534a68
+import Image from 'next/image';
 import { QuantumCatBox } from '@/components/quantum-cat-box';
 import { MessageDisplay } from '@/components/message-display';
 import { DevPanel } from '@/components/dev-panel';
-import { TutorialOverlay } from '@/components/tutorial-overlay';
-<<<<<<< HEAD
-import { OnboardingTour } from '@/components/onboarding-tour';
 import { MainActions } from '@/components/main-actions';
 import { ShareCard } from '@/components/share-card';
 import { TitleDisplay } from '@/components/title-display';
@@ -21,40 +12,33 @@ import { SplashScreen } from '@/components/splash-screen';
 import { useCatLogic } from '@/lib/hooks/use-cat-logic';
 import { useDevMode } from '@/lib/hooks/use-dev-mode';
 import { ShareAsset, useShare } from '@/lib/hooks/use-share';
-=======
-import { MainActions } from '@/components/main-actions';
-import { ShareCard } from '@/components/share-card';
-import { TitleDisplay } from '@/components/title-display';
-import { useCatLogic } from '@/lib/hooks/use-cat-logic';
-import { useDevMode } from '@/lib/hooks/use-dev-mode';
-import { useShare } from '@/lib/hooks/use-share';
->>>>>>> 957e37b3f48dbd57181f2e1cae07716037534a68
 import { useDiary } from '@/context/diary-context';
 import { useBadges } from '@/context/badge-context';
-import { useSound } from '@/context/sound-context';
+import { useFeedback } from '@/context/feedback-context';
 import { useBoxSkin } from '@/context/box-skin-context';
 import { useToast } from '@/hooks/use-toast';
 import { playSound } from '@/lib/audio';
-<<<<<<< HEAD
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/context/auth-context';
+import { OnboardingModal } from '@/components/onboarding-modal';
 
 export default function HomePage({ onInteraction, setRevealedCatId }: { onInteraction?: () => void; setRevealedCatId?: (id: string | null) => void; }) {
     const [showOnboarding, setShowOnboarding] = useState(false);
-    const [showTapHint, setShowTapHint] = useState(false);
     const [isAmbientShaking, setIsAmbientShaking] = useState(false);
     const [isGeneratingShare, setIsGeneratingShare] = useState(false);
     const [isShareDialogOpen, setIsShareDialogOpen] = useState(false);
     const [shareAsset, setShareAsset] = useState<ShareAsset | null>(null);
     const [currentCatId, setCurrentCatId] = useState<string | null>(null);
     const [showSplash, setShowSplash] = useState(true);
-    const [unlockCountdown, setUnlockCountdown] = useState('');
+    const [lockNotice, setLockNotice] = useState('');
+
+    const [isShared, setIsShared] = useState(false);
 
     const { toast } = useToast();
-    const { toggleDiaryEntry, isMessageSaved: isDiaryMessageSaved } = useDiary();
+    const { toggleDiaryEntry, isMessageSaved: isDiaryMessageSaved, recordReveal } = useDiary();
     const { lastUnlockedBadgeId, triggerCelebration } = useBadges();
-    const { reduceMotion } = useSound();
+    const { reduceMotion } = useFeedback();
     const { selectedSkin } = useBoxSkin();
     const { storageMode, localProgressMessageSeen, markLocalMessageSeen } = useAuth();
 
@@ -72,38 +56,18 @@ export default function HomePage({ onInteraction, setRevealedCatId }: { onIntera
         isDailyLocked,
         nextAvailableAt,
         refreshDailyLock,
+        overrideDailyLock,
     } = useCatLogic({
         onInteraction,
         setRevealedCatId: (id) => {
             setCurrentCatId(id);
             setRevealedCatId?.(id);
         },
-        onCatReveal: (catId: string, _message: string) => {
+        onCatReveal: (catId: string, _revealedMessage: string) => {
             setCurrentCatId(catId);
+            recordReveal(catId);
         }
     });
-=======
-import { cn } from '@/lib/utils';
-
-export default function HomePage({ onInteraction, setRevealedCatId }: { onInteraction?: () => void; setRevealedCatId?: (id: string | null) => void; }) {
-    const [isMessageSaved, setIsMessageSaved] = useState(false);
-    const [showTutorial, setShowTutorial] = useState(false);
-    const [isAmbientShaking, setIsAmbientShaking] = useState(false);
-
-    const { toast } = useToast();
-    const { addDiaryEntry } = useDiary();
-    const { lastUnlockedBadgeId, triggerCelebration } = useBadges();
-    const { reduceMotion } = useSound();
-    const { selectedSkin } = useBoxSkin();
-
-    const { catState = { outcome: 'initial' }, message, isLoading, isRevealing, revealedCatName, handleBoxClick, handleReset, setCatState, setMessage, setRevealedCatName } = useCatLogic({
-        onInteraction,
-        setRevealedCatId,
-        onCatReveal: (catId, msg) => {
-            setIsMessageSaved(false);
-        }
-    })|| {};
->>>>>>> 957e37b3f48dbd57181f2e1cae07716037534a68
 
     const { isDevMode, handleTitleClick, handleDevCatSelect, allCats } = useDevMode({
         handleReset,
@@ -113,7 +77,8 @@ export default function HomePage({ onInteraction, setRevealedCatId }: { onIntera
         setRevealedCatId
     });
 
-<<<<<<< HEAD
+    const devRepeatEnabled = process.env.NEXT_PUBLIC_DEV_MULTI_OPEN === 'true' || process.env.NODE_ENV !== 'production';
+
     const { shareCardRef, createShareAsset, rewardShare } = useShare(message);
     const revealedCatId = catState?.catId;
     const activeCatId = catState?.catId ?? currentCatId;
@@ -134,24 +99,12 @@ export default function HomePage({ onInteraction, setRevealedCatId }: { onIntera
 
     useEffect(() => {
         try {
-            const onboardingSeen = localStorage.getItem('quantum-cat-onboarding-v1');
+            const onboardingSeen = localStorage.getItem('quantum-cat-onboarding-v2');
             if (!onboardingSeen) {
                 setShowOnboarding(true);
             }
-        } catch (e) {
-            console.error("Could not access localStorage for onboarding", e);
-=======
-    const { shareCardRef, handleShare } = useShare(message, revealedCatName);
-
-    useEffect(() => {
-        try {
-            const tutorialSeen = localStorage.getItem('quantum-cat-tutorial-seen');
-            if (!tutorialSeen) {
-                setShowTutorial(true);
-            }
-        } catch (e) {
-            console.error("Could not access localStorage for tutorial", e);
->>>>>>> 957e37b3f48dbd57181f2e1cae07716037534a68
+        } catch (error) {
+            console.error('Could not access localStorage for onboarding', error);
         }
     }, []);
 
@@ -170,7 +123,6 @@ export default function HomePage({ onInteraction, setRevealedCatId }: { onIntera
     }, [catState.outcome, isLoading, isRevealing, reduceMotion]);
 
     useEffect(() => {
-<<<<<<< HEAD
         if (!message || !lastUnlockedBadgeId || !revealedCatId || isRevealing || isLoading) return;
 
         const words = message.trim().split(/\s+/).filter(Boolean);
@@ -196,45 +148,10 @@ export default function HomePage({ onInteraction, setRevealedCatId }: { onIntera
     }, [storageMode, localProgressMessageSeen, catState?.outcome, catState?.catId, toast, markLocalMessageSeen]);
 
     useEffect(() => {
-        if (!isDailyLocked || !nextAvailableAt) {
-            setUnlockCountdown('');
-            return;
+        if (!isDailyLocked) {
+            setLockNotice('');
         }
-
-        const updateCountdown = () => {
-            const diff = nextAvailableAt - Date.now();
-            if (diff <= 0) {
-                setUnlockCountdown('');
-                if (typeof window !== 'undefined') {
-                    window.setTimeout(() => {
-                        refreshDailyLock();
-                    }, 0);
-                }
-                return;
-            }
-
-            const totalSeconds = Math.floor(diff / 1000);
-            const hours = Math.floor(totalSeconds / 3600);
-            const minutes = Math.floor((totalSeconds % 3600) / 60);
-            const seconds = totalSeconds % 60;
-
-            let formatted: string;
-            if (hours > 0) {
-                formatted = `${hours}h ${minutes.toString().padStart(2, '0')}m`;
-            } else if (minutes > 0) {
-                formatted = `${minutes}m ${seconds.toString().padStart(2, '0')}s`;
-            } else {
-                formatted = `${seconds}s`;
-            }
-
-            setUnlockCountdown(formatted);
-        };
-
-        updateCountdown();
-        const interval = window.setInterval(updateCountdown, 1000);
-
-        return () => window.clearInterval(interval);
-    }, [isDailyLocked, nextAvailableAt, refreshDailyLock]);
+    }, [isDailyLocked]);
 
     const handleToggleSaveMessage = () => {
         if (!activeCatId || !message) return;
@@ -258,62 +175,30 @@ export default function HomePage({ onInteraction, setRevealedCatId }: { onIntera
 
     const handleOnboardingDismiss = () => {
         setShowOnboarding(false);
-        setShowTapHint(true);
         try {
-            localStorage.setItem('quantum-cat-onboarding-v1', 'true');
-        } catch (e) {
-            console.error("Could not set localStorage for onboarding", e);
+            localStorage.setItem('quantum-cat-onboarding-v2', 'true');
+        } catch (error) {
+            console.error('Could not persist onboarding state', error);
         }
     };
+
+    const LOCK_NOTICE_MESSAGE = 'Quantum experiments are closed.\nCome back tomorrow.';
 
     const onBoxClick = () => {
         if (showOnboarding) {
             return;
         }
         if (isDailyLocked) {
-            toast({
-                title: 'Quantum core recharging',
-                description: unlockCountdown
-                    ? `Come back in ${unlockCountdown} for the next observation.`
-                    : 'Come back tomorrow at midnight for the next observation.',
-            });
+            playSound('haptic-3');
+            setLockNotice(LOCK_NOTICE_MESSAGE);
             return;
         }
-        if (showTapHint) {
-            setShowTapHint(false);
-=======
-        if (message && lastUnlockedBadgeId) {
-            setTimeout(() => {
-                triggerCelebration();
-            }, 3000);
-        }
-    }, [message, lastUnlockedBadgeId, triggerCelebration]);
-
-    const handleSaveMessage = () => {
-        if (isMessageSaved || !catState.catId || !message) return;
-        playSound('haptic-1');
-        addDiaryEntry(catState.catId, message);
-        setIsMessageSaved(true);
-        toast({
-            title: "Message Saved",
-            description: "You can find it in the cat's diary in your gallery.",
-        });
-    };
-
-    const onBoxClick = () => {
-        if (showTutorial) {
-            setShowTutorial(false);
-            try {
-                localStorage.setItem('quantum-cat-tutorial-seen', 'true');
-            } catch (e) {
-                console.error("Could not set localStorage for tutorial", e);
-            }
->>>>>>> 957e37b3f48dbd57181f2e1cae07716037534a68
+        if (lockNotice) {
+            setLockNotice('');
         }
         handleBoxClick();
     };
 
-<<<<<<< HEAD
     const shareText = useMemo(() => {
         if (revealedCatName) {
             return `I opened the box and my cat is a ${revealedCatName}! What state will your cat be in?`;
@@ -395,8 +280,8 @@ export default function HomePage({ onInteraction, setRevealedCatId }: { onIntera
             });
 
             rewardShare();
+            setIsShared(true);
             toast({
-                title: 'Shared!',
                 description: '10 Fish Points awarded.',
             });
             setIsShareDialogOpen(false);
@@ -435,6 +320,7 @@ export default function HomePage({ onInteraction, setRevealedCatId }: { onIntera
             }
 
             rewardShare();
+            setIsShared(true);
             toast({
                 title: 'Image saved!',
                 description: '10 Fish Points awarded. Share it from your gallery.',
@@ -459,55 +345,66 @@ export default function HomePage({ onInteraction, setRevealedCatId }: { onIntera
     return (
         <>
             {showSplash ? (
-                <SplashScreen onComplete={handleSplashComplete} />
-            ) : (
-                <>
-                    <OnboardingTour
-                        open={showOnboarding}
-                        onComplete={handleOnboardingDismiss}
-                        onSkip={handleOnboardingDismiss}
-                    />
+            <SplashScreen onComplete={handleSplashComplete} />
+        ) : (
+            <>
+                <OnboardingModal open={showOnboarding} onClose={handleOnboardingDismiss} />
 
-                    <div className="absolute left-[-1000px] top-[-1000px]">
-                        <div ref={shareCardRef} style={{ width: '320px', height: '520px' }}>
-                            <ShareCard catState={catState} message={message} boxSkin={selectedSkin} />
+                <div className="absolute left-[-1000px] top-[-1000px]">
+                    <div ref={shareCardRef} style={{ width: '320px', height: '520px' }}>
+                        <ShareCard catState={catState} message={message} boxSkin={selectedSkin} />
+                    </div>
+                </div>
+
+                    <div className="mx-auto flex w-full max-w-full flex-col items-center text-center">
+                        <TitleDisplay name={revealedCatName} onTitleClick={handleTitleClick} reduceMotion={reduceMotion} />
+
+                        {isDevMode && <DevPanel allCats={allCats} onCatSelect={handleDevCatSelect} catState={catState} message={message} />}
+
+                        <div className="relative mt-6 flex h-64 w-full items-center justify-center">
+                            <QuantumCatBox
+                                onClick={onBoxClick}
+                                isLoading={isLoading}
+                                isRevealing={isRevealing}
+                                catState={catState}
+                                isAmbientShaking={isAmbientShaking}
+                                isLocked={isDailyLocked}
+                            />
                         </div>
-                    </div>
 
-                    <TitleDisplay name={revealedCatName} onTitleClick={handleTitleClick} reduceMotion={reduceMotion} />
-
-                    {isDevMode && <DevPanel allCats={allCats} onCatSelect={handleDevCatSelect} catState={catState} message={message} />}
-
-                    <div className="relative h-64 flex items-center justify-center mt-4">
-                        {showTapHint && !isDailyLocked && <TutorialOverlay reduceMotion={reduceMotion} />}
-                        <QuantumCatBox
-                            onClick={onBoxClick}
-                            isLoading={isLoading}
-                            isRevealing={isRevealing}
-                            catState={catState}
-                            isAmbientShaking={isAmbientShaking}
-                            isLocked={isDailyLocked}
-                            lockMessage={isDailyLocked ? (unlockCountdown ? `Reopens in ${unlockCountdown}` : 'Reopens at midnight') : undefined}
-                        />
-                    </div>
-
-                    <div className="h-28 mt-4 flex flex-col justify-center items-center">
-                        {catState.outcome !== 'initial' && (
-                            <div className='w-full flex flex-col items-center'>
-                                <MessageDisplay message={message} catState={catState} />
-                                {message && (
-                                    <MainActions
-                                        onSave={handleToggleSaveMessage}
-                                        onShare={handleShareRequest}
-                                        onReset={handleReset}
-                                        isSaved={isCurrentMessageSaved}
-                                        reduceMotion={reduceMotion}
-                                        isShareDisabled={isGeneratingShare}
-                                        isResetDisabled={isDailyLocked}
-                                    />
-                                )}
-                            </div>
-                        )}
+                        <div className="mt-6 flex h-28 w-full flex-col items-center justify-center">
+                            {catState.outcome !== 'initial' && (
+                                <div className="flex w-full flex-col items-center">
+                                    <MessageDisplay message={message} catState={catState} />
+                                    {lockNotice && (
+                                        <div className="mt-4 w-full max-w-2xl">
+                                            <div className="rounded-xl border border-emerald-400 bg-emerald-500/10 px-4 py-4">
+                                                <div className="font-fortune text-center text-emerald-400 text-xl font-semibold leading-tight md:text-2xl">
+                                                    {lockNotice.split('\n').map((line, index) => (
+                                                        <div key={index}>{line}</div>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
+                                    {message && (
+                                        <MainActions
+                                            onSave={handleToggleSaveMessage}
+                                            onShare={handleShareRequest}
+                                            onReset={() => {
+                                                handleReset();
+                                                setIsShared(false);
+                                            }}
+                                            isSaved={isCurrentMessageSaved}
+                                            isShared={isShared}
+                                            reduceMotion={reduceMotion}
+                                            isShareDisabled={isGeneratingShare}
+                                            isResetDisabled={isDailyLocked}
+                                        />
+                                    )}
+                                </div>
+                            )}
+                        </div>
                     </div>
 
                     <Dialog open={isShareDialogOpen} onOpenChange={(open) => {
@@ -526,10 +423,13 @@ export default function HomePage({ onInteraction, setRevealedCatId }: { onIntera
                             {shareAsset ? (
                                 <div className="space-y-4">
                                     <div className="overflow-hidden rounded-lg border bg-background/50">
-                                        <img
+                                        <Image
                                             src={shareAsset.dataUrl}
                                             alt="Quantum Cat share card"
-                                            className="w-full"
+                                            width={320}
+                                            height={520}
+                                            unoptimized
+                                            className="w-full h-auto"
                                         />
                                     </div>
 
@@ -552,57 +452,19 @@ export default function HomePage({ onInteraction, setRevealedCatId }: { onIntera
                             )}
                         </DialogContent>
                     </Dialog>
-                    {isDailyLocked && (
-                        <div className="mt-12 flex justify-center px-6 pb-6">
-                            <p className="max-w-md text-center text-sm text-muted-foreground">
-                                {unlockCountdown
-                                    ? `Daily observation complete. The box recharges in ${unlockCountdown}.`
-                                    : 'Daily observation complete. The box will recharge at midnight.'}
-                            </p>
+                    {devRepeatEnabled && isDailyLocked && (
+                        <div className="flex justify-center pb-6">
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => overrideDailyLock()}
+                            >
+                                Open Again (dev)
+                            </Button>
                         </div>
                     )}
                 </>
             )}
-=======
-    return (
-        <>
-            <div className="absolute left-[-1000px] top-[-1000px]">
-                <div ref={shareCardRef} style={{ width: '320px', height: '520px' }}>
-                    <ShareCard catState={catState} message={message} boxSkin={selectedSkin} />
-                </div>
-            </div>
-
-            <TitleDisplay name={revealedCatName} onTitleClick={handleTitleClick} reduceMotion={reduceMotion} />
-
-            {isDevMode && <DevPanel allCats={allCats} onCatSelect={handleDevCatSelect} catState={catState} message={message} />}
-
-            <div className="relative h-64 flex items-center justify-center mt-4">
-                {showTutorial && <TutorialOverlay reduceMotion={reduceMotion} />}
-                <QuantumCatBox
-                    onClick={onBoxClick}
-                    isLoading={isLoading}
-                    catState={catState}
-                    isAmbientShaking={isAmbientShaking}
-                />
-            </div>
-
-            <div className="h-28 mt-4 flex flex-col justify-center items-center">
-                {catState.outcome !== 'initial' && (
-                    <div className='w-full flex flex-col items-center'>
-                        <MessageDisplay message={message} catState={catState} />
-                        {message && (
-                            <MainActions
-                                onSave={handleSaveMessage}
-                                onShare={handleShare}
-                                onReset={handleReset}
-                                isSaved={isMessageSaved}
-                                reduceMotion={reduceMotion}
-                            />
-                        )}
-                    </div>
-                )}
-            </div>
->>>>>>> 957e37b3f48dbd57181f2e1cae07716037534a68
         </>
     );
 }

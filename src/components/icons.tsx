@@ -67,6 +67,81 @@ export const BoxIcon = ({ className, isOpen }: { className?: string, isOpen?: bo
   </svg>
 );
 
+export const CarbonBoxIcon = ({ className, isOpen }: { className?: string, isOpen?: boolean }) => (
+    <svg
+        viewBox="0 0 100 100"
+        xmlns="http://www.w3.org/2000/svg"
+        className={className}
+    >
+        <defs>
+            <linearGradient id="shiny-body-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#434343" />
+                <stop offset="100%" stop-color="#000000" />
+            </linearGradient>
+
+            <linearGradient id="shiny-lid-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#666666" />
+                <stop offset="100%" stop-color="#222222" />
+            </linearGradient>
+
+            <linearGradient id="neon-purple" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="hsl(270 100% 70%)" />
+                <stop offset="100%" stop-color="hsl(280 100% 60%)" />
+            </linearGradient>
+
+            <filter id="glow">
+                <feGaussianBlur stdDeviation="2.5" result="coloredBlur" />
+                <feMerge>
+                    <feMergeNode in="coloredBlur" />
+                    <feMergeNode in="SourceGraphic" />
+                </feMerge>
+            </filter>
+        </defs>
+
+        <g className={cn("transition-transform duration-300 group-hover:-translate-y-1", isOpen && "-translate-y-4")}>
+            <path
+                d="M8,28 H92 C96,28 96,22 92,22 L8,22 C4,22 4,28 8,28 Z"
+                fill="url(#shiny-lid-gradient)"
+            />
+            <rect
+                x="8"
+                y="27.5"
+                width="84"
+                height="1"
+                fill="url(#neon-purple)"
+                filter="url(#glow)"
+            />
+            <path
+                d="M48 20 L52 20 L52 16 L48 16 Z"
+                fill="hsl(var(--primary, 270 100% 60%))"
+                filter="url(#glow)"
+            />
+        </g>
+
+        <g>
+            <rect
+                x="5"
+                y="28"
+                width="90"
+                height="60"
+                rx="5"
+                fill="url(#shiny-body-gradient)"
+            />
+            <path
+                d="M20 40 L80 40
+                    M20 50 L80 50
+                    M20 60 L80 60
+                    M20 70 L80 70"
+                stroke="url(#neon-purple)"
+                stroke-width="1.2"
+                filter="url(#glow)"
+            />
+        </g>
+
+        <ellipse cx="50" cy="94" rx="40" ry="5" fill="#000000" fill-opacity="0.2" />
+    </svg>
+);
+
 
 const catBody = "M30 90 C 10 90, 10 60, 30 60 L 70 60 C 90 60, 90 90, 70 90 Z";
 const catHead = "M 35 60 C 25 30, 75 30, 65 60 Z";
@@ -136,45 +211,142 @@ export const FishboneIcon = (props: React.SVGProps<SVGSVGElement>) => (
   </svg>
 );
 
-export const ShinyBoxIcon = ({ className, isOpen }: { className?: string, isOpen?: boolean }) => (
-    <svg 
-      viewBox="0 0 100 100" 
-      xmlns="http://www.w3.org/2000/svg"
-      className={cn(className)}
-    >
-      <defs>
-        <linearGradient id="shiny-body-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#434343" />
-            <stop offset="100%" stopColor="#000000" />
-        </linearGradient>
-        <linearGradient id="shiny-lid-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#666666" />
-            <stop offset="100%" stopColor="#222222" />
-        </linearGradient>
-        <filter id="glow">
-            <feGaussianBlur stdDeviation="2.5" result="coloredBlur" />
-            <feMerge>
-                <feMergeNode in="coloredBlur" />
-                <feMergeNode in="SourceGraphic" />
-            </feMerge>
-        </filter>
-      </defs>
-      
-      {/* Lid */}
-      <g className={cn("transition-transform duration-300", !isOpen && "group-hover:-translate-y-1", isOpen && "-translate-y-4")}>
-        <path d="M 8,28 H 92 C 96,28 96,22 92,22 L 8,22 C 4,22 4,28 8,28 Z" fill={'url(#shiny-lid-gradient)'} />
-        <path d="M 48 20 L 52 20 L 52 16 L 48 16 Z" fill="hsl(var(--primary))" filter="url(#glow)" />
-      </g>
-  
-      {/* Box Body */}
-      <g>
-        <rect x="5" y="28" width="90" height="60" rx="5" fill={"url(#shiny-body-gradient)"} />
-        <path d="M 20 40 L 80 40 M 20 50 L 80 50 M 20 60 L 80 60 M 20 70 L 80 70" stroke="hsl(var(--primary) / 0.5)" strokeWidth="1" filter="url(#glow)" />
-      </g>
-      
-      <ellipse cx="50" cy="94" rx="40" ry="5" fill="#000000" fillOpacity={0.2} />
+export const StoneBoxIcon = ({ className, isOpen }: { className?: string, isOpen?: boolean }) => (
+    <svg className={className} viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+            <linearGradient id="stone-body-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor="#8f8f8f" />
+                <stop offset="25%" stopColor="#6b8e23" />
+                <stop offset="50%" stopColor="#6b6b6b" />
+                <stop offset="75%" stopColor="#6b8e23" />
+                <stop offset="100%" stopColor="#8f8f8f" />
+            </linearGradient>
+            <linearGradient id="stone-lid-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor="#9f9f9f" />
+                <stop offset="50%" stopColor="#8fbc8f" />
+                <stop offset="100%" stopColor="#9f9f9f" />
+            </linearGradient>
+        </defs>
+        <g className={cn("transition-transform duration-300", !isOpen && "group-hover:-translate-y-1", isOpen && "-translate-y-4")}>
+            <path d="M 8,28 H 92 C 96,28 96,22 92,22 L 8,22 C 4,22 4,28 8,28 Z" fill={"url(#stone-lid-gradient)"} />
+        </g>
+        <g>
+            <rect x="5" y="28" width="90" height="60" rx="5" fill={"url(#stone-body-gradient)"} />
+        </g>
+        <ellipse cx="50" cy="94" rx="40" ry="5" fill="#000000" fillOpacity={0.2} />
     </svg>
-  );
+);
+
+export const SpecialXK6BoxIcon = ({ className, isOpen }: { className?: string, isOpen?: boolean }) => (
+    <svg
+        viewBox="0 0 100 100"
+        xmlns="http://www.w3.org/2000/svg"
+        className={className}
+    >
+        <defs>
+            <linearGradient id="xk6-body-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor="#f0f0f0" />
+                <stop offset="100%" stopColor="#d0d0d0" />
+            </linearGradient>
+
+            <linearGradient id="xk6-lid-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor="#ffffff" />
+                <stop offset="100%" stopColor="#e0e0e0" />
+            </linearGradient>
+
+            <linearGradient id="xk6-neon-light" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stopColor="hsl(210 100% 80%)" />
+                <stop offset="100%" stopColor="hsl(200 100% 70%)" />
+            </linearGradient>
+
+            <filter id="xk6-glow">
+                <feGaussianBlur stdDeviation="2.5" result="coloredBlur" />
+                <feMerge>
+                    <feMergeNode in="coloredBlur" />
+                    <feMergeNode in="SourceGraphic" />
+                </feMerge>
+            </filter>
+        </defs>
+
+        <g className={cn("transition-transform duration-300 group-hover:-translate-y-1", isOpen && "-translate-y-4")}>
+            <path
+                d="M8,28 H92 C96,28 96,22 92,22 L8,22 C4,22 4,28 8,28 Z"
+                fill="url(#xk6-lid-gradient)"
+            />
+            <rect
+                x="8"
+                y="27.5"
+                width="84"
+                height="1"
+                fill="url(#xk6-neon-light)"
+                filter="url(#xk6-glow)"
+            />
+            <path
+                d="M48 20 L52 20 L52 16 L48 16 Z"
+                fill="hsl(var(--primary, 210 100% 70%))"
+                filter="url(#xk6-glow)"
+            />
+        </g>
+
+        <g>
+            <rect
+                x="5"
+                y="28"
+                width="90"
+                height="60"
+                rx="5"
+                fill="url(#xk6-body-gradient)"
+            />
+            <path
+                d="M20 40 L80 40
+                    M20 50 L80 50
+                    M20 60 L80 60
+                    M20 70 L80 70"
+                stroke="url(#xk6-neon-light)"
+                stroke-width="1.2"
+                filter="url(#xk6-glow)"
+            />
+        </g>
+
+        <ellipse cx="50" cy="94" rx="40" ry="5" fill="#000000" fill-opacity="0.2" />
+    </svg>
+);
+
+export const BlackWoodenBoxIcon = ({ className, isOpen }: { className?: string, isOpen?: boolean }) => (
+    <svg className={className} viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+            <linearGradient id="blackwood-stripes" gradientTransform="rotate(45)">
+                <stop offset="0%" stopColor="#2c1e1e" />
+                <stop offset="10%" stopColor="#2c1e1e" />
+                <stop offset="10%" stopColor="#1a1212" />
+                <stop offset="20%" stopColor="#1a1212" />
+                <stop offset="20%" stopColor="#2c1e1e" />
+                <stop offset="30%" stopColor="#2c1e1e" />
+                <stop offset="30%" stopColor="#1a1212" />
+                <stop offset="40%" stopColor="#1a1212" />
+                <stop offset="40%" stopColor="#2c1e1e" />
+                <stop offset="50%" stopColor="#2c1e1e" />
+                <stop offset="50%" stopColor="#1a1212" />
+                <stop offset="60%" stopColor="#1a1212" />
+                <stop offset="60%" stopColor="#2c1e1e" />
+                <stop offset="70%" stopColor="#2c1e1e" />
+                <stop offset="70%" stopColor="#1a1212" />
+                <stop offset="80%" stopColor="#1a1212" />
+                <stop offset="80%" stopColor="#2c1e1e" />
+                <stop offset="90%" stopColor="#2c1e1e" />
+                <stop offset="90%" stopColor="#1a1212" />
+                <stop offset="100%" stopColor="#1a1212" />
+            </linearGradient>
+        </defs>
+        <g transform={isOpen ? 'translate(0, -15) rotate(-15, 50, 80)' : ''} style={{ transition: 'transform 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55)' }}>
+            <path d="M 8,28 H 92 C 96,28 96,22 92,22 L 8,22 C 4,22 4,28 8,28 Z" fill={"#1a1212"} />
+        </g>
+        <g>
+            <rect x="5" y="28" width="90" height="60" rx="5" fill={"url(#blackwood-stripes)"} />
+        </g>
+        <ellipse cx="50" cy="94" rx="40" ry="5" fill="#000000" fillOpacity={0.2} />
+    </svg>
+);
   
 
 export * from './icons/fish-badge-icon';

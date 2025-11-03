@@ -13,7 +13,12 @@
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 
-const GenerateCatMessageInputSchema = z.object({});
+const GenerateCatMessageInputSchema = z.object({
+  catId: z.string().describe('Unique identifier of the revealed cat'),
+  catName: z.string().describe('Display name of the revealed cat'),
+  catType: z.string().describe('Outcome type of the cat (Alive, Dead, Paradox, etc.)'),
+  catDescription: z.string().optional().describe('Brief description of the cat to inspire message variety'),
+});
 export type GenerateCatMessageInput = z.infer<typeof GenerateCatMessageInputSchema>;
 
 const GenerateCatMessageOutputSchema = z.object({
@@ -30,6 +35,13 @@ const prompt = ai.definePrompt({
   input: {schema: GenerateCatMessageInputSchema},
   output: {schema: GenerateCatMessageOutputSchema},
   prompt: `You are a feline oracle, a mysterious and witty cat that dispenses cryptic, thought-provoking wisdom. Your tone is that of a sophisticated, slightly aloof self-help guru.
+
+You are speaking specifically about the cat described below. Use the context to craft a personalised fortune that clearly references the cat.
+
+Cat profile:
+- Name: {{catName}}
+- Type: {{catType}}
+{{#if catDescription}}- Description: {{catDescription}}{{/if}}
 
 Generate a single, short (20 words or less) and insightful message.
 
@@ -52,6 +64,19 @@ Here are some examples of the style you should emulate:
 Generate a new, original message in that style.`,
 });
 
+async function buildFallbackMessage(input: GenerateCatMessageInput): Promise<GenerateCatMessageOutput> {
+  const fallbackModule = await import('@/lib/fallback-messages.json');
+  const fallbackPayload = fallbackModule.default as { messages: string[] } | string[];
+  const messagePool = Array.isArray(fallbackPayload) ? fallbackPayload : fallbackPayload.messages;
+  const selectedEntry = messagePool[Math.floor(Math.random() * messagePool.length)];
+  const base =
+    typeof selectedEntry === 'string'
+      ? selectedEntry
+      : (selectedEntry as { message?: string }).message ?? 'Embrace the mystery beyond the box.';
+
+  return { message: base };
+}
+
 const generateCatMessageFlow = ai.defineFlow(
   {
     name: 'generateCatMessageFlow',
@@ -59,38 +84,22 @@ const generateCatMessageFlow = ai.defineFlow(
     outputSchema: GenerateCatMessageOutputSchema,
   },
   async input => {
-<<<<<<< HEAD
     if (!process.env.GEMINI_API_KEY) {
-      const fallbackModule = await import('@/lib/fallback-messages.json');
-      const fallbackPayload = fallbackModule.default as { messages: string[] } | string[];
-      const messagePool = Array.isArray(fallbackPayload) ? fallbackPayload : fallbackPayload.messages;
-      const selectedEntry = messagePool[Math.floor(Math.random() * messagePool.length)];
-      const message =
-        typeof selectedEntry === 'string'
-          ? selectedEntry
-          : (selectedEntry as { message?: string }).message ?? 'Embrace the mystery beyond the box.';
-
-      return { message };
+      return buildFallbackMessage(input);
     }
 
-    const response = await prompt(input);
-    const promptOutput = response.output;
+    try {
+      const response = await prompt(input);
+      const promptOutput = response.output;
 
-    if (!promptOutput || typeof promptOutput.message !== 'string') {
-      return { message: 'Embrace the mystery beyond the box.' };
+      if (!promptOutput || typeof promptOutput.message !== 'string') {
+        return buildFallbackMessage(input);
+      }
+
+      return promptOutput;
+    } catch (error) {
+      console.error('generateCatMessageFlow prompt failed', error);
+      return buildFallbackMessage(input);
     }
-
-    return promptOutput;
-=======
-    let output: any;
-if (!process.env.GEMINI_API_KEY) {
-  const msgs = (await import('@/lib/fallback-messages.json')).default as any[];
-  const pick = msgs[Math.floor(Math.random()*msgs.length)];
-  output = { text: (pick?.message ?? pick) };
-} else {
-  ({ output } = await prompt(input));
-}
-    return output!;
->>>>>>> 957e37b3f48dbd57181f2e1cae07716037534a68
   }
 );

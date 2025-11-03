@@ -1,26 +1,23 @@
 'use client';
 
-<<<<<<< HEAD
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { SplashScreen } from '@/components/splash-screen';
 
 export default function RootPage() {
   const router = useRouter();
-  const [shouldShowSplash, setShouldShowSplash] = useState(false);
+  const [shouldShowSplash] = useState<boolean>(() => {
+    if (typeof window === 'undefined') {
+      return false;
+    }
+    return sessionStorage.getItem('quantum-cat-splash') !== 'seen';
+  });
 
   useEffect(() => {
-    if (typeof window === 'undefined') {
-      return;
-    }
-
-    const alreadySeen = sessionStorage.getItem('quantum-cat-splash') === 'seen';
-    if (alreadySeen) {
+    if (!shouldShowSplash) {
       router.replace('/home');
-      return;
     }
-    setShouldShowSplash(true);
-  }, [router]);
+  }, [router, shouldShowSplash]);
 
   const handleSplashComplete = () => {
     try {
@@ -41,29 +38,3 @@ export default function RootPage() {
 
   return <SplashScreen onComplete={handleSplashComplete} />;
 }
-=======
-import { useAuth } from '@/context/auth-context';
-import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-
-export default function RootPage() {
-  const { user, loading } = useAuth();
-  const router = useRouter();
-
-  useEffect(() => {
-    if (!loading) {
-      if (user) {
-        router.replace('/home');
-      } else {
-        router.replace('/login');
-      }
-    }
-  }, [user, loading, router]);
-
-  return (
-    <div className="flex h-screen w-full items-center justify-center">
-      <p className="text-lg text-muted-foreground">Loading...</p>
-    </div>
-  );
-}
->>>>>>> 957e37b3f48dbd57181f2e1cae07716037534a68

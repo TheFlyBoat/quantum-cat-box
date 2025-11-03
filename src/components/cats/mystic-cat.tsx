@@ -3,12 +3,25 @@ import { cn } from '@/lib/utils';
 
 const MYSTIC_STYLES = `
     .cat.mystic {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        height: 100%;
+        transform: none;
+        overflow: visible;
+    }
+
+    .mystic-figure {
+        width: 115%;
+        height: 115%;
+        transform-origin: center bottom;
         animation: mystic-float 6s infinite ease-in-out;
     }
 
     @keyframes mystic-float {
-        0%, 100% { transform: translate(-50%, 0); }
-        50% { transform: translate(-50%, -2%); }
+        0%, 100% { transform: translateY(0) scale(1); }
+        50% { transform: translateY(-4%) scale(1.04); }
     }
 
     @keyframes mystic-color-cycle {
@@ -170,6 +183,8 @@ const MysticFigure: React.FC = () => (
 export const MysticCatIcon: React.FC<{ className?: string }> = ({ className }) => (
     <div className={cn('relative cat mystic', className)}>
         <style>{MYSTIC_STYLES}</style>
-        <MysticFigure />
+        <div className="mystic-figure">
+            <MysticFigure />
+        </div>
     </div>
 );

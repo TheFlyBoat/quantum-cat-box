@@ -6,13 +6,8 @@ import { cn } from '@/lib/utils';
 function getCatTitleParts(name: string | null) {
     if (!name) return { part1: 'The', part2: 'Quantum', part3: 'Cat' };
 
-<<<<<<< HEAD
     if (name === 'Void') {
         return { part1: 'The', part2: 'Void', part3: 'Cat' };
-=======
-    if (name === 'Breu') {
-        return { part1: 'The', part2: 'Breu', part3: 'Cat' };
->>>>>>> 957e37b3f48dbd57181f2e1cae07716037534a68
     }
 
     if (name.endsWith(' Cat')) {
@@ -27,6 +22,12 @@ function getCatTitleParts(name: string | null) {
     return { part1: 'The', part2: name, part3: 'Cat' };
 }
 
+/**
+ * A component that displays the title of the cat.
+ * @param name The name of the cat.
+ * @param onTitleClick A function to call when the title is clicked.
+ * @param reduceMotion Whether to reduce motion.
+ */
 export function TitleDisplay({ name, onTitleClick, reduceMotion }: { name: string | null; onTitleClick: () => void; reduceMotion: boolean; }) {
     const titleParts = getCatTitleParts(name);
 

@@ -1,21 +1,17 @@
 
 'use client';
 
-<<<<<<< HEAD
 import { Atom } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
 import { Button } from "@/components/ui/button";
-=======
-import { useEffect, useRef } from "react";
->>>>>>> 957e37b3f48dbd57181f2e1cae07716037534a68
 import { cn } from "@/lib/utils";
 
 interface CelebrationCardProps {
     title: string;
+    badgeName: string;
     description: string;
     icon?: React.ReactNode;
-<<<<<<< HEAD
     onClose: () => void;
 }
 
@@ -46,15 +42,18 @@ const BACKGROUND_ATOMS = [
     { top: '84%', left: '48%', size: 36, opacity: 0.45, duration: 24, delay: 2.7 },
 ];
 
-export const CelebrationCard = ({ title, description, icon, onClose }: CelebrationCardProps) => {
+/**
+ * A card component that displays a celebration for unlocking a badge.
+ * This component has a lot of complex animation and styling. It is designed to be a visually rich and engaging experience.
+ * @param title The title of the celebration.
+ * @param badgeName The name of the badge.
+ * @param description The description of the badge.
+ * @param icon The icon of the badge.
+ * @param onClose A function to call when the celebration is closed.
+ */
+export const CelebrationCard = ({ title, badgeName, description, icon, onClose }: CelebrationCardProps) => {
     const cardRef = useRef<HTMLDivElement>(null);
     const [quantumPhase, setQuantumPhase] = useState<'orbit' | 'merge'>('orbit');
-=======
-}
-
-export const CelebrationCard = ({ title, description, icon }: CelebrationCardProps) => {
-    const cardRef = useRef<HTMLDivElement>(null);
->>>>>>> 957e37b3f48dbd57181f2e1cae07716037534a68
 
     useEffect(() => {
         const card = cardRef.current;
@@ -63,7 +62,6 @@ export const CelebrationCard = ({ title, description, icon }: CelebrationCardPro
         const createParticle = () => {
             const particle = document.createElement('div');
             particle.classList.add('particle');
-<<<<<<< HEAD
 
             const size = Math.random() * 10 + 6;
             const stretch = Math.random() > 0.4 ? Math.random() * 0.6 + 0.8 : 1;
@@ -122,7 +120,7 @@ export const CelebrationCard = ({ title, description, icon }: CelebrationCardPro
         <div
             ref={cardRef}
             className={cn(
-                "fixed inset-0 z-50 flex cursor-pointer items-center justify-center overflow-hidden px-4",
+                "fixed inset-0 z-[200] flex cursor-pointer items-center justify-center overflow-hidden px-4",
                 "bg-black/60 backdrop-blur-lg",
                 "animate-celebration-in"
             )}
@@ -153,10 +151,7 @@ export const CelebrationCard = ({ title, description, icon }: CelebrationCardPro
                 ))}
             </div>
 
-            <div
-                className="relative w-full max-w-xl cursor-auto"
-                onClick={(event) => event.stopPropagation()}
-            >
+            <div className="relative w-full max-w-xl cursor-pointer">
                 <div
                     aria-hidden
                     className="absolute -inset-[3px] rounded-[32px] bg-gradient-to-r from-primary/80 via-magenta-500/80 to-secondary/80 opacity-80 blur-xl animate-celebration-glow"
@@ -167,12 +162,16 @@ export const CelebrationCard = ({ title, description, icon }: CelebrationCardPro
                     <div aria-hidden className="absolute inset-[1px] rounded-[26px] border border-white/30 opacity-50" />
 
                     <div className="relative flex flex-col items-center gap-6 text-center">
+                        <h2 className="text-4xl font-headline font-bold leading-tight tracking-tight text-foreground drop-shadow-[0_6px_20px_rgba(236,72,153,0.25)]">
+                            {title}
+                        </h2>
+
                         {icon && (
-                            <div className="relative flex h-24 w-24 items-center justify-center overflow-visible rounded-full bg-[conic-gradient(from_140deg,rgba(59,130,246,0.9),rgba(236,72,153,0.85),rgba(253,224,71,0.85),rgba(59,130,246,0.9))] text-white shadow-[0_18px_48px_rgba(14,165,233,0.45)] animate-celebration-float">
+                            <div className="relative flex h-28 w-28 items-center justify-center overflow-visible rounded-full bg-[conic-gradient(from_140deg,rgba(59,130,246,0.9),rgba(236,72,153,0.85),rgba(253,224,71,0.85),rgba(59,130,246,0.9))] text-white shadow-[0_20px_56px_rgba(14,165,233,0.45)] animate-celebration-float">
                                 <div
                                     aria-hidden
                                     className={cn(
-                                        "pointer-events-none absolute -inset-12",
+                                        "pointer-events-none absolute -inset-14",
                                         quantumPhase === 'merge' ? "animate-quantum-collapse" : "animate-quantum-glitter"
                                     )}
                                 >
@@ -181,19 +180,19 @@ export const CelebrationCard = ({ title, description, icon }: CelebrationCardPro
                                             key={`${orbit.radius}-${index}`}
                                             className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/20 animate-[spin_14s_linear_infinite]"
                                             style={{
-                                                width: `${orbit.radius * 2}px`,
-                                                height: `${orbit.radius * 2}px`,
+                                                width: `${orbit.radius * 2 + 20}px`,
+                                                height: `${orbit.radius * 2 + 20}px`,
                                                 animationDuration: `${orbit.duration}s`,
                                                 animationDelay: `${orbit.delay}s`,
                                                 borderColor: orbit.glow,
-                                                boxShadow: `0 0 36px ${orbit.glow}`,
+                                                boxShadow: `0 0 40px ${orbit.glow}`,
                                             }}
                                         >
                                             <Atom
                                                 className="absolute left-1/2 top-0 -translate-x-1/2 text-white"
                                                 style={{
-                                                    width: `${orbit.size}px`,
-                                                    height: `${orbit.size}px`,
+                                                    width: `${orbit.size + 4}px`,
+                                                    height: `${orbit.size + 4}px`,
                                                     filter: `drop-shadow(0 0 16px ${orbit.glow})`,
                                                 }}
                                             />
@@ -201,11 +200,11 @@ export const CelebrationCard = ({ title, description, icon }: CelebrationCardPro
                                     ))}
                                 </div>
                                 <div className="absolute inset-0 rounded-full border border-white/40 opacity-80 mix-blend-screen" />
-                                <div className="absolute -inset-[10px] rounded-full bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.5),transparent_65%)] blur-xl opacity-70" />
-                                <div className="absolute -inset-[6px] rounded-full border border-white/20 opacity-60 animate-celebration-pulse" />
+                                <div className="absolute -inset-[14px] rounded-full bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.5),transparent_65%)] blur-xl opacity-70" />
+                                <div className="absolute -inset-[8px] rounded-full border border-white/20 opacity-60 animate-celebration-pulse" />
                                 <div
                                     className={cn(
-                                        "relative z-10 flex h-16 w-16 items-center justify-center rounded-full bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.4),rgba(14,165,233,0.35)_60%,rgba(56,189,248,0.25))] text-4xl text-white shadow-[0_0_25px_rgba(14,165,233,0.55)] animate-quantum-core transition-transform duration-500",
+                                        "relative z-10 flex h-20 w-20 items-center justify-center rounded-full bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.4),rgba(14,165,233,0.35)_60%,rgba(56,189,248,0.25))] text-5xl text-white shadow-[0_0_35px_rgba(14,165,233,0.55)] animate-quantum-core transition-transform duration-500",
                                         quantumPhase === 'merge' && "scale-110"
                                     )}
                                 >
@@ -214,10 +213,10 @@ export const CelebrationCard = ({ title, description, icon }: CelebrationCardPro
                             </div>
                         )}
 
-                        <div className="flex w-full max-w-md flex-col items-center gap-4 text-center">
-                            <h2 className="text-4xl font-headline font-bold leading-tight tracking-tight text-foreground drop-shadow-[0_6px_20px_rgba(236,72,153,0.25)]">
-                                {title}
-                            </h2>
+                        <div className="flex w-full max-w-md flex-col items-center gap-3 text-center">
+                            <h3 className="text-3xl font-headline font-semibold tracking-tight text-foreground sm:text-4xl">
+                                {badgeName}
+                            </h3>
                             <p className="mx-auto max-w-md text-base text-muted-foreground/90 sm:text-lg">
                                 {description}
                             </p>
@@ -229,52 +228,13 @@ export const CelebrationCard = ({ title, description, icon }: CelebrationCardPro
                             onClick={onClose}
                             className="mt-4 w-full max-w-[220px] text-base font-semibold uppercase tracking-wide shadow-[0_12px_35px_rgba(14,165,233,0.35)]"
                         >
-                            Home
+                            Collect
                         </Button>
                     </div>
                 </div>
-=======
-            const size = Math.random() * 8 + 4;
-            const angle = Math.random() * 360;
-            const radius = Math.random() * 150 + 100;
-            const x = Math.cos(angle) * radius;
-            const y = Math.sin(angle) * radius;
-
-            particle.style.width = `${size}px`;
-            particle.style.height = `${size}px`;
-            particle.style.setProperty('--tx', `${x}px`);
-            particle.style.setProperty('--ty', `${y}px`);
-
-            card.appendChild(particle);
-            setTimeout(() => particle.remove(), 1000);
-        };
-
-        const interval = setInterval(createParticle, 50);
-
-        return () => clearInterval(interval);
-    }, []);
-
-
-    return (
-        <div 
-            ref={cardRef}
-            className={cn(
-                "fixed inset-0 z-50 flex items-center justify-center",
-                "animate-celebration-in"
-            )}
-        >
-            <div className="relative flex flex-col items-center justify-center gap-4 rounded-2xl border border-primary/20 bg-gradient-to-br from-background via-secondary/50 to-background p-8 shadow-2xl">
-                 {icon}
-                 <h2 className="text-3xl font-headline font-bold text-foreground text-center">{title}</h2>
-                 <p className="text-muted-foreground text-center">{description}</p>
->>>>>>> 957e37b3f48dbd57181f2e1cae07716037534a68
             </div>
         </div>
     );
 };
 
-<<<<<<< HEAD
     
-=======
-    
->>>>>>> 957e37b3f48dbd57181f2e1cae07716037534a68

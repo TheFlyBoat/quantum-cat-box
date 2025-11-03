@@ -1,18 +1,11 @@
 
 'use client';
 
-<<<<<<< HEAD
 import React, { createContext, useState, useContext, ReactNode, useEffect, useCallback, useMemo } from 'react';
 import { playSound } from '@/lib/audio';
 import { useAuth } from './auth-context';
 import { defaultUserData, saveUserData } from '@/lib/user-data';
 import badgeData from '@/lib/badge-data.json';
-=======
-import React, { createContext, useState, useContext, ReactNode, useEffect, useCallback } from 'react';
-import { playSound } from '@/lib/audio';
-import { useAuth } from './auth-context';
-import { saveUserData, UserData } from '@/lib/user-data';
->>>>>>> 957e37b3f48dbd57181f2e1cae07716037534a68
 
 type UnlockOptions = {
     celebrateImmediately?: boolean;
@@ -23,16 +16,12 @@ interface BadgeContextType {
   unlockBadge: (badgeId: string, options?: UnlockOptions) => void;
   isBadgeUnlocked: (badgeId: string) => boolean;
   lastUnlockedBadgeId: string | null;
-<<<<<<< HEAD
   celebrationBadgeId: string | null;
-=======
->>>>>>> 957e37b3f48dbd57181f2e1cae07716037534a68
   triggerCelebration: () => void;
 }
 
 const BadgeContext = createContext<BadgeContextType | undefined>(undefined);
 
-<<<<<<< HEAD
 const validBadgeIds = new Set((badgeData.badges ?? []).map(badge => badge.id));
 
 const badgeMigrationMap: Record<string, string | null> = {
@@ -124,37 +113,6 @@ export const BadgeProvider = ({ children }: { children: ReactNode }) => {
 
     const newBadges = [...unlockedBadges, resolvedBadgeId];
     setLastUnlockedBadgeId(resolvedBadgeId); // Set the pending badge ID
-=======
-export const BadgeProvider = ({ children }: { children: ReactNode }) => {
-  const [unlockedBadges, setUnlockedBadges] = useState<string[]>([]);
-  const [lastUnlockedBadgeId, setLastUnlockedBadgeId] = useState<string | null>(null);
-  
-  const { user, userData, setUserData } = useAuth();
-
-  useEffect(() => {
-    if (user === 'guest') {
-      setUnlockedBadges([]);
-    } else if (userData) {
-      setUnlockedBadges(userData.unlockedBadges || []);
-    }
-  }, [userData, user]);
-
-  const triggerCelebration = useCallback(() => {
-    if (lastUnlockedBadgeId) {
-      playSound('badge-unlocked');
-      // The CelebrationCard in layout will see the ID and show itself.
-      // We reset it here so it can be re-triggered for the next badge.
-      setTimeout(() => setLastUnlockedBadgeId(null), 4000); 
-    }
-  }, [lastUnlockedBadgeId]);
-
-  const unlockBadge = useCallback((badgeId: string, options: UnlockOptions = { celebrateImmediately: true }) => {
-    if (unlockedBadges.includes(badgeId)) return;
-
-    const newBadges = [...unlockedBadges, badgeId];
-    setUnlockedBadges(newBadges);
-    setLastUnlockedBadgeId(badgeId); // Set the pending badge ID
->>>>>>> 957e37b3f48dbd57181f2e1cae07716037534a68
 
     if (options.celebrateImmediately) {
         // We use a micro-task timeout to ensure the state update has propagated
@@ -163,7 +121,6 @@ export const BadgeProvider = ({ children }: { children: ReactNode }) => {
     }
     
     // Persist for logged-in users
-<<<<<<< HEAD
     setUserData(prevData => {
       const base = prevData ?? defaultUserData;
       return { ...base, unlockedBadges: newBadges };
@@ -173,16 +130,6 @@ export const BadgeProvider = ({ children }: { children: ReactNode }) => {
       void saveUserData(user.uid, { unlockedBadges: newBadges });
     }
   }, [unlockedBadges, user, setUserData, triggerCelebration, storageMode]);
-=======
-    if (user && user !== 'guest' && setUserData) {
-      setUserData(prevData => {
-        const updatedData = { ...prevData, unlockedBadges: newBadges };
-        saveUserData(user.uid, updatedData as UserData);
-        return updatedData as UserData;
-      });
-    }
-  }, [unlockedBadges, user, setUserData, triggerCelebration]);
->>>>>>> 957e37b3f48dbd57181f2e1cae07716037534a68
 
 
   const isBadgeUnlocked = useCallback((badgeId: string) => {
@@ -190,11 +137,7 @@ export const BadgeProvider = ({ children }: { children: ReactNode }) => {
   }, [unlockedBadges]);
 
   return (
-<<<<<<< HEAD
     <BadgeContext.Provider value={{ unlockedBadges, unlockBadge, isBadgeUnlocked, lastUnlockedBadgeId, celebrationBadgeId, triggerCelebration }}>
-=======
-    <BadgeContext.Provider value={{ unlockedBadges, unlockBadge, isBadgeUnlocked, lastUnlockedBadgeId, triggerCelebration }}>
->>>>>>> 957e37b3f48dbd57181f2e1cae07716037534a68
       {children}
     </BadgeContext.Provider>
   );

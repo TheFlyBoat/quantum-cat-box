@@ -4,7 +4,7 @@
 import { type CatState } from '@/lib/types';
 import { useEffect, useState } from 'react';
 import { Fish } from 'lucide-react';
-import { useSound } from '@/context/sound-context';
+import { useFeedback } from '@/context/feedback-context';
 import { cn } from '@/lib/utils';
 import { playSound } from '@/lib/audio';
 
@@ -13,34 +13,17 @@ interface MessageDisplayProps {
   catState: CatState;
 }
 
-const LoadingFishes = () => {
-    const [fishCount, setFishCount] = useState(1);
-    const colors = ['text-accent/40', 'text-accent/60', 'text-accent/80', 'text-accent'];
-
-    useEffect(() => {
-        const interval = setInterval(() => {
-            setFishCount(prevCount => (prevCount % 4) + 1);
-        }, 400);
-        return () => clearInterval(interval);
-    }, []);
-
-    return (
-        <div className="flex items-center justify-center space-x-2">
-            {Array.from({ length: 4 }).map((_, i) => (
-                <Fish
-                    key={i}
-                    className={`h-5 w-5 ${colors[i]} transition-opacity duration-300`}
-                    style={{ opacity: i < fishCount ? 1 : 0 }}
-                />
-            ))}
-        </div>
-    );
-};
+import { LoadingFishes } from '@/components/ui/loading-fishes';
 
 
+/**
+ * A component that displays the message from the cat.
+ * It also has a loading animation while the message is being generated.
+ * @param message The message to display.
+ * @param catState The state of the cat.
+ */
 export function MessageDisplay({ message, catState }: MessageDisplayProps) {
-  const { reduceMotion } = useSound();
-
+      const { reduceMotion } = useFeedback();
   useEffect(() => {
     if (message) {
       if (catState.outcome === 'alive') {
@@ -65,25 +48,17 @@ export function MessageDisplay({ message, catState }: MessageDisplayProps) {
     );
   }
 
-  const sentences = message.split('.').filter(sentence => sentence.trim().length > 0);
+  const sentences = message.split(/(?<=[.!?])\s+/).filter(sentence => sentence.trim().length > 0);
 
   return (
     <div className={cn("w-full max-w-2xl", !reduceMotion && "animate-bounce-in")}>
-      <div className="rounded-xl p-3">
-<<<<<<< HEAD
+      <div className="rounded-xl p-4 bg-muted/50">
         <div className={`font-fortune font-semibold text-lg text-center text-primary`}>
-=======
-        <div className={`font-body text-lg text-center text-primary`}>
->>>>>>> 957e37b3f48dbd57181f2e1cae07716037534a68
             {sentences.map((sentence, index) => (
-                <div key={index}>{sentence}.</div>
+                <p key={index}>{sentence}</p>
             ))}
         </div>
       </div>
     </div>
   );
 }
-<<<<<<< HEAD
-=======
-
->>>>>>> 957e37b3f48dbd57181f2e1cae07716037534a68

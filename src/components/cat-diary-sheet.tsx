@@ -23,6 +23,12 @@ interface CatDiarySheetProps {
     onOpenChange: (open: boolean) => void;
 }
 
+/**
+ * A sheet component that displays the diary entries for a cat.
+ * @param cat The cat to display the diary for.
+ * @param open Whether the sheet is open.
+ * @param onOpenChange A function to call when the sheet is opened or closed.
+ */
 export function CatDiarySheet({ cat, open, onOpenChange }: CatDiarySheetProps) {
     const { getDiary, getRevealCount } = useDiary();
     const diaryEntries = getDiary(cat.id);
@@ -32,21 +38,21 @@ export function CatDiarySheet({ cat, open, onOpenChange }: CatDiarySheetProps) {
         <Sheet open={open} onOpenChange={onOpenChange}>
             <SheetContent className="flex flex-col">
                 <SheetHeader>
-                    <SheetTitle className="flex items-center gap-2">
-                        <span>{cat.name}'s Diary</span>
+                    <SheetTitle className="section-title flex items-center gap-2">
+                        <span>{cat.name}&apos;s Diary</span>
                         <Badge variant="secondary" className="flex items-center gap-1.5">
                            <Eye className="w-4 h-4" />
                            {revealCount}
                         </Badge>
                     </SheetTitle>
-                    <SheetDescription>{cat.description}</SheetDescription>
+                    <SheetDescription className="body-text">{cat.description}</SheetDescription>
                 </SheetHeader>
                 <ScrollArea className="flex-grow pr-4 -mr-6">
                     <div className="space-y-4">
                         {diaryEntries.length > 0 ? (
                              diaryEntries.map((entry, index) => (
-                                <div key={index} className="bg-muted/50 rounded-lg p-3 text-sm text-muted-foreground italic">
-                                    "{entry}"
+                                <div key={index} className="bg-muted/50 rounded-lg p-3 body-text text-muted-foreground italic">
+                                    &ldquo;{entry}&rdquo;
                                 </div>
                             ))
                         ) : (

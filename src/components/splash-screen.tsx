@@ -1,7 +1,7 @@
 'use client';
 
 import type { CSSProperties } from 'react';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { cn } from '@/lib/utils';
 
 const SPLASH_STYLES = `
@@ -125,10 +125,10 @@ const SPLASH_STYLES = `
 }
 
 .quantum-text__eyebrow {
-  font-size: clamp(0.65rem, 0.8vw + 0.4rem, 0.85rem);
-  letter-spacing: 0.48em;
-  text-transform: uppercase;
-  color: rgba(224, 231, 255, 0.55);
+  font-size: clamp(0.75rem, 0.6vw + 0.45rem, 0.95rem);
+  letter-spacing: 0.08em;
+  text-transform: none;
+  color: rgba(226, 232, 240, 0.68);
 }
 
 .quantum-text__title {
@@ -141,8 +141,11 @@ const SPLASH_STYLES = `
 }
 
 .quantum-text__body {
-  font-size: clamp(0.95rem, 0.5vw + 0.85rem, 1.1rem);
-  color: rgba(226, 232, 240, 0.72);
+  font-family: var(--font-fortune, inherit);
+  font-weight: 600;
+  font-size: clamp(1.05rem, 0.65vw + 0.9rem, 1.25rem);
+  color: rgba(226, 232, 240, 0.85);
+  line-height: 1.35;
 }
 
 .quantum-text__eyebrow,
@@ -155,6 +158,10 @@ const SPLASH_STYLES = `
 
 .quantum-text__title {
   animation-delay: 0.22s;
+}
+
+.quantum-text__eyebrow {
+  animation-delay: 0.32s;
 }
 
 .quantum-text__body {
@@ -483,6 +490,10 @@ function generateParticles(count: number): Particle[] {
   }));
 }
 
+/**
+ * A component that displays the splash screen.
+ * @param onComplete A function to call when the splash screen is complete.
+ */
 export function SplashScreen({ onComplete }: { onComplete?: () => void }) {
   const [isActive, setIsActive] = useState(true);
   const [isFadingOut, setIsFadingOut] = useState(false);
@@ -492,7 +503,10 @@ export function SplashScreen({ onComplete }: { onComplete?: () => void }) {
     }
     return window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
   });
-  const [particles, setParticles] = useState<Particle[]>(() => generateParticles(36));
+  const particles = useMemo(
+    () => generateParticles(prefersReducedMotion ? 12 : 36),
+    [prefersReducedMotion],
+  );
 
   useEffect(() => {
     if (typeof window === 'undefined' || !window.matchMedia) {
@@ -506,10 +520,6 @@ export function SplashScreen({ onComplete }: { onComplete?: () => void }) {
 
     return () => mediaQuery.removeEventListener?.('change', updateMotionPreference);
   }, []);
-
-  useEffect(() => {
-    setParticles(generateParticles(prefersReducedMotion ? 12 : 36));
-  }, [prefersReducedMotion]);
 
   useEffect(() => {
     if (!isActive) {
@@ -583,11 +593,8 @@ export function SplashScreen({ onComplete }: { onComplete?: () => void }) {
       <div className="quantum-splash__content">
         <QuantumCat animate={!prefersReducedMotion} />
         <div className="quantum-text">
-          <span className="quantum-text__eyebrow">Quantum Universe</span>
-          <h1 className="quantum-text__title">Tuning half-life probabilities</h1>
-          <p className="quantum-text__body">
-            Hold tight while the box decides if our cat chooses purrs, paradox, or peaceful non-existence.
-          </p>
+          <h1 className="quantum-text__title">The Quantum Cat</h1>
+          <span className="quantum-text__eyebrow">Flyboat</span>
         </div>
       </div>
     </div>

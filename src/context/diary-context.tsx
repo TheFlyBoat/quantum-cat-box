@@ -1,17 +1,10 @@
 
 'use client';
 
-<<<<<<< HEAD
 import React, { createContext, useContext, ReactNode, useCallback, useMemo } from 'react';
 import { useBadges } from './badge-context';
 import { useAuth } from './auth-context';
 import { defaultUserData, saveUserData } from '@/lib/user-data';
-=======
-import React, { createContext, useState, useContext, ReactNode, useEffect, useCallback } from 'react';
-import { useBadges } from './badge-context';
-import { useAuth } from './auth-context';
-import { saveUserData } from '@/lib/user-data';
->>>>>>> 957e37b3f48dbd57181f2e1cae07716037534a68
 
 type DiaryEntry = {
   messages: string[];
@@ -24,12 +17,9 @@ type DiaryData = {
 
 interface DiaryContextType {
   data: DiaryData;
-<<<<<<< HEAD
   toggleDiaryEntry: (catId: string, message: string) => boolean;
+  recordReveal: (catId: string) => void;
   isMessageSaved: (catId: string, message: string) => boolean;
-=======
-  addDiaryEntry: (catId: string, message: string) => void;
->>>>>>> 957e37b3f48dbd57181f2e1cae07716037534a68
   getDiary: (catId: string) => string[];
   getRevealCount: (catId: string) => number;
 }
@@ -37,7 +27,6 @@ interface DiaryContextType {
 const DiaryContext = createContext<DiaryContextType | undefined>(undefined);
 
 export const DiaryProvider = ({ children }: { children: ReactNode }) => {
-<<<<<<< HEAD
   const { unlockBadge, isBadgeUnlocked } = useBadges();
   const { user, userData, setUserData, storageMode } = useAuth();
   const data = useMemo(() => userData?.diary || {}, [userData]);
@@ -54,17 +43,17 @@ export const DiaryProvider = ({ children }: { children: ReactNode }) => {
       const updatedMessages = hasMessage
         ? existingEntry.messages.filter(entry => entry !== message)
         : [...existingEntry.messages, message];
-      const updatedCount = Math.max(existingEntry.count + (hasMessage ? -1 : 1), 0);
+      const newEntry: DiaryEntry = {
+        messages: updatedMessages,
+        count: existingEntry.count,
+      };
 
       const newDiary: DiaryData = { ...baseDiary };
 
-      if (updatedMessages.length === 0 && updatedCount === 0) {
+      if (newEntry.messages.length === 0 && newEntry.count === 0) {
         delete newDiary[catId];
       } else {
-        newDiary[catId] = {
-          messages: updatedMessages,
-          count: updatedCount,
-        };
+        newDiary[catId] = newEntry;
       }
 
       let shouldUnlockBadge = false;
@@ -84,67 +73,43 @@ export const DiaryProvider = ({ children }: { children: ReactNode }) => {
       return { ...base, diary: newDiary };
     });
 
-    if (result?.unlockBadge) {
+    const outcome = result as { saved: boolean; diary: DiaryData; unlockBadge: boolean } | null;
+
+    if (outcome?.unlockBadge) {
       unlockBadge('message-keeper');
     }
 
-    if (storageMode === 'cloud' && user && user !== 'guest' && result) {
-      void saveUserData(user.uid, { diary: result.diary });
+    if (storageMode === 'cloud' && user && user !== 'guest' && outcome) {
+      void saveUserData(user.uid, { diary: outcome.diary });
     }
 
-    return result?.saved ?? false;
+    return outcome?.saved ?? false;
   }, [isBadgeUnlocked, unlockBadge, setUserData, storageMode, user]);
+
+  const recordReveal = useCallback((catId: string) => {
+    let updatedDiary: DiaryData | null = null;
+
+    setUserData(prevData => {
+      const base = prevData ?? defaultUserData;
+      const baseDiary: DiaryData = base.diary ?? {};
+      const existingEntry = baseDiary[catId] ?? { messages: [], count: 0 };
+      const newEntry: DiaryEntry = {
+        messages: existingEntry.messages,
+        count: existingEntry.count + 1,
+      };
+      const newDiary: DiaryData = { ...baseDiary, [catId]: newEntry };
+      updatedDiary = newDiary;
+      return { ...base, diary: newDiary };
+    });
+
+    if (storageMode === 'cloud' && user && user !== 'guest' && updatedDiary) {
+      void saveUserData(user.uid, { diary: updatedDiary });
+    }
+  }, [setUserData, storageMode, user]);
 
   const isMessageSaved = useCallback((catId: string, message: string) => {
     return data[catId]?.messages.includes(message) ?? false;
   }, [data]);
-=======
-  const [data, setData] = useState<DiaryData>({});
-  const { unlockBadge, isBadgeUnlocked } = useBadges();
-  const { user, userData, setUserData } = useAuth();
-
-  useEffect(() => {
-    if (user === 'guest') {
-      setData({});
-    } else if (userData) {
-      setData(userData.diary || {});
-    }
-  }, [userData, user]);
-
-  const addDiaryEntry = useCallback((catId: string, message: string) => {
-    const newData = { ...data };
-    const existingEntry = newData[catId] || { messages: [], count: 0 };
-    
-    const newMessages = existingEntry.messages.includes(message)
-      ? existingEntry.messages
-      : [...existingEntry.messages, message];
-      
-    newData[catId] = {
-      messages: newMessages,
-      count: existingEntry.count + 1,
-    };
-    
-    setData(newData);
-
-    const totalSavedMessages = Object.values(newData).reduce((sum, entry) => sum + entry.messages.length, 0);
-
-    if (totalSavedMessages >= 10 && !isBadgeUnlocked('10-messages-saved')) {
-      unlockBadge('10-messages-saved');
-    }
-
-    if (totalSavedMessages >= 50 && !isBadgeUnlocked('50-messages-saved')) {
-      unlockBadge('50-messages-saved');
-    }
-
-    if (user && user !== 'guest' && setUserData) {
-      setUserData(prevData => {
-        const updatedData = { ...prevData, diary: newData };
-        saveUserData(user.uid, updatedData as UserData);
-        return updatedData as UserData;
-      });
-    }
-  }, [data, isBadgeUnlocked, unlockBadge, user, setUserData]);
->>>>>>> 957e37b3f48dbd57181f2e1cae07716037534a68
 
   const getDiary = useCallback((catId: string) => {
     return data[catId]?.messages || [];
@@ -155,11 +120,7 @@ export const DiaryProvider = ({ children }: { children: ReactNode }) => {
   }, [data]);
 
   return (
-<<<<<<< HEAD
-    <DiaryContext.Provider value={{ data, toggleDiaryEntry, isMessageSaved, getDiary, getRevealCount }}>
-=======
-    <DiaryContext.Provider value={{ data, addDiaryEntry, getDiary, getRevealCount }}>
->>>>>>> 957e37b3f48dbd57181f2e1cae07716037534a68
+    <DiaryContext.Provider value={{ data, toggleDiaryEntry, recordReveal, isMessageSaved, getDiary, getRevealCount }}>
       {children}
     </DiaryContext.Provider>
   );

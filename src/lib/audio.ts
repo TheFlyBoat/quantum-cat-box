@@ -5,7 +5,7 @@ type SoundType =
   | 'click-1' 
   | 'click-2'
   | 'reveal-default'
-  | 'reveal-shiny'
+  | 'reveal-carbon'
   | 'reveal-cardboard'
   | 'haptic-1'
   | 'haptic-2'
@@ -20,40 +20,49 @@ type SoundType =
   | 'celebration-long'
   | 'box-shake';
 
-export const soundList: SoundType[] = ['click-1', 'click-2', 'reveal-default', 'reveal-shiny', 'reveal-cardboard', 'haptic-1', 'haptic-2', 'haptic-3', 'toggle-on', 'toggle-off', 'badge-unlocked', 'message-alive', 'message-dead', 'message-default', 'celebration-magic', 'celebration-long', 'box-shake'];
+export const soundList: SoundType[] = ['click-1', 'click-2', 'reveal-default', 'reveal-carbon', 'reveal-cardboard', 'haptic-1', 'haptic-2', 'haptic-3', 'toggle-on', 'toggle-off', 'badge-unlocked', 'message-alive', 'message-dead', 'message-default', 'celebration-magic', 'celebration-long', 'box-shake'];
 
 let soundEnabled = true;
+let vibrationEnabled = true;
 let masterVolume = 1.0;
 
 // This function subscribes to the sound setting from local storage
 if (typeof window !== 'undefined') {
-  const updateSoundStatus = () => {
+  const updateFeedbackStatus = () => {
     try {
       const storedSound = localStorage.getItem('quantum-cat-sound-enabled');
       soundEnabled = storedSound ? JSON.parse(storedSound) : true;
       
+      const storedVibration = localStorage.getItem('quantum-cat-vibration-enabled');
+      vibrationEnabled = storedVibration ? JSON.parse(storedVibration) : true;
+
       const storedVolume = localStorage.getItem('quantum-cat-volume');
       masterVolume = storedVolume ? parseFloat(storedVolume) : 1.0;
 
     } catch {
       soundEnabled = true;
+      vibrationEnabled = true;
       masterVolume = 1.0;
     }
   };
 
-  updateSoundStatus(); // Initial check
+  updateFeedbackStatus(); // Initial check
 
   // Listen for changes from other tabs
   window.addEventListener('storage', (event) => {
-    if (event.key === 'quantum-cat-sound-enabled' || event.key === 'quantum-cat-volume') {
-      updateSoundStatus();
+    if (event.key === 'quantum-cat-sound-enabled' || event.key === 'quantum-cat-volume' || event.key === 'quantum-cat-vibration-enabled') {
+      updateFeedbackStatus();
     }
   });
 
   // Custom event for same-tab updates
-  window.addEventListener('sound-setting-changed', updateSoundStatus);
+  window.addEventListener('feedback-setting-changed', updateFeedbackStatus);
 }
 
+export const playVibration = (pattern: number | number[]) => {
+    if (typeof window === 'undefined' || !vibrationEnabled || !('vibrate' in navigator)) return;
+    navigator.vibrate(pattern);
+}
 
 // This function generates sounds using the Web Audio API,
 // so it only works on the client-side.
@@ -61,14 +70,12 @@ export const playSound = (type: SoundType) => {
   // Check if window is defined (i.e., we're on the client)
   if (typeof window === 'undefined') return;
 
-  if (soundEnabled && 'vibrate' in navigator) {
-    if (type.startsWith('click') || type.startsWith('haptic') || type.startsWith('toggle')) {
-      navigator.vibrate(50); // Short vibration for clicks
-    } else if (type.startsWith('reveal')) {
-      navigator.vibrate([100, 50, 100]); // Pattern for reveals
-    } else if (type === 'badge-unlocked' || type === 'celebration-long') {
-        navigator.vibrate([100, 30, 100, 30, 100]);
-    }
+  if (type.startsWith('click') || type.startsWith('haptic') || type.startsWith('toggle')) {
+    playVibration(50); // Short vibration for clicks
+  } else if (type.startsWith('reveal')) {
+    playVibration([100, 50, 100]); // Pattern for reveals
+  } else if (type === 'badge-unlocked' || type === 'celebration-long') {
+      playVibration([100, 30, 100, 30, 100]);
   }
 
   if (!soundEnabled) return;
@@ -150,7 +157,7 @@ export const playSound = (type: SoundType) => {
         osc.start(now + i * 0.05);
         osc.stop(now + i * 0.05 + 0.4);
      }
-  } else if (type === 'reveal-shiny') {
+  } else if (type === 'reveal-carbon') {
     const notes = [1046.50, 1396.91, 1567.98]; // C6, F6, G6
     const gainNode = audioContext.createGain();
     gainNode.gain.value = 0.2;

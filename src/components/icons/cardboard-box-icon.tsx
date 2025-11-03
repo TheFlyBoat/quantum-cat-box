@@ -38,7 +38,6 @@ export const CardboardBoxIcon = ({ className, isOpen }: { className?: string, is
             <path d="M30 75 L50 55 L70 75" />
             <path d="M20 85 L80 85" />
       </g>
-<<<<<<< HEAD
       {/* Hazard Symbol */}
       <g transform="translate(28 42) scale(0.44)">
         <path
@@ -50,14 +49,6 @@ export const CardboardBoxIcon = ({ className, isOpen }: { className?: string, is
         />
         <rect x="44" y="38" width="12" height="30" rx="4" fill="#8B5A2B" />
         <circle cx="50" cy="78" r="7" fill="#8B5A2B" />
-=======
-       {/* Hazard Symbol */}
-        <g transform="translate(40 68) scale(0.2)" fill="#A0522D">
-            <path d="M50 10 A 40 40 0 0 1 84.6 30 L 67.3 30 A 20 20 0 0 0 50 10 Z" transform="rotate(0 50 50)" />
-            <path d="M50 10 A 40 40 0 0 1 84.6 30 L 67.3 30 A 20 20 0 0 0 50 10 Z" transform="rotate(120 50 50)" />
-            <path d="M50 10 A 40 40 0 0 1 84.6 30 L 67.3 30 A 20 20 0 0 0 50 10 Z" transform="rotate(240 50 50)" />
-            <circle cx="50" cy="50" r="8" />
->>>>>>> 957e37b3f48dbd57181f2e1cae07716037534a68
       </g>
     </g>
 

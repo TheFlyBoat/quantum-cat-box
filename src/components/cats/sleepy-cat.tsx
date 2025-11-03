@@ -56,11 +56,7 @@ export const SleepyCatIcon = ({ className }: { className?: string }) => (
                 @keyframes float-zzz {
                     0%   { transform: translateY(0) scale(0.8); opacity: 0; }
                     20%  { opacity: 1; }
-<<<<<<< HEAD
                     100% { transform: translateY(-4000px) scale(1.5); opacity: 0; }
-=======
-                    100% { transform: translateY(-9000px) scale(1.5); opacity: 0; }
->>>>>>> 957e37b3f48dbd57181f2e1cae07716037534a68
                 }
             `}</style>
         </defs>

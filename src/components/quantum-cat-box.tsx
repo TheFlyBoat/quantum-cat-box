@@ -2,20 +2,16 @@
 'use client';
 
 import { cn } from '@/lib/utils';
-import { BoxIcon, ShinyBoxIcon, CardboardBoxIcon } from '@/components/icons';
+import { BoxIcon, CarbonBoxIcon, CardboardBoxIcon, BlackWoodenBoxIcon, SpecialXK6BoxIcon, StoneBoxIcon } from '@/components/icons';
 import { CatState } from '@/lib/types';
 import { CatDisplay } from './cat-display';
 import { useBoxSkin } from '@/context/box-skin-context';
-import { useSound } from '@/context/sound-context';
-<<<<<<< HEAD
+import { useFeedback } from '@/context/feedback-context';
 import { Lock } from 'lucide-react';
-=======
->>>>>>> 957e37b3f48dbd57181f2e1cae07716037534a68
 
 interface QuantumCatBoxProps {
   onClick: () => void;
   isLoading: boolean;
-<<<<<<< HEAD
   isRevealing?: boolean;
   isAmbientShaking?: boolean;
   catState: CatState;
@@ -23,28 +19,40 @@ interface QuantumCatBoxProps {
   lockMessage?: string;
 }
 
+/**
+ * A component that displays the quantum cat box.
+ * It handles the box clicking, loading, and revealing animations.
+ * @param onClick A function to call when the box is clicked.
+ * @param isLoading Whether the box is loading.
+ * @param isRevealing Whether the box is revealing.
+ * @param isAmbientShaking Whether the box is shaking ambiently.
+ * @param catState The state of the cat.
+ * @param isLocked Whether the box is locked.
+ * @param lockMessage The message to display when the box is locked.
+ */
 export function QuantumCatBox({ onClick, isLoading, isRevealing = false, catState, isAmbientShaking, isLocked = false, lockMessage }: QuantumCatBoxProps) {
-=======
-  isAmbientShaking?: boolean;
-  catState: CatState;
-}
-
-export function QuantumCatBox({ onClick, isLoading, catState, isAmbientShaking }: QuantumCatBoxProps) {
->>>>>>> 957e37b3f48dbd57181f2e1cae07716037534a68
   console.log('--- In QuantumCatBox: Received prop catState:', catState, '---');
   const { selectedSkin } = useBoxSkin();
-  const { reduceMotion } = useSound();
-  const isOpen = catState.outcome !== 'initial' && !isLoading;
+      const { reduceMotion } = useFeedback();  const isOpen = catState.outcome !== 'initial' && !isLoading;
   const isGravityCat = catState.catId === 'gravity';
 
   let BoxComponent;
-  switch (selectedSkin) {
-    case 'shiny':
-      BoxComponent = ShinyBoxIcon;
-      break;
-    case 'cardboard':
-      BoxComponent = CardboardBoxIcon;
-      break;
+      switch (selectedSkin) {
+          case 'carbon':
+              BoxComponent = CarbonBoxIcon;
+              break;
+          case 'cardboard':
+              BoxComponent = CardboardBoxIcon;
+              break;
+          case 'black-wooden':
+              BoxComponent = BlackWoodenBoxIcon;
+              break;
+          case 'special-xk6':
+              BoxComponent = SpecialXK6BoxIcon;
+              break;
+          case 'stone':
+              BoxComponent = StoneBoxIcon;
+              break;
     default:
       BoxComponent = BoxIcon;
       break;
@@ -53,7 +61,6 @@ export function QuantumCatBox({ onClick, isLoading, catState, isAmbientShaking }
   return (
     <button
       onClick={onClick}
-<<<<<<< HEAD
       disabled={isLoading || isOpen || isLocked}
       className={cn(
         'relative group transition-transform duration-300 ease-out focus:outline-none focus-visible:ring-4 focus-visible:ring-ring focus-visible:ring-offset-4 focus-visible:ring-offset-background rounded-2xl',
@@ -64,17 +71,6 @@ export function QuantumCatBox({ onClick, isLoading, catState, isAmbientShaking }
       )}
       aria-label={isLocked ? 'Quantum cat box locked until tomorrow' : 'Open the quantum cat box'}
       aria-disabled={isLoading || isOpen || isLocked}
-=======
-      disabled={isLoading || isOpen}
-      className={cn(
-        'relative group transition-transform duration-300 ease-out focus:outline-none focus-visible:ring-4 focus-visible:ring-ring focus-visible:ring-offset-4 focus-visible:ring-offset-background rounded-2xl',
-        !isOpen && !isLoading && 'hover:scale-105',
-        isLoading && !reduceMotion && 'animate-shake',
-        isAmbientShaking && !reduceMotion && 'animate-subtle-shake',
-        (isLoading || isOpen) ? 'cursor-default' : 'cursor-pointer'
-      )}
-      aria-label="Open the quantum cat box"
->>>>>>> 957e37b3f48dbd57181f2e1cae07716037534a68
     >
       <BoxComponent className="w-52 h-52 md:w-56 md:h-56" isOpen={isOpen} />
       
@@ -92,18 +88,13 @@ export function QuantumCatBox({ onClick, isLoading, catState, isAmbientShaking }
               </div>
           </div>
       )}
-<<<<<<< HEAD
-      {isLocked && !isOpen && !isLoading && !isRevealing && (
+      {isLocked && !isOpen && !isLoading && !isRevealing && lockMessage && (
         <div className="absolute inset-0 flex flex-col items-center justify-center rounded-2xl bg-background/80 backdrop-blur-sm px-4 text-center">
-          <Lock className="mb-2 h-8 w-8 text-primary" />
-          <p className="text-sm font-semibold text-foreground">Quantum flux stabilizing</p>
-          {lockMessage && (
-            <p className="mt-1 text-xs text-muted-foreground">{lockMessage}</p>
-          )}
+          <Lock className="mb-1.5 h-6 w-6 text-primary" />
+          <p className="text-xs font-semibold text-foreground">Quantum flux stabilizing</p>
+          <p className="mt-1 text-[11px] text-muted-foreground">{lockMessage}</p>
         </div>
       )}
-=======
->>>>>>> 957e37b3f48dbd57181f2e1cae07716037534a68
     </button>
   );
 }

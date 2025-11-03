@@ -3,11 +3,9 @@
 
 import * as React from 'react';
 import { useState } from 'react';
-import { useAuth } from '@/context/auth-context';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Rocket } from 'lucide-react';
 import { playSound } from '@/lib/audio';
 
 interface NicknameDialogProps {
@@ -17,14 +15,12 @@ interface NicknameDialogProps {
 }
 
 export function NicknameDialog({ isOpen, onOpenChange, onNicknameSet }: NicknameDialogProps) {
-    const { updateDisplayName } = useAuth();
     const [nickname, setNickname] = useState('');
 
-    const handleNicknameSubmit = async (e: React.FormEvent) => {
+    const handleNicknameSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         const trimmedNickname = nickname.trim();
         if (trimmedNickname.length > 2) {
-            await updateDisplayName(trimmedNickname);
             onNicknameSet(trimmedNickname);
             playSound('celebration-magic');
         }

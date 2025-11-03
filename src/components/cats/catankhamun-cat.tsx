@@ -10,12 +10,71 @@ const CATANKHAMUN_BASE_PROPS: CatComponentProps = {
 
 const CATANKHAMUN_STYLES = `
     .cat.catankhamun {
-        animation: catankhamun-mummy-float 4s infinite ease-in-out;
+        position: relative;
+        overflow: hidden;
+        transform: none;
     }
 
-    @keyframes catankhamun-mummy-float {
-        0%, 100% { transform: translate(-50%, 0); }
-        50% { transform: translate(-50%, -6px); }
+    .catankhamun-figure {
+        position: absolute;
+        bottom: -4%;
+        left: 50%;
+        width: min(88%, 280px);
+        aspect-ratio: 3131 / 2957;
+        transform: translateX(-50%);
+    }
+
+    .catankhamun-figure-track {
+        width: 100%;
+        height: 100%;
+        transform-origin: center bottom;
+        animation: catankhamun-mummy-walk 9s linear infinite;
+        animation-delay: -3s;
+    }
+
+    .catankhamun-figure-inner {
+        height: 100%;
+        transform-origin: center bottom;
+        animation: catankhamun-mummy-bob 1.2s ease-in-out infinite;
+    }
+
+    .catankhamun-figure-inner svg {
+        width: 100%;
+        height: 100%;
+        display: block;
+    }
+
+    @keyframes catankhamun-mummy-walk {
+        0% {
+            transform: translateX(-35%) scaleX(1);
+        }
+        42% {
+            transform: translateX(35%) scaleX(1);
+        }
+        46% {
+            transform: translateX(35%) scaleX(-1);
+        }
+        96% {
+            transform: translateX(-35%) scaleX(-1);
+        }
+        100% {
+            transform: translateX(-35%) scaleX(1);
+        }
+    }
+
+    @keyframes catankhamun-mummy-bob {
+        0%, 100% {
+            transform: translateY(0) rotate(0deg);
+        }
+        25% {
+            transform: translateY(-3%) rotate(-1.5deg);
+        }
+        50% {
+            transform: translateY(-5%) rotate(0deg);
+        }
+        75% {
+            transform: translateY(-3%) rotate(1.25deg);
+        }
     }
 
     .catankhamun-eyes {
@@ -73,6 +132,12 @@ const CatankhamunFigure: React.FC<CatComponentProps> = ({ body, accent }) => {
 export const CatankhamunCatIcon: React.FC<{ className?: string }> = ({ className }) => (
     <div className={cn('relative cat catankhamun', className)}>
         <style>{CATANKHAMUN_STYLES}</style>
-        <CatankhamunFigure {...CATANKHAMUN_BASE_PROPS} />
+        <div className="catankhamun-figure">
+            <div className="catankhamun-figure-track">
+                <div className="catankhamun-figure-inner">
+                    <CatankhamunFigure {...CATANKHAMUN_BASE_PROPS} />
+                </div>
+            </div>
+        </div>
     </div>
 );
