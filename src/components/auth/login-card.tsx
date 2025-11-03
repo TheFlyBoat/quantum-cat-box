@@ -86,7 +86,7 @@ export function LoginCard({ className, onSuccess, onGuest, allowGuest = true }: 
     };
 
     return (
-        <Card className={cn('relative w-full max-w-sm rounded-2xl shadow-2xl bg-card/80 backdrop-blur-sm border-border/50', className)}>
+        <Card className={cn('relative w-full max-w-[400px] mx-auto rounded-2xl shadow-2xl bg-card/80 backdrop-blur-sm border-border/50', className)}>
             <CardContent className="space-y-4 pt-6">
                 {authError && (
                     <Alert variant="destructive">

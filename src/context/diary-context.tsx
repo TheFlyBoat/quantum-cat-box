@@ -30,6 +30,7 @@ export const DiaryProvider = ({ children }: { children: ReactNode }) => {
   const { unlockBadge, isBadgeUnlocked } = useBadges();
   const { user, userData, setUserData, storageMode } = useAuth();
   const data = useMemo(() => userData?.diary || {}, [userData]);
+  const unlockedCats = useMemo(() => userData?.unlockedCats || [], [userData?.unlockedCats]);
 
   const toggleDiaryEntry = useCallback((catId: string, message: string) => {
     let result: { saved: boolean; diary: DiaryData; unlockBadge: boolean } | null = null;
@@ -116,8 +117,15 @@ export const DiaryProvider = ({ children }: { children: ReactNode }) => {
   }, [data]);
 
   const getRevealCount = useCallback((catId: string) => {
-    return data[catId]?.count || 0;
-  }, [data]);
+    const diaryCount = data[catId]?.count || 0;
+    const isUnlocked = unlockedCats.includes(catId);
+
+    if (isUnlocked && diaryCount === 0) {
+      return 1;
+    }
+    
+    return diaryCount;
+  }, [data, unlockedCats]);
 
   return (
     <DiaryContext.Provider value={{ data, toggleDiaryEntry, recordReveal, isMessageSaved, getDiary, getRevealCount }}>

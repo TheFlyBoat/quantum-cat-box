@@ -5,7 +5,7 @@ import React, { createContext, useContext, ReactNode, useCallback, useMemo } fro
 import { useAuth } from './auth-context';
 import { defaultUserData, saveUserData } from '@/lib/user-data';
 
-type BoxSkin = 'default' | 'carbon' | 'cardboard' | 'black-wooden' | 'special-xk6' | 'stone';
+type BoxSkin = 'default' | 'carbon' | 'cardboard' | 'black-wooden' | 'special-xk6' | 'stone' | 'tardis';
 
 interface BoxSkinContextType {
   selectedSkin: BoxSkin;
@@ -16,8 +16,8 @@ interface BoxSkinContextType {
 
 const BoxSkinContext = createContext<BoxSkinContextType | undefined>(undefined);
 
-const defaultSkins: BoxSkin[] = ['default', 'carbon', 'cardboard', 'black-wooden', 'special-xk6', 'stone'];
-const allSkins: BoxSkin[] = ['default', 'carbon', 'cardboard', 'black-wooden', 'special-xk6', 'stone'];
+const defaultSkins: BoxSkin[] = ['default', 'carbon', 'cardboard', 'black-wooden', 'special-xk6', 'stone', 'tardis'];
+const allSkins: BoxSkin[] = ['default', 'carbon', 'cardboard', 'black-wooden', 'special-xk6', 'stone', 'tardis'];
 
 const isBoxSkin = (skin: string | undefined): skin is BoxSkin =>
   typeof skin === 'string' && (allSkins as string[]).includes(skin);

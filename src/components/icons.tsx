@@ -353,4 +353,4 @@ export * from './icons/fish-badge-icon';
 export * from './icons/cardboard-box-icon';
 export * from './icons/share-badge-icon';
 export * from './icons/message-square-badge-icon';
-
+export * from './icons/tardis-box-icon';

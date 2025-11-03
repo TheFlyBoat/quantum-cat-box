@@ -1,12 +1,13 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import Image from 'next/image';
-import { QuantumCatBox } from '@/components/quantum-cat-box';
-import { MessageDisplay } from '@/components/message-display';
-import { DevPanel } from '@/components/dev-panel';
-import { MainActions } from '@/components/main-actions';
-import { ShareCard } from '@/components/share-card';
+import { QuantumCatBox } from '@/components/features/quantum-cat-box';
+import { QuantumMessageDisplay } from '@/components/features/message-display';
+import { DevPanel } from '@/components/features/dev-panel';
+import { QuantumMessageActions } from '@/components/features/quantum-message-actions';
+import { ShareCard } from '@/components/features/share-card';
+import { TutorialOverlay } from '@/components/features/tutorial-overlay';
 import { TitleDisplay } from '@/components/title-display';
 import { SplashScreen } from '@/components/splash-screen';
 import { useCatLogic } from '@/lib/hooks/use-cat-logic';
@@ -21,7 +22,7 @@ import { playSound } from '@/lib/audio';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/context/auth-context';
-import { OnboardingModal } from '@/components/onboarding-modal';
+import { OnboardingModal } from '@/components/features/onboarding-modal';
 
 export default function HomePage({ onInteraction, setRevealedCatId }: { onInteraction?: () => void; setRevealedCatId?: (id: string | null) => void; }) {
     const [showOnboarding, setShowOnboarding] = useState(false);
@@ -34,6 +35,8 @@ export default function HomePage({ onInteraction, setRevealedCatId }: { onIntera
     const [lockNotice, setLockNotice] = useState('');
 
     const [isShared, setIsShared] = useState(false);
+    const [pendingAutoOpen, setPendingAutoOpen] = useState(false);
+    const [showTutorialOverlay, setShowTutorialOverlay] = useState(false);
 
     const { toast } = useToast();
     const { toggleDiaryEntry, isMessageSaved: isDiaryMessageSaved, recordReveal } = useDiary();
@@ -76,8 +79,6 @@ export default function HomePage({ onInteraction, setRevealedCatId }: { onIntera
         setRevealedCatName,
         setRevealedCatId
     });
-
-    const devRepeatEnabled = process.env.NEXT_PUBLIC_DEV_MULTI_OPEN === 'true' || process.env.NODE_ENV !== 'production';
 
     const { shareCardRef, createShareAsset, rewardShare } = useShare(message);
     const revealedCatId = catState?.catId;
@@ -148,10 +149,47 @@ export default function HomePage({ onInteraction, setRevealedCatId }: { onIntera
     }, [storageMode, localProgressMessageSeen, catState?.outcome, catState?.catId, toast, markLocalMessageSeen]);
 
     useEffect(() => {
+        if (!pendingAutoOpen) return;
+        if (isLoading || isRevealing) return;
+        if (catState.outcome !== 'initial') return;
+
+        setPendingAutoOpen(false);
+        handleBoxClick({ ignoreLock: true });
+    }, [pendingAutoOpen, isLoading, isRevealing, catState.outcome, handleBoxClick]);
+
+    useEffect(() => {
         if (!isDailyLocked) {
             setLockNotice('');
         }
     }, [isDailyLocked]);
+
+    useEffect(() => {
+        if (typeof window === 'undefined') return;
+        try {
+            const tutorialSeen = localStorage.getItem('quantum-cat-tutorial-v1') === 'true';
+            if (!tutorialSeen) {
+                setShowTutorialOverlay(true);
+            }
+        } catch (error) {
+            console.warn('Unable to access tutorial overlay state', error);
+        }
+    }, []);
+
+    const dismissTutorialOverlay = useCallback(() => {
+        setShowTutorialOverlay(false);
+        if (typeof window === 'undefined') return;
+        try {
+            localStorage.setItem('quantum-cat-tutorial-v1', 'true');
+        } catch (error) {
+            console.warn('Unable to persist tutorial overlay state', error);
+        }
+    }, []);
+
+    useEffect(() => {
+        if (catState.outcome !== 'initial') {
+            dismissTutorialOverlay();
+        }
+    }, [catState.outcome, dismissTutorialOverlay]);
 
     const handleToggleSaveMessage = () => {
         if (!activeCatId || !message) return;
@@ -182,21 +220,28 @@ export default function HomePage({ onInteraction, setRevealedCatId }: { onIntera
         }
     };
 
-    const LOCK_NOTICE_MESSAGE = 'Quantum experiments are closed.\nCome back tomorrow.';
-
     const onBoxClick = () => {
         if (showOnboarding) {
             return;
         }
         if (isDailyLocked) {
-            playSound('haptic-3');
-            setLockNotice(LOCK_NOTICE_MESSAGE);
+            overrideDailyLock();
+            setPendingAutoOpen(true);
+            if (lockNotice) {
+                setLockNotice('');
+            }
+            if (showTutorialOverlay) {
+                dismissTutorialOverlay();
+            }
             return;
         }
         if (lockNotice) {
             setLockNotice('');
         }
-        handleBoxClick();
+        if (showTutorialOverlay) {
+            dismissTutorialOverlay();
+        }
+        handleBoxClick({ ignoreLock: true });
     };
 
     const shareText = useMemo(() => {
@@ -217,6 +262,17 @@ export default function HomePage({ onInteraction, setRevealedCatId }: { onIntera
         const anchor = document.createElement('a');
         return typeof anchor.download !== 'undefined';
     }, []);
+
+    const handleRequestAnotherBox = useCallback(() => {
+        if (isDailyLocked) {
+            overrideDailyLock();
+        } else {
+            handleReset({ ignoreLock: true });
+        }
+        setIsShared(false);
+        setLockNotice('');
+        setPendingAutoOpen(false);
+    }, [isDailyLocked, overrideDailyLock, handleReset]);
 
     const handleShareRequest = async () => {
         if (isGeneratingShare) return;
@@ -359,23 +415,33 @@ export default function HomePage({ onInteraction, setRevealedCatId }: { onIntera
                     <div className="mx-auto flex w-full max-w-full flex-col items-center text-center">
                         <TitleDisplay name={revealedCatName} onTitleClick={handleTitleClick} reduceMotion={reduceMotion} />
 
-                        {isDevMode && <DevPanel allCats={allCats} onCatSelect={handleDevCatSelect} catState={catState} message={message} />}
+                        {isDevMode && (
+                            <DevPanel
+                                allCats={allCats}
+                                onCatSelect={handleDevCatSelect}
+                                catState={catState}
+                                quantumMessage={message}
+                            />
+                        )}
 
                         <div className="relative mt-6 flex h-64 w-full items-center justify-center">
+                            {showTutorialOverlay && !showOnboarding && !isDailyLocked && catState.outcome === 'initial' && (
+                                <TutorialOverlay />
+                            )}
                             <QuantumCatBox
                                 onClick={onBoxClick}
                                 isLoading={isLoading}
                                 isRevealing={isRevealing}
                                 catState={catState}
                                 isAmbientShaking={isAmbientShaking}
-                                isLocked={isDailyLocked}
+                                isLocked={false}
                             />
                         </div>
 
-                        <div className="mt-6 flex h-28 w-full flex-col items-center justify-center">
+                        <div className="mt-6 flex w-full flex-col items-center gap-6">
                             {catState.outcome !== 'initial' && (
-                                <div className="flex w-full flex-col items-center">
-                                    <MessageDisplay message={message} catState={catState} />
+                                <div className="flex w-full flex-col items-center gap-6">
+                                    <QuantumMessageDisplay message={message} catState={catState} />
                                     {lockNotice && (
                                         <div className="mt-4 w-full max-w-2xl">
                                             <div className="rounded-xl border border-emerald-400 bg-emerald-500/10 px-4 py-4">
@@ -388,19 +454,18 @@ export default function HomePage({ onInteraction, setRevealedCatId }: { onIntera
                                         </div>
                                     )}
                                     {message && (
-                                        <MainActions
-                                            onSave={handleToggleSaveMessage}
-                                            onShare={handleShareRequest}
-                                            onReset={() => {
-                                                handleReset();
-                                                setIsShared(false);
-                                            }}
-                                            isSaved={isCurrentMessageSaved}
-                                            isShared={isShared}
-                                            reduceMotion={reduceMotion}
-                                            isShareDisabled={isGeneratingShare}
-                                            isResetDisabled={isDailyLocked}
-                                        />
+                                        <div className="w-full">
+                                            <QuantumMessageActions
+                                                onToggleDiaryEntry={handleToggleSaveMessage}
+                                                onShareQuantumMessage={handleShareRequest}
+                                                onRequestAnotherQuantumBox={handleRequestAnotherBox}
+                                                isDiarySaved={isCurrentMessageSaved}
+                                                hasSharedQuantumMessage={isShared}
+                                                reduceMotion={reduceMotion}
+                                                isShareDisabled={isGeneratingShare}
+                                                isResetDisabled={false}
+                                            />
+                                        </div>
                                     )}
                                 </div>
                             )}
@@ -452,17 +517,6 @@ export default function HomePage({ onInteraction, setRevealedCatId }: { onIntera
                             )}
                         </DialogContent>
                     </Dialog>
-                    {devRepeatEnabled && isDailyLocked && (
-                        <div className="flex justify-center pb-6">
-                            <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => overrideDailyLock()}
-                            >
-                                Open Again (dev)
-                            </Button>
-                        </div>
-                    )}
                 </>
             )}
         </>

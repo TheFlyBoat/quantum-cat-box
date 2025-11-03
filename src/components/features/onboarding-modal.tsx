@@ -1,45 +1,53 @@
 'use client';
 
-import { useState } from 'react';
+import { type ComponentType, useState } from 'react';
+
 import { Dialog, DialogContent } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Box, Fish, Heart, Share2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { Box, Fish, Heart, Share2 } from 'lucide-react';
 
 interface OnboardingModalProps {
     open: boolean;
     onClose: () => void;
 }
 
-const sections = [
-    {
-        icon: Box,
-        iconClass: 'text-teal-500',
-        title: 'Open the Box',
-        titleClass: 'text-purple-500',
-        body: 'Each tap collapses reality, revealing a unique cat: Alive, Dead, or Paradox, each with a cosmic message.',
-    },
-    {
-        icon: Fish,
-        iconClass: 'text-purple-500',
-        title: 'Collect & Discover',
-        titleClass: 'text-cyan-500',
-        body: 'Earn Fish Points, unlock badges, and grow your streak as you reveal new quantum cats.',
-    },
-    {
-        icon: Heart,
-        iconClass: 'text-cyan-500',
-        title: 'Save & Reflect',
-        titleClass: 'text-rose-400',
-        body: 'Keep your favourite messages in each cat’s diary and explore your growing gallery of discoveries.',
-    },
-    {
-        icon: Share2,
-        iconClass: 'text-rose-400',
-        title: 'Share the Wonder',
-        titleClass: 'text-teal-500',
-        body: 'Unlock box skins, share your revelations, and return daily for a new cat and a new twist in reality.',
-    },
+type OnboardingSection = {
+  icon: ComponentType<{ className?: string }>;
+  accentClass: string;
+  title: string;
+  titleClass: string;
+  body: string;
+};
+
+const onboardingSections: OnboardingSection[] = [
+  {
+    icon: Box,
+    accentClass: 'bg-[#A240FF]/10 text-[#A240FF]',
+    title: 'Open the Quantum Box',
+    titleClass: 'text-[#A240FF]',
+    body: 'Tap the Quantum Box to collapse possibilities and reveal a cat in one of three cat states: alive, dead, or paradox.',
+  },
+  {
+    icon: Fish,
+    accentClass: 'bg-[#FF809F]/10 text-[#FF809F]',
+    title: 'Collect Fish Points',
+    titleClass: 'text-[#FF809F]',
+    body: 'Earn Fish Points, unlock badges, and grow your streak as you uncover new cats from the quantum realm.',
+  },
+  {
+    icon: Heart,
+    accentClass: 'bg-[#3696C9]/10 text-[#3696C9]',
+    title: 'Curate Your Cat Diary',
+    titleClass: 'text-[#3696C9]',
+    body: 'Save your favourite Quantum Messages to the Cat Diary and revisit past revelations in your gallery.',
+  },
+  {
+    icon: Share2,
+    accentClass: 'bg-[#A9DB4A]/10 text-[#A9DB4A]',
+    title: 'Share the Wonder',
+    titleClass: 'text-[#A9DB4A]',
+    body: 'Unlock Box Skins, share your discoveries, and return daily for fresh twists in quantum reality.',
+  },
 ];
 
 /**
@@ -49,8 +57,8 @@ const sections = [
  */
 export function OnboardingModal({ open, onClose }: OnboardingModalProps) {
     const [stepIndex, setStepIndex] = useState(0);
-    const totalSteps = sections.length;
-    const currentStep = sections[stepIndex];
+    const totalSteps = onboardingSections.length;
+    const currentStep = onboardingSections[stepIndex];
     const isLastStep = stepIndex === totalSteps - 1;
 
     const handleAdvance = () => {
@@ -85,12 +93,12 @@ export function OnboardingModal({ open, onClose }: OnboardingModalProps) {
                                 handleAdvance();
                             }
                         }}
-                        className="flex w-full max-w-md flex-col items-center gap-6 rounded-3xl bg-white p-10 text-center shadow-xl focus:outline-none focus:ring-2 focus:ring-primary"
+                        className="flex w-full max-w-md flex-col items-center gap-6 rounded-3xl bg-white p-10 text-center shadow-xl focus:outline-none focus:ring-2 focus:ring-[#A240FF]"
                     >
                         <div
                             className={cn(
-                                'flex h-20 w-20 items-center justify-center rounded-2xl bg-slate-100',
-                                currentStep.iconClass
+                                'flex h-20 w-20 items-center justify-center rounded-2xl',
+                                currentStep.accentClass
                             )}
                         >
                             <IconComponent className="h-10 w-10" />

@@ -181,9 +181,9 @@ export function useCatLogic({ onInteraction, setRevealedCatId, onCatReveal }: {
         };
     }, []);
 
-    const handleBoxClick = async () => {
+    const handleBoxClick = async (options?: { ignoreLock?: boolean }) => {
         if (isLoading || catState.outcome !== 'initial' || isRevealing) return;
-        if (isDailyLocked) {
+        if (isDailyLocked && !options?.ignoreLock) {
             playSound('haptic-3');
             return;
         }
@@ -191,7 +191,9 @@ export function useCatLogic({ onInteraction, setRevealedCatId, onCatReveal }: {
         onInteraction?.();
 
         playSound('click-1');
-        lockForToday();
+        if (!options?.ignoreLock) {
+            lockForToday();
+        }
         setIsRevealing(true);
         setMessage('');
         setRevealedCatName(null);

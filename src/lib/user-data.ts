@@ -21,8 +21,16 @@ export interface UserData {
   streak?: number;
   totalObservations?: number;
   unlockedBadges?: string[];
-    selectedSkin?: 'default' | 'carbon' | 'cardboard' | 'black-wooden' | 'special-xk6' | 'stone';
-    unlockedSkins?: ('default' | 'carbon' | 'cardboard' | 'black-wooden' | 'special-xk6' | 'stone')[];
+  selectedSkin?: 'default' | 'carbon' | 'cardboard' | 'black-wooden' | 'special-xk6' | 'stone' | 'tardis';
+  unlockedSkins?: (
+    | 'default'
+    | 'carbon'
+    | 'cardboard'
+    | 'black-wooden'
+    | 'special-xk6'
+    | 'stone'
+    | 'tardis'
+  )[];
   unlockedCats?: string[];
   diary?: { [catId: string]: { messages: string[]; count: number } };
   points?: number;
@@ -37,7 +45,8 @@ export const defaultUserData: UserData = {
   streak: 0,
   totalObservations: 0,
   unlockedBadges: [],
-      unlockedSkins: ['default', 'carbon'],  selectedSkin: 'default',
+  unlockedSkins: ['default', 'carbon', 'tardis'],
+  selectedSkin: 'default',
   unlockedCats: [],
   diary: {},
   points: 0,

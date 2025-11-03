@@ -1,21 +1,38 @@
 
 'use client';
 
-import { Award, Flame, Fish, User } from 'lucide-react';
+import * as React from 'react';
+import { Award, Flame, Fish } from 'lucide-react';
 import { useBadges } from '@/context/badge-context';
 import { useAchievements } from '@/context/achievements-context';
 import { usePoints } from '@/context/points-context';
-import { useAuth } from '@/context/auth-context';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
+import { UserStatusLabel } from '@/components/auth/user-status-label';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Button } from '@/components/ui/button';
+import { useAuth } from '@/context/auth-context';
 
 export function AppHeader() {
     const { unlockedBadges } = useBadges();
     const { streak } = useAchievements();
     const { points } = usePoints();
-    const { user } = useAuth();
+    const { user, displayName, logout, openLoginModal } = useAuth();
+    const [userMenuOpen, setUserMenuOpen] = React.useState(false);
 
-    const accountLabel = user && user !== 'guest' ? user.email : 'Guest Mode';
+    const isGuest = !user || user === 'guest';
+    const userEmail = typeof user === 'object' && user ? user.email ?? null : null;
+    const fullUserIdentity = isGuest ? 'Guest Mode' : (userEmail ?? displayName ?? 'Signed in user');
+
+    const handleSignIn = React.useCallback(() => {
+        openLoginModal();
+        setUserMenuOpen(false);
+    }, [openLoginModal]);
+
+    const handleSignOut = React.useCallback(async () => {
+        await logout();
+        setUserMenuOpen(false);
+    }, [logout]);
 
     const metrics = [
         {
@@ -56,10 +73,33 @@ export function AppHeader() {
                         </Tooltip>
                     ))}
                 </div>
-                <div className="flex items-center justify-end gap-1.5 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground sm:text-xs">
-                    <User className="h-3.5 w-3.5 text-primary" />
-                    <span>{accountLabel}</span>
-                </div>
+                <Popover open={userMenuOpen} onOpenChange={setUserMenuOpen}>
+                    <PopoverTrigger asChild>
+                        <button
+                            type="button"
+                            className="rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                        >
+                            <UserStatusLabel className="cursor-pointer select-none justify-end self-end sm:self-center" />
+                        </button>
+                    </PopoverTrigger>
+                    <PopoverContent align="end" className="w-60 space-y-4">
+                        <div className="space-y-1">
+                            <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                                User
+                            </p>
+                            <p className="text-sm font-semibold text-foreground break-words">
+                                {fullUserIdentity}
+                            </p>
+                        </div>
+                        <Button
+                            onClick={isGuest ? handleSignIn : handleSignOut}
+                            variant={isGuest ? 'default' : 'outline'}
+                            className="w-full"
+                        >
+                            {isGuest ? 'Sign In' : 'Sign Out'}
+                        </Button>
+                    </PopoverContent>
+                </Popover>
             </div>
         </TooltipProvider>
     );

@@ -28,8 +28,8 @@ export function BadgeCard({ badge, unlocked, badgeImage }: BadgeCardProps) {
         <TooltipProvider delayDuration={150}>
             <Tooltip>
                 <TooltipTrigger asChild>
-                    <Card className="overflow-hidden aspect-square flex flex-col">
-                        <CardContent className="p-2 flex-grow h-full flex items-center justify-center bg-muted/50 relative">
+                    <Card className="flex aspect-square flex-col overflow-hidden rounded-3xl border border-border/40 bg-background/80 shadow-sm">
+                        <CardContent className="relative flex flex-1 items-center justify-center bg-gradient-to-br from-background via-background/70 to-background p-2">
                             {unlocked && badgeImage ? (
                                 <Image
                                     src={badgeImage}
@@ -39,11 +39,13 @@ export function BadgeCard({ badge, unlocked, badgeImage }: BadgeCardProps) {
                                     className="w-16 h-16"
                                 />
                             ) : (
-                                <Lock className="w-6 h-6 text-muted-foreground" />
+                                <Lock className="h-8 w-8 text-muted-foreground/80" />
                             )}
                         </CardContent>
-                        <CardFooter className="p-2 justify-center bg-background/50">
-                            <p className="body-text font-bold text-center">{unlocked ? badge.name : '???'}</p>
+                        <CardFooter className="bg-background/60 p-2 text-center">
+                            <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                                {unlocked ? badge.name : '???'}
+                            </p>
                         </CardFooter>
                     </Card>
                 </TooltipTrigger>

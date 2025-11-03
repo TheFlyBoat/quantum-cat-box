@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import badgeData from '@/lib/badge-data.json';
 import { useBadges } from '@/context/badge-context';
-import { BadgeCard } from '@/components/badge-card';
+import { BadgeCard } from '@/components/features/BadgeCard';
 import { badgeImageMap, defaultBadgeImage } from '@/lib/badge-images';
 
 export default function AwardsPage() {

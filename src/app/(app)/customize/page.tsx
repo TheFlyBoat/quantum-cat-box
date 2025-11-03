@@ -4,7 +4,7 @@
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useBoxSkin } from '@/context/box-skin-context';
-import { BoxIcon, CarbonBoxIcon, CardboardBoxIcon, BlackWoodenBoxIcon, SpecialXK6BoxIcon, StoneBoxIcon } from '@/components/icons';
+import { BoxIcon, CarbonBoxIcon, CardboardBoxIcon, BlackWoodenBoxIcon, SpecialXK6BoxIcon, StoneBoxIcon, TardisBoxIcon } from '@/components/icons';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { useBadges } from '@/context/badge-context';
@@ -50,7 +50,7 @@ export default function CustomizePage() {
 
 
 
-    const handleSelectSkin = (skin: 'default' | 'carbon' | 'cardboard' | 'black-wooden' | 'special-xk6' | 'stone') => {
+    const handleSelectSkin = (skin: 'default' | 'carbon' | 'cardboard' | 'black-wooden' | 'special-xk6' | 'stone' | 'tardis') => {
 
         nudgeLogin();
 
@@ -124,7 +124,7 @@ export default function CustomizePage() {
 
     return (
 
-        <Card>
+        <Card className="border-none bg-transparent shadow-none">
 
             <CardHeader>
 
@@ -136,13 +136,36 @@ export default function CustomizePage() {
 
                 <Tabs defaultValue="box-skins" className="w-full">
 
-                    <TabsList className="grid w-full grid-cols-2">
+                    {(() => {
+                        const tabBaseClass =
+                            'flex-1 px-3 py-1.5 font-semibold transition transform rounded-2xl hover:scale-105 hover:shadow-md data-[state=active]:bg-white data-[state=active]:font-bold data-[state=active]:text-foreground data-[state=active]:scale-[1.08] dark:data-[state=active]:bg-white';
 
-                        <TabsTrigger value="box-skins">Box Skins</TabsTrigger>
+                        return (
+                            <TabsList className="grid w-full grid-cols-2 gap-3 rounded-3xl border border-border/40 bg-background/80 p-2 text-[11px] font-semibold uppercase tracking-wide shadow-sm">
 
-                        <TabsTrigger value="other">Other</TabsTrigger>
+                                <TabsTrigger
+                                    value="box-skins"
+                                    className={cn(
+                                        tabBaseClass,
+                                        'bg-sky-300/80 text-sky-900 dark:bg-sky-700 dark:text-sky-100'
+                                    )}
+                                >
+                                    Box Skins
+                                </TabsTrigger>
 
-                    </TabsList>
+                                <TabsTrigger
+                                    value="themes"
+                                    className={cn(
+                                        tabBaseClass,
+                                        'bg-pink-300/80 text-pink-900 dark:bg-pink-700 dark:text-pink-100'
+                                    )}
+                                >
+                                    Themes
+                                </TabsTrigger>
+
+                            </TabsList>
+                        );
+                    })()}
 
                     <TabsContent value="box-skins">
 
@@ -160,7 +183,7 @@ export default function CustomizePage() {
 
                                             className={cn(
 
-                                                "overflow-hidden aspect-square flex flex-col cursor-pointer",
+                                                "flex aspect-square flex-col overflow-hidden rounded-3xl border border-border/40 bg-background/80 shadow-sm cursor-pointer transition-colors",
 
                                                 selectedSkin === 'default' && 'border-primary'
 
@@ -168,15 +191,15 @@ export default function CustomizePage() {
 
                                         >
 
-                                             <CardContent className="p-2 flex-grow h-full flex items-center justify-center bg-muted/50 relative">
+                                             <CardContent className="relative flex flex-1 items-center justify-center bg-gradient-to-br from-background via-background/70 to-background p-3">
 
                                                 <BoxIcon className="w-16 h-16" />
 
                                              </CardContent>
 
-                                            <CardFooter className="p-2 justify-center bg-background/50">
+                                            <CardFooter className="bg-background/60 p-2 text-center">
 
-                                                <p className="body-text font-bold text-center">Wooden</p>
+                                                <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Wooden</p>
 
                                             </CardFooter>
 
@@ -202,7 +225,7 @@ export default function CustomizePage() {
 
                                             className={cn(
 
-                                                "overflow-hidden aspect-square flex flex-col cursor-pointer",
+                                                "flex aspect-square flex-col overflow-hidden rounded-3xl border border-border/40 bg-background/80 shadow-sm cursor-pointer transition-colors",
 
                                                 selectedSkin === 'carbon' && 'border-primary'
 
@@ -210,15 +233,15 @@ export default function CustomizePage() {
 
                                         >
 
-                                             <CardContent className="p-2 flex-grow h-full flex items-center justify-center bg-muted/50 relative">
+                                             <CardContent className="relative flex flex-1 items-center justify-center bg-gradient-to-br from-background via-background/70 to-background p-3">
 
                                                 <CarbonBoxIcon className="w-16 h-16" />
 
                                              </CardContent>
 
-                                            <CardFooter className="p-2 justify-center bg-background/50">
+                                            <CardFooter className="bg-background/60 p-2 text-center">
 
-                                                <p className="body-text font-bold text-center">Carbon</p>
+                                                <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Carbon</p>
 
                                             </CardFooter>
 
@@ -250,7 +273,7 @@ export default function CustomizePage() {
 
                                                     className={cn(
 
-                                                        "overflow-hidden aspect-square flex flex-col",
+                                                        "flex aspect-square flex-col overflow-hidden rounded-3xl border border-border/40 bg-background/80 shadow-sm transition-colors",
 
                                                         isCardboardUnlocked ? 'cursor-pointer' : 'cursor-default',
 
@@ -260,11 +283,11 @@ export default function CustomizePage() {
 
                                                 >
 
-                                                     <CardContent className="p-2 flex-grow h-full flex items-center justify-center bg-muted/50 relative">
+                                                     <CardContent className="relative flex flex-1 items-center justify-center bg-gradient-to-br from-background via-background/70 to-background p-3">
 
-                                                        {isCardboardUnlocked ? (
+                                                       {isCardboardUnlocked ? (
 
-                                                            <CardboardBoxIcon className="w-16 h-16" />
+                                                           <CardboardBoxIcon className="w-16 h-16" />
 
                                                         ) : (
 
@@ -286,9 +309,9 @@ export default function CustomizePage() {
 
                                                      </CardContent>
 
-                                                    <CardFooter className="p-2 justify-center bg-background/50">
+                                                    <CardFooter className="bg-background/60 p-2 text-center">
 
-                                                        <p className="body-text font-bold text-center">Cardboard</p>
+                                                        <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Cardboard</p>
 
                                                     </CardFooter>
 
@@ -346,7 +369,7 @@ export default function CustomizePage() {
 
                                     className={cn(
 
-                                        "overflow-hidden aspect-square flex flex-col cursor-pointer",
+                                        "flex aspect-square flex-col overflow-hidden rounded-3xl border border-border/40 bg-background/80 shadow-sm cursor-pointer transition-colors",
 
                                         selectedSkin === 'black-wooden' && 'border-primary'
 
@@ -354,15 +377,15 @@ export default function CustomizePage() {
 
                                 >
 
-                                     <CardContent className="p-2 flex-grow h-full flex items-center justify-center bg-muted/50 relative">
+                                     <CardContent className="relative flex flex-1 items-center justify-center bg-gradient-to-br from-background via-background/70 to-background p-3">
 
                                         <BlackWoodenBoxIcon className="w-16 h-16" />
 
                                      </CardContent>
 
-                                    <CardFooter className="p-2 justify-center bg-background/50">
+                                    <CardFooter className="bg-background/60 p-2 text-center">
 
-                                        <p className="body-text font-bold text-center">Black Wooden</p>
+                                        <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Black Wooden</p>
 
                                     </CardFooter>
 
@@ -374,7 +397,7 @@ export default function CustomizePage() {
 
                                     className={cn(
 
-                                        "overflow-hidden aspect-square flex flex-col cursor-pointer",
+                                        "flex aspect-square flex-col overflow-hidden rounded-3xl border border-border/40 bg-background/80 shadow-sm cursor-pointer transition-colors",
 
                                         selectedSkin === 'special-xk6' && 'border-primary'
 
@@ -382,15 +405,15 @@ export default function CustomizePage() {
 
                                 >
 
-                                     <CardContent className="p-2 flex-grow h-full flex items-center justify-center bg-muted/50 relative">
+                                     <CardContent className="relative flex flex-1 items-center justify-center bg-gradient-to-br from-background via-background/70 to-background p-3">
 
                                         <SpecialXK6BoxIcon className="w-16 h-16" />
 
                                      </CardContent>
 
-                                    <CardFooter className="p-2 justify-center bg-background/50">
+                                    <CardFooter className="bg-background/60 p-2 text-center">
 
-                                        <p className="body-text font-bold text-center">Special XK6</p>
+                                        <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Special XK6</p>
 
                                     </CardFooter>
 
@@ -402,7 +425,7 @@ export default function CustomizePage() {
 
                                     className={cn(
 
-                                        "overflow-hidden aspect-square flex flex-col cursor-pointer",
+                                        "flex aspect-square flex-col overflow-hidden rounded-3xl border border-border/40 bg-background/80 shadow-sm cursor-pointer transition-colors",
 
                                         selectedSkin === 'stone' && 'border-primary'
 
@@ -410,27 +433,85 @@ export default function CustomizePage() {
 
                                 >
 
-                                     <CardContent className="p-2 flex-grow h-full flex items-center justify-center bg-muted/50 relative">
+                                     <CardContent className="relative flex flex-1 items-center justify-center bg-gradient-to-br from-background via-background/70 to-background p-3">
 
                                         <StoneBoxIcon className="w-16 h-16" />
 
                                      </CardContent>
 
-                                    <CardFooter className="p-2 justify-center bg-background/50">
+                                    <CardFooter className="bg-background/60 p-2 text-center">
 
-                                        <p className="body-text font-bold text-center">Stone</p>
+                                        <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Stone</p>
 
                                     </CardFooter>
 
                                 </Card>
 
+                                <Tooltip>
+
+                                    <TooltipTrigger asChild>
+
+                                        <Card 
+
+                                            onClick={() => handleSelectSkin('tardis')}
+
+                                            className={cn(
+
+                                                "flex aspect-square flex-col overflow-hidden rounded-3xl border border-border/40 bg-background/80 shadow-sm cursor-pointer transition-colors",
+
+                                                selectedSkin === 'tardis' && 'border-primary'
+
+                                            )}
+
+                                        >
+
+                                             <CardContent className="relative flex flex-1 items-center justify-center bg-gradient-to-br from-background via-background/70 to-background p-3">
+
+                                                <TardisBoxIcon className="w-16 h-16" />
+
+                                             </CardContent>
+
+                                            <CardFooter className="bg-background/60 p-2 text-center">
+
+                                                <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Time Capsule</p>
+
+                                            </CardFooter>
+
+                                        </Card>
+
+                                    </TooltipTrigger>
+
+                                    <TooltipContent side="top">
+
+                                        <p>Temporal shielding for cats who open boxes before they exist.</p>
+
+                                    </TooltipContent>
+
+                                </Tooltip>
+
                             </TooltipProvider>
+
+                            {Array.from({ length: 5 }).map((_, index) => (
+                                <Card
+                                    key={`placeholder-skin-${index}`}
+                                    className="flex aspect-square flex-col overflow-hidden rounded-3xl border border-dashed border-muted-foreground/40 bg-background/60 shadow-inner"
+                                >
+                                    <CardContent className="flex flex-1 items-center justify-center bg-gradient-to-br from-muted/30 via-transparent to-transparent p-3">
+                                        <div className="relative flex h-full w-full items-center justify-center">
+                                            <Lock className="h-10 w-10 text-muted-foreground/70" />
+                                        </div>
+                                    </CardContent>
+                                    <CardFooter className="bg-background/60 p-2 text-center">
+                                        <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Coming Soon</p>
+                                    </CardFooter>
+                                </Card>
+                            ))}
 
                         </div>
 
                     </TabsContent>
 
-                    <TabsContent value="other">
+                    <TabsContent value="themes">
 
                         <p className="text-muted-foreground text-center py-8">More customization options coming soon!</p>
 
