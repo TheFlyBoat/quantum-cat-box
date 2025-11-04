@@ -13,15 +13,15 @@ interface Observation {
     type: CatOutcome;
 }
 
-interface AchievementsContextType {
+interface BadgeProgressContextType {
   streak: number;
   totalObservations: number;
   recordObservation: (catId: string, catType: CatOutcome) => void;
 }
 
-const AchievementsContext = createContext<AchievementsContextType | undefined>(undefined);
+const BadgeProgressContext = createContext<BadgeProgressContextType | undefined>(undefined);
 
-export const AchievementsProvider = ({ children }: { children: ReactNode }) => {
+export const BadgeProgressProvider = ({ children }: { children: ReactNode }) => {
   const { unlockBadge, isBadgeUnlocked } = useBadges();
   const { user, userData, setUserData, storageMode } = useAuth();
 
@@ -77,16 +77,16 @@ export const AchievementsProvider = ({ children }: { children: ReactNode }) => {
   }, [isBadgeUnlocked, unlockBadge, setUserData, storageMode, user, userData]);
 
   return (
-    <AchievementsContext.Provider value={{ streak, totalObservations, recordObservation }}>
+    <BadgeProgressContext.Provider value={{ streak, totalObservations, recordObservation }}>
       {children}
-    </AchievementsContext.Provider>
+    </BadgeProgressContext.Provider>
   );
 };
 
-export const useAchievements = () => {
-  const context = useContext(AchievementsContext);
+export const useBadgeProgress = () => {
+  const context = useContext(BadgeProgressContext);
   if (context === undefined) {
-    throw new Error('useAchievements must be used within an AchievementsProvider');
+    throw new Error('useBadgeProgress must be used within an BadgeProgressProvider');
   }
   return context;
 };

@@ -4,7 +4,7 @@
 import * as React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, Cat, BoxIcon, Settings } from 'lucide-react';
+import { Home, Cat, Award, BoxIcon, Settings } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { playFeedback } from '@/lib/audio';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
@@ -12,6 +12,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 const navItems = [
     { href: '/home', icon: Home, label: 'Home', hoverColorClass: 'hover:text-sky-400', activeColorClass: 'text-sky-400' },
     { href: '/gallery', icon: Cat, label: 'Gallery', hoverColorClass: 'hover:text-fuchsia-400', activeColorClass: 'text-fuchsia-400' },
+    { href: '/awards', icon: Award, label: 'Awards', hoverColorClass: 'hover:text-pink-400', activeColorClass: 'text-pink-400' },
     { href: '/customize', icon: BoxIcon, label: 'Customise', hoverColorClass: 'hover:text-amber-400', activeColorClass: 'text-amber-400' },
     { href: '/settings', icon: Settings, label: 'Settings', hoverColorClass: 'hover:text-emerald-400', activeColorClass: 'text-emerald-400' },
 ];

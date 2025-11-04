@@ -3,7 +3,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { CatState, CatOutcome } from '@/lib/types';
-import { useAchievements } from '@/context/achievements-context';
+import { useBadgeProgress } from '@/context/badge-progress-context';
 import { useCatCollection } from '@/context/cat-collection-context';
 import { usePoints } from '@/context/points-context';
 import { generateCatMessage } from '@/ai/flows/generate-cat-message';
@@ -59,7 +59,7 @@ export function useCatLogic({ onInteraction, setRevealedCatId, onCatReveal }: {
     const [nextAvailableAt, setNextAvailableAt] = useState<number | null>(null);
     const unlockTimerRef = useRef<number | undefined>(undefined);
 
-    const { recordObservation } = useAchievements();
+    const { recordObservation } = useBadgeProgress();
     const { unlockCat } = useCatCollection();
     const { addPoints } = usePoints();
     const { selectedSkin } = useBoxSkin();

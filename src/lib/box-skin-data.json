@@ -3,62 +3,74 @@
     {
       "id": "default",
       "name": "Wooden",
-      "description": "Classic wooden crate tuned for baseline collapses."
+      "description": "Classic wooden crate tuned for baseline collapses.",
+      "cost": 0
     },
     {
       "id": "carbon",
       "name": "Carbon",
-      "description": "A sleek, dark carbon fiber box."
+      "description": "A sleek, dark carbon fiber box.",
+      "cost": 0
     },
     {
       "id": "cardboard",
       "name": "Cardboard",
-      "description": "Recycled timelines keep things whimsically unpredictable."
+      "description": "Recycled timelines keep things whimsically unpredictable.",
+      "cost": 0
     },
     {
       "id": "black-wooden",
       "name": "Black Wooden",
-      "description": "A dark, mysterious wooden box."
+      "description": "A dark, mysterious wooden box.",
+      "cost": 10
     },
     {
       "id": "special-xk6",
       "name": "Special XK6",
-      "description": "A special edition box with a unique design."
+      "description": "A special edition box with a unique design.",
+      "cost": 10
     },
     {
       "id": "stone",
       "name": "Stone",
-      "description": "A heavy, stone box that feels ancient."
+      "description": "A heavy, stone box that feels ancient.",
+      "cost": 10
     },
     {
       "id": "tardis",
       "name": "Time Capsule",
-      "description": "Temporal shielding for cats who open boxes before they exist."
+      "description": "Temporal shielding for cats who open boxes before they exist.",
+      "cost": 20
     },
     {
       "id": "circuit-board",
       "name": "Circuit Board",
-      "description": "A box made of glowing circuit boards."
+      "description": "A box made of glowing circuit boards.",
+      "cost": 20
     },
     {
       "id": "crystal",
       "name": "Crystal",
-      "description": "A box made of shimmering crystal."
+      "description": "A box made of shimmering crystal.",
+      "cost": 20
     },
     {
       "id": "galaxy",
       "name": "Galaxy",
-      "description": "A box that contains a swirling galaxy."
+      "description": "A box that contains a swirling galaxy.",
+      "cost": 20
     },
     {
       "id": "plush",
       "name": "Plush",
-      "description": "A soft, plush box that's perfect for napping on."
+      "description": "A soft, plush box that's perfect for napping on.",
+      "cost": 20
     },
     {
       "id": "steampunk",
       "name": "Steampunk",
-      "description": "A box made of brass gears and pipes."
+      "description": "A box made of brass gears and pipes.",
+      "cost": 20
     }
   ]
 }

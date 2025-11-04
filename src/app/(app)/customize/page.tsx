@@ -25,16 +25,17 @@ import boxSkinData from '@/lib/box-skin-data.json';
 
 export default function CustomizePage() {
     const router = useRouter();
-    const { selectedSkin, selectSkin, unlockedSkins, unlockSkin } = useBoxSkin();
+    const { selectedSkin, selectSkin, isSkinUnlocked, unlockSkin, getSkinCost } = useBoxSkin();
     const { isBadgeUnlocked, unlockBadge } = useBadges();
-    const { points, addPoints } = usePoints();
+    const { points } = usePoints();
     const { toast } = useToast();
     const { storageMode, maybeShowLoginPrompt } = useAuth();
 
-    const [isDialogOpen, setIsDialogOpen] = useState(false);
-    const [selectedSkinForDialog, setSelectedSkinForDialog] = useState(boxSkinData.skins[0]);
+    const [isApplyDialogOpen, setIsApplyDialogOpen] = useState(false);
+    const [selectedSkinForApplyDialog, setSelectedSkinForApplyDialog] = useState(boxSkinData.skins[0]);
 
-    const cardboardCost = 100;
+    const [isPurchaseDialogOpen, setIsPurchaseDialogOpen] = useState(false);
+    const [selectedSkinForPurchaseDialog, setSelectedSkinForPurchaseDialog] = useState(boxSkinData.skins[0]);
 
     const nudgeLogin = () => {
         if (storageMode === 'local') {
@@ -42,48 +43,42 @@ export default function CustomizePage() {
         }
     };
 
-    const handleSkinClick = (skin: typeof boxSkinData.skins[0]) => {
-        if (!unlockedSkins.includes(skin.id) && skin.id !== 'default' && skin.id !== 'cardboard') {
-            return; // Or show a toast
+    const handleSkinClick = (skin: typeof boxSkinData.skins[number]) => {
+        nudgeLogin();
+        if (isSkinUnlocked(skin.id)) {
+            setSelectedSkinForApplyDialog(skin);
+            setIsApplyDialogOpen(true);
+            playFeedback('click-1');
+        } else {
+            setSelectedSkinForPurchaseDialog(skin);
+            setIsPurchaseDialogOpen(true);
+            playFeedback('click-2');
         }
-        setSelectedSkinForDialog(skin);
-        setIsDialogOpen(true);
-        playFeedback('click-1');
     };
 
     const handleApplySkin = () => {
-        selectSkin(selectedSkinForDialog.id as any);
-        if (selectedSkinForDialog.id !== 'default' && !isBadgeUnlocked('skin-changer')) {
+        selectSkin(selectedSkinForApplyDialog.id);
+        if (selectedSkinForApplyDialog.id !== 'default' && !isBadgeUnlocked('skin-changer')) {
             unlockBadge('skin-changer');
         }
-        setIsDialogOpen(false);
+        setIsApplyDialogOpen(false);
         playFeedback('haptic-1');
         toast({
             title: 'Skin Applied!',
-            description: `You are now using the ${selectedSkinForDialog.name} box.`,
+            description: `You are now using the ${selectedSkinForApplyDialog.name} box.`,
         });
         router.push('/home');
     };
 
-    const handlePurchaseCardboard = () => {
-        nudgeLogin();
-        if (points >= cardboardCost) {
-            addPoints(-cardboardCost);
-            unlockSkin('cardboard');
-            selectSkin('cardboard');
+    const handlePurchaseSkin = () => {
+        const success = unlockSkin(selectedSkinForPurchaseDialog.id);
+        if (success) {
             playFeedback('celebration-magic');
-            toast({
-                title: 'Skin Unlocked!',
-                description: 'You can now use the Cardboard Box skin.',
-            });
-        } else {
-            playFeedback('haptic-3');
-            toast({
-                variant: 'destructive',
-                title: 'Not enough points!',
-                description: `You need ${cardboardCost} Fish Points to unlock this skin.`,
-            });
+            // Optionally select the skin immediately after purchase
+            selectSkin(selectedSkinForPurchaseDialog.id);
+            router.push('/home');
         }
+        setIsPurchaseDialogOpen(false);
     };
 
     const skinIcons: { [key: string]: React.ComponentType<{ className?: string }> } = {
@@ -127,45 +122,9 @@ export default function CustomizePage() {
                             <div className="grid grid-cols-3 gap-4">
                                 {boxSkinData.skins.map((skin) => {
                                     const SkinIcon = skinIcons[skin.id];
-                                    const isUnlocked = unlockedSkins.includes(skin.id);
-                                    const isCardboard = skin.id === 'cardboard';
-
-                                    if (isCardboard && !isUnlocked) {
-                                        return (
-                                            <AlertDialog key={skin.id}>
-                                                <AlertDialogTrigger asChild>
-                                                    <Card className={cn('flex aspect-square flex-col overflow-hidden rounded-3xl border border-border/40 bg-background/80 shadow-sm transition-colors cursor-pointer')}>
-                                                        <CardContent className="relative flex flex-1 items-center justify-center bg-gradient-to-br from-background via-background/70 to-background p-3">
-                                                            <div className="flex flex-col items-center gap-2 text-muted-foreground">
-                                                                <Lock className="w-8 h-8" />
-                                                                <Badge variant="secondary" className="flex items-center gap-1">
-                                                                    <Fish className="w-3 h-3" />
-                                                                    {cardboardCost}
-                                                                </Badge>
-                                                            </div>
-                                                        </CardContent>
-                                                        <CardFooter className="bg-background/60 p-2 text-center">
-                                                            <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{skin.name}</p>
-                                                        </CardFooter>
-                                                    </Card>
-                                                </AlertDialogTrigger>
-                                                <AlertDialogContent>
-                                                    <AlertDialogHeader>
-                                                        <AlertDialogTitle>Unlock Cardboard Skin?</AlertDialogTitle>
-                                                        <AlertDialogDescription>
-                                                            This will cost {cardboardCost} Fish Points. You currently have {points} points.
-                                                        </AlertDialogDescription>
-                                                    </AlertDialogHeader>
-                                                    <AlertDialogFooter>
-                                                        <AlertDialogCancel onClick={() => playFeedback('click-2')}>Cancel</AlertDialogCancel>
-                                                        <AlertDialogAction onClick={handlePurchaseCardboard} disabled={points < cardboardCost}>
-                                                            Unlock for {cardboardCost} Points
-                                                        </AlertDialogAction>
-                                                    </AlertDialogFooter>
-                                                </AlertDialogContent>
-                                            </AlertDialog>
-                                        );
-                                    }
+                                    const unlocked = isSkinUnlocked(skin.id);
+                                    const cost = getSkinCost(skin.id);
+                                    const canAfford = points >= cost;
 
                                     return (
                                         <Card
@@ -174,11 +133,28 @@ export default function CustomizePage() {
                                             className={cn(
                                                 'flex aspect-square flex-col overflow-hidden rounded-3xl border border-border/40 bg-background/80 shadow-sm cursor-pointer transition-colors',
                                                 selectedSkin === skin.id && 'border-primary',
-                                                !isUnlocked && skin.id !== 'default' && 'opacity-50 cursor-not-allowed'
+                                                !unlocked && 'opacity-50',
+                                                !unlocked && !canAfford && 'cursor-not-allowed',
+                                                !unlocked && canAfford && 'hover:border-primary'
                                             )}
                                         >
                                             <CardContent className="relative flex flex-1 items-center justify-center bg-gradient-to-br from-background via-background/70 to-background p-3">
-                                                {SkinIcon ? <SkinIcon className="w-16 h-16" /> : <Lock className="w-8 h-8 text-muted-foreground" />}
+                                                {SkinIcon ? (
+                                                    <SkinIcon className={cn("w-16 h-16", !unlocked && "grayscale")} />
+                                                ) : (
+                                                    <Lock className="w-8 h-8 text-muted-foreground" />
+                                                )}
+                                                {!unlocked && (
+                                                    <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/50 text-white">
+                                                        <Lock className="w-8 h-8" />
+                                                        {cost > 0 && (
+                                                            <Badge variant="secondary" className="mt-2 flex items-center gap-1">
+                                                                <Fish className="w-3 h-3" />
+                                                                {cost}
+                                                            </Badge>
+                                                        )}
+                                                    </div>
+                                                )}
                                             </CardContent>
                                             <CardFooter className="bg-background/60 p-2 text-center">
                                                 <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{skin.name}</p>
@@ -194,12 +170,35 @@ export default function CustomizePage() {
                     </Tabs>
                 </CardContent>
             </Card>
+
+            {/* Apply Skin Dialog */}
             <BoxSkinDialog
-                open={isDialogOpen}
-                onOpenChange={setIsDialogOpen}
-                skin={selectedSkinForDialog}
+                open={isApplyDialogOpen}
+                onOpenChange={setIsApplyDialogOpen}
+                skin={selectedSkinForApplyDialog}
                 onApply={handleApplySkin}
             />
+
+            {/* Purchase Skin Dialog */}
+            <AlertDialog open={isPurchaseDialogOpen} onOpenChange={setIsPurchaseDialogOpen}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>Unlock {selectedSkinForPurchaseDialog.name} Skin?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            This will cost {getSkinCost(selectedSkinForPurchaseDialog.id)} Fish Points. You currently have {points} points.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel onClick={() => playFeedback('click-2')}>Cancel</AlertDialogCancel>
+                        <AlertDialogAction
+                            onClick={handlePurchaseSkin}
+                            disabled={points < getSkinCost(selectedSkinForPurchaseDialog.id)}
+                        >
+                            Unlock for {getSkinCost(selectedSkinForPurchaseDialog.id)} Points
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </>
     );
 }

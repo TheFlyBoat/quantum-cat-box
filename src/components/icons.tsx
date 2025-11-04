@@ -1,4 +1,3 @@
-
 import { cn } from "@/lib/utils";
 import React from "react";
 
@@ -138,7 +137,7 @@ export const CarbonBoxIcon = ({ className, isOpen }: { className?: string, isOpe
             />
         </g>
 
-        <ellipse cx="50" cy="94" rx="40" ry="5" fill="#000000" fillOpacity="0.2" />
+        <ellipse cx="50" cy="94" rx="40" ry="5" fill="#000000" fillOpacity={0.2} />
     </svg>
 );
 
@@ -308,7 +307,7 @@ export const SpecialXK6BoxIcon = ({ className, isOpen }: { className?: string, i
             />
         </g>
 
-        <ellipse cx="50" cy="94" rx="40" ry="5" fill="#000000" fillOpacity="0.2" />
+        <ellipse cx="50" cy="94" rx="40" ry="5" fill="#000000" fillOpacity={0.2} />
     </svg>
 );
 
@@ -354,3 +353,8 @@ export * from './icons/cardboard-box-icon';
 export * from './icons/share-badge-icon';
 export * from './icons/message-square-badge-icon';
 export * from './icons/tardis-box-icon';
+export * from './icons/circuit-board-box-icon';
+export * from './icons/crystal-box-icon';
+export * from './icons/galaxy-box-icon';
+export * from './icons/plush-box-icon';
+export * from './icons/steampunk-box-icon';

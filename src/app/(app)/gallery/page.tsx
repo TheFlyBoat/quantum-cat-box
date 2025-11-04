@@ -87,7 +87,7 @@ export default function GalleryPage() {
         return acc;
     }, {} as Record<string, typeof allCats>);
 
-    const groupOrder = ['Alive', 'Dead', 'Paradox', 'Awards'];
+    const groupOrder = ['Alive', 'Dead', 'Paradox'];
 
     const { isUnlocked } = useCatCollection();
     const { isBadgeUnlocked } = useBadges();
@@ -152,7 +152,7 @@ export default function GalleryPage() {
             </CardHeader>
             <CardContent>
                 <Tabs defaultValue="Alive" className="w-full">
-                    <TabsList className="grid w-full grid-cols-4 gap-3 rounded-3xl border border-border/40 bg-background/80 p-2 text-[11px] font-semibold uppercase tracking-wide shadow-sm">
+                    <TabsList className="grid w-full grid-cols-3 gap-3 rounded-3xl border border-border/40 bg-background/80 p-2 text-[11px] font-semibold uppercase tracking-wide shadow-sm">
                         {groupOrder.map(groupName => (
                             <TabsTrigger
                                 key={groupName}
@@ -168,24 +168,7 @@ export default function GalleryPage() {
                     </TabsList>
                     {groupOrder.map(groupName => (
                         <TabsContent key={groupName} value={groupName}>
-                            {groupName === 'Awards' ? (
-                                <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-                                    {awardsDisplay.map((badge, index) => {
-                                        const isPlaceholder = badge.id.startsWith('placeholder-award-');
-                                        const unlocked = !isPlaceholder && isBadgeUnlocked(badge.id);
-                                        const badgeImage = !isPlaceholder ? (badgeImageMap[badge.id] ?? defaultBadgeImage) : undefined;
-                                        return (
-                                            <BadgeCard
-                                                key={`${badge.id}-${index}`}
-                                                badge={badge}
-                                                unlocked={unlocked}
-                                                badgeImage={badgeImage}
-                                            />
-                                        );
-                                    })}
-                                </div>
-                            ) : (
-                                <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+                            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
                                     {(() => {
                                         const catsInGroup = catGroups[groupName] ?? [];
                                         const placeholdersNeeded = Math.max(0, 12 - catsInGroup.length);
@@ -304,7 +287,6 @@ export default function GalleryPage() {
                                         });
                                     })()}
                                 </div>
-                            )}
                         </TabsContent>
                     ))}
                 </Tabs>

@@ -5,7 +5,7 @@ import { Nunito, Patrick_Hand, Quicksand } from 'next/font/google';
 import { cn } from '@/lib/utils';
 import { Toaster } from '@/components/ui/toaster';
 import { AuthProvider } from '@/context/auth-context';
-import { AchievementsProvider } from '@/context/achievements-context';
+import { BadgeProgressProvider } from '@/context/badge-progress-context';
 import { CatCollectionProvider } from '@/context/cat-collection-context';
 import { DiaryProvider } from '@/context/diary-context';
 import { PointsProvider } from '@/context/points-context';
@@ -74,19 +74,19 @@ export default function RootLayout({
         >
           <AuthProvider>
             <BadgeProvider>
-              <AchievementsProvider>
-                <CatCollectionProvider>
+              <CatCollectionProvider>
+                <BadgeProgressProvider>
                   <DiaryProvider>
                     <PointsProvider>
-                        <BoxSkinProvider>
-                          <FeedbackProvider>
-                            {children}
-                          </FeedbackProvider>
-                        </BoxSkinProvider>
+                      <BoxSkinProvider>
+                        <FeedbackProvider>
+                          {children}
+                        </FeedbackProvider>
+                      </BoxSkinProvider>
                     </PointsProvider>
                   </DiaryProvider>
-                </CatCollectionProvider>
-              </AchievementsProvider>
+                </BadgeProgressProvider>
+              </CatCollectionProvider>
             </BadgeProvider>
           </AuthProvider>
         </ThemeProvider>

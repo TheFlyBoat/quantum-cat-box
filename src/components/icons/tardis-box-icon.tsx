@@ -27,13 +27,20 @@ export const TardisBoxIcon = ({ className, isOpen }: TardisBoxIconProps) => {
       preserveAspectRatio="xMidYMid meet"
       className={cn('h-full w-full', className)}
     >
-      <g transform="translate(0, 40)">
-        <image
-          href={boxSrc}
-          width="1572"
-          height="985"
-          preserveAspectRatio="xMidYMid meet"
-        />
+      <defs>
+        <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+          <feDropShadow dx="0" dy="30" stdDeviation="30" floodColor="#000000" floodOpacity="0.25" />
+        </filter>
+      </defs>
+      <g style={{ filter: 'url(#shadow)' }}>
+        <g transform="translate(0, 40)">
+          <image
+            href={boxSrc}
+            width="1572"
+            height="985"
+            preserveAspectRatio="xMidYMid meet"
+          />
+        </g>
       </g>
       <g
         className={cn(
@@ -49,14 +56,6 @@ export const TardisBoxIcon = ({ className, isOpen }: TardisBoxIconProps) => {
           preserveAspectRatio="xMidYMid meet"
         />
       </g>
-      <ellipse
-        cx="786"
-        cy="955"
-        rx="520"
-        ry="80"
-        fill="#000000"
-        fillOpacity={0.18}
-      />
     </svg>
   );
 };

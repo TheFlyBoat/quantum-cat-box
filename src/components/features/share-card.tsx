@@ -101,19 +101,19 @@ export function ShareCard({ catState, message, boxSkin }: ShareCardProps) {
           </div>
         </header>
 
-        <div className="flex w-full flex-col items-center gap-4">
-          <div className="relative h-40 w-40">
+        <div className="flex w-full flex-1 flex-col items-center justify-center gap-4">
+          <div className="relative h-36 w-36">
             <BoxComponent className="h-full w-full" isOpen />
-            <div className="absolute inset-0 flex items-end justify-center">
-              <div className="h-full w-full translate-y-[25%] scale-[0.6]">
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="h-full w-full scale-[0.8]">
                 <CatDisplay state={catState} />
               </div>
             </div>
           </div>
 
           <div className="w-full max-w-[260px]">
-            <div className="rounded-xl bg-white/85 px-4 py-4 text-center shadow-sm backdrop-blur">
-              <div className="font-fortune text-lg font-semibold leading-relaxed text-primary sm:text-xl">
+            <div className="rounded-xl bg-white/85 px-4 py-3 text-center shadow-sm backdrop-blur">
+              <div className="font-fortune text-base font-semibold leading-relaxed text-primary">
                 {sentences.length > 0 ? (
                   sentences.map((sentence, index) => (
                     <p key={`${sentence}-${index}`} className="mb-1 last:mb-0">

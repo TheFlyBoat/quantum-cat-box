@@ -4,7 +4,7 @@
 import * as React from 'react';
 import { Award, Flame, Fish } from 'lucide-react';
 import { useBadges } from '@/context/badge-context';
-import { useAchievements } from '@/context/achievements-context';
+import { useBadgeProgress } from '@/context/badge-progress-context';
 import { usePoints } from '@/context/points-context';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
@@ -15,7 +15,7 @@ import { useAuth } from '@/context/auth-context';
 
 export function AppHeader() {
     const { unlockedBadges } = useBadges();
-    const { streak } = useAchievements();
+    const { streak } = useBadgeProgress();
     const { points } = usePoints();
     const { user, displayName, logout, openLoginModal } = useAuth();
     const [userMenuOpen, setUserMenuOpen] = React.useState(false);

@@ -4,28 +4,35 @@
 import React, { createContext, useContext, ReactNode, useCallback, useMemo } from 'react';
 import { useAuth } from './auth-context';
 import { defaultUserData, saveUserData } from '@/lib/user-data';
+import boxSkinData from '@/lib/box-skin-data.json';
+import { usePoints } from './points-context';
+import { useToast } from '@/hooks/use-toast';
 
-type BoxSkin = 'default' | 'carbon' | 'cardboard' | 'black-wooden' | 'special-xk6' | 'stone' | 'tardis';
+type SkinId = typeof boxSkinData.skins[number]['id'];
 
 interface BoxSkinContextType {
-  selectedSkin: BoxSkin;
-  selectSkin: (skin: BoxSkin) => void;
-  unlockedSkins: BoxSkin[];
-  unlockSkin: (skin: BoxSkin) => void;
+  selectedSkin: SkinId;
+  selectSkin: (skin: SkinId) => void;
+  unlockedSkins: SkinId[];
+  unlockSkin: (skinId: SkinId) => boolean;
+  getSkinCost: (skinId: SkinId) => number;
+  isSkinUnlocked: (skinId: SkinId) => boolean;
 }
 
 const BoxSkinContext = createContext<BoxSkinContextType | undefined>(undefined);
 
-const defaultSkins: BoxSkin[] = ['default', 'carbon', 'cardboard', 'black-wooden', 'special-xk6', 'stone', 'tardis'];
-const allSkins: BoxSkin[] = ['default', 'carbon', 'cardboard', 'black-wooden', 'special-xk6', 'stone', 'tardis'];
+const allSkinIds: SkinId[] = boxSkinData.skins.map(skin => skin.id);
 
-const isBoxSkin = (skin: string | undefined): skin is BoxSkin =>
-  typeof skin === 'string' && (allSkins as string[]).includes(skin);
+const isSkinId = (skin: string | undefined): skin is SkinId =>
+  typeof skin === 'string' && (allSkinIds as string[]).includes(skin);
 
-const normalizeSkins = (skins?: string[]): BoxSkin[] => {
-  const merged = new Set<BoxSkin>(defaultSkins);
+const normalizeSkins = (skins?: string[]): SkinId[] => {
+  const merged = new Set<SkinId>();
+  // Always include free skins by default
+  boxSkinData.skins.filter(s => s.cost === 0).forEach(s => merged.add(s.id));
+
   (skins ?? []).forEach(skin => {
-    if (isBoxSkin(skin)) {
+    if (isSkinId(skin)) {
       merged.add(skin);
     }
   });
@@ -34,6 +41,8 @@ const normalizeSkins = (skins?: string[]): BoxSkin[] => {
 
 export const BoxSkinProvider = ({ children }: { children: ReactNode }) => {
   const { user, userData, setUserData, storageMode } = useAuth();
+  const { points, spendPoints } = usePoints();
+  const { toast } = useToast();
 
   const unlockedSkins = useMemo(
     () => normalizeSkins(userData?.unlockedSkins),
@@ -41,11 +50,11 @@ export const BoxSkinProvider = ({ children }: { children: ReactNode }) => {
   );
 
   const selectedSkin = useMemo(() => {
-    const storedSkin = isBoxSkin(userData?.selectedSkin) ? userData?.selectedSkin : 'default';
+    const storedSkin = isSkinId(userData?.selectedSkin) ? userData?.selectedSkin : 'default';
     return unlockedSkins.includes(storedSkin) ? storedSkin : 'default';
   }, [userData, unlockedSkins]);
 
-  const selectSkin = useCallback((skin: BoxSkin) => {
+  const selectSkin = useCallback((skin: SkinId) => {
     setUserData(prevData => {
       const base = prevData ?? defaultUserData;
       return { ...base, selectedSkin: skin };
@@ -55,10 +64,40 @@ export const BoxSkinProvider = ({ children }: { children: ReactNode }) => {
     }
   }, [user, setUserData, storageMode]);
 
-  const unlockSkin = useCallback((skin: BoxSkin) => {
-    if (unlockedSkins.includes(skin)) return;
+  const getSkinCost = useCallback((skinId: SkinId) => {
+    const skin = boxSkinData.skins.find(s => s.id === skinId);
+    return skin?.cost ?? 0;
+  }, []);
 
-    const newSkins = Array.from(new Set([...unlockedSkins, skin]));
+  const isSkinUnlocked = useCallback((skinId: SkinId) => {
+    return unlockedSkins.includes(skinId);
+  }, [unlockedSkins]);
+
+  const unlockSkin = useCallback((skinId: SkinId): boolean => {
+    if (isSkinUnlocked(skinId)) {
+      toast({
+        title: 'Skin already unlocked!',
+        description: `You already own the ${skinId} box.`,
+      });
+      return true;
+    }
+
+    const cost = getSkinCost(skinId);
+
+    if (points < cost) {
+      toast({
+        variant: 'destructive',
+        title: 'Not enough Fish Points!',
+        description: `You need ${cost} Fish Points to unlock this skin.`,
+      });
+      return false;
+    }
+
+    // Deduct points
+    spendPoints(cost);
+
+    // Add skin to unlocked list
+    const newSkins = Array.from(new Set([...unlockedSkins, skinId]));
 
     setUserData(prevData => {
       const base = prevData ?? defaultUserData;
@@ -68,10 +107,16 @@ export const BoxSkinProvider = ({ children }: { children: ReactNode }) => {
     if (storageMode === 'cloud' && user && user !== 'guest') {
       void saveUserData(user.uid, { unlockedSkins: newSkins });
     }
-  }, [unlockedSkins, user, setUserData, storageMode]);
+
+    toast({
+      title: 'Skin Unlocked!',
+      description: `You have unlocked the ${skinId} box for ${cost} Fish Points.`,
+    });
+    return true;
+  }, [unlockedSkins, isSkinUnlocked, getSkinCost, points, spendPoints, setUserData, storageMode, user, toast]);
 
   return (
-    <BoxSkinContext.Provider value={{ selectedSkin, selectSkin, unlockedSkins, unlockSkin }}>
+    <BoxSkinContext.Provider value={{ selectedSkin, selectSkin, unlockedSkins, unlockSkin, getSkinCost, isSkinUnlocked }}>
       {children}
     </BoxSkinContext.Provider>
   );

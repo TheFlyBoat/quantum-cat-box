@@ -8,6 +8,7 @@ import { defaultUserData, saveUserData } from '@/lib/user-data';
 interface PointsContextType {
   points: number;
   addPoints: (amount: number, options?: { celebrateImmediately?: boolean }) => void;
+  spendPoints: (amount: number) => void;
 }
 
 const PointsContext = createContext<PointsContextType | undefined>(undefined);
@@ -28,8 +29,12 @@ export const PointsProvider = ({ children }: { children: ReactNode }) => {
     }
   }, [points, setUserData, storageMode, user]);
 
+  const spendPoints = useCallback((amount: number) => {
+    addPoints(-amount);
+  }, [addPoints]);
+
   return (
-    <PointsContext.Provider value={{ points, addPoints }}>
+    <PointsContext.Provider value={{ points, addPoints, spendPoints }}>
       {children}
     </PointsContext.Provider>
   );

@@ -45,7 +45,7 @@ export const defaultUserData: UserData = {
   streak: 0,
   totalObservations: 0,
   unlockedBadges: [],
-  unlockedSkins: ['default', 'carbon', 'tardis'],
+  unlockedSkins: ['default', 'carbon', 'cardboard'],
   selectedSkin: 'default',
   unlockedCats: [],
   diary: {},

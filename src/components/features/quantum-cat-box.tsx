@@ -10,8 +10,13 @@ import {
   BoxIcon,
   CarbonBoxIcon,
   CardboardBoxIcon,
+  CircuitBoardBoxIcon,
+  CrystalBoxIcon,
+  GalaxyBoxIcon,
+  PlushBoxIcon,
   SpecialXK6BoxIcon,
   StoneBoxIcon,
+  SteampunkBoxIcon,
   TardisBoxIcon,
 } from '@/components/icons';
 import { useBoxSkin } from '@/context/box-skin-context';
@@ -41,6 +46,11 @@ const SKIN_COMPONENTS: Record<string, ComponentType<BoxComponentProps>> = {
   'special-xk6': SpecialXK6BoxIcon,
   stone: StoneBoxIcon,
   tardis: TardisBoxIcon,
+  'circuit-board': CircuitBoardBoxIcon,
+  crystal: CrystalBoxIcon,
+  galaxy: GalaxyBoxIcon,
+  plush: PlushBoxIcon,
+  steampunk: SteampunkBoxIcon,
 };
 
 /**
