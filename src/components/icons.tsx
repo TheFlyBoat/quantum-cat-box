@@ -54,7 +54,7 @@ export const BoxIcon = ({ className, isOpen }: { className?: string, isOpen?: bo
 
         {/* Lid */}
         <g className={cn("transition-transform duration-300", !isOpen && "group-hover:-translate-y-1", isOpen && "-translate-y-4")}>
-            <path d="M 8,28 H 92 C 96,28 96,22 92,22 L 8,22 C 4,22 4,28 8,28 Z" fill={'#8B4513'} />
+            <path d="M 8,28 H 92 C 96,28 96,22 92,22 L 8,22 C 4,22 4,28 8,28 Z" fill={"#8B4513"} />
         </g>
 
         {/* Box Body */}
@@ -348,10 +348,7 @@ export const BlackWoodenBoxIcon = ({ className, isOpen }: { className?: string, 
 );
 
 
-export * from './icons/fish-badge-icon';
 export * from './icons/cardboard-box-icon';
-export * from './icons/share-badge-icon';
-export * from './icons/message-square-badge-icon';
 export * from './icons/tardis-box-icon';
 export * from './icons/circuit-board-box-icon';
 export * from './icons/crystal-box-icon';
