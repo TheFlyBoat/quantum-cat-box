@@ -16,7 +16,7 @@ import { usePoints } from '@/context/points-context';
 import { useToast } from '@/hooks/use-toast';
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
-    const { celebrationBadgeId } = useBadges();
+    const { celebrationBadgeId, collectBadge, isBadgeUnlocked, unlockBadge } = useBadges();
     const [celebrationContent, setCelebrationContent] = React.useState<{ title: string; badgeName: string; description: string; icon?: React.ReactNode } | null>(null);
     const [celebrationState, setCelebrationState] = React.useState('idle');
     const [hiddenGameOpen, setHiddenGameOpen] = React.useState(false);
@@ -25,9 +25,12 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     const { toast } = useToast();
 
     const closeCelebration = React.useCallback(() => {
+        if (celebrationBadgeId) {
+            collectBadge(celebrationBadgeId);
+        }
         setCelebrationState('finished');
         setCelebrationContent(null);
-    }, []);
+    }, [celebrationBadgeId, collectBadge]);
 
     React.useEffect(() => {
         if (!celebrationBadgeId) return;
@@ -67,6 +70,10 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
     const celebrationInProgress = celebrationState === 'celebrating' || celebrationState === 'spotlight';
 
+    const openHiddenGame = React.useCallback(() => {
+        setHiddenGameOpen(true);
+    }, []);
+
     const handleHiddenGameComplete = React.useCallback((result: InfiniteBoxGameResult) => {
         if (result.fishPointsAwarded > 0) {
             addPoints(result.fishPointsAwarded);
@@ -80,8 +87,12 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                 description: 'No bonus Fish Points this time, but the Quantum Cat is impressed.',
             });
         }
+
+        if (!isBadgeUnlocked('infinite-chaser')) {
+            unlockBadge('infinite-chaser');
+        }
         setHiddenGameOpen(false);
-    }, [addPoints, toast]);
+    }, [addPoints, toast, isBadgeUnlocked, unlockBadge]);
 
     const handleHiddenGameDismiss = React.useCallback(() => {
         setHiddenGameOpen(false);
@@ -95,7 +106,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                     <div className="mt-6 flex w-full flex-col gap-6 flex-grow">
                         {children}
                     </div>
-                    <FloatingMenu />
+                    <FloatingMenu onSecretCustomizeClick={openHiddenGame} />
                 </main>
             </div>
             {celebrationState === 'celebrating' && celebrationContent && (

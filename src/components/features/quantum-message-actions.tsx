@@ -75,12 +75,12 @@ export function QuantumMessageActions({
           hasSharedQuantumMessage && 'from-[#A9DB4A] via-[#A9DB4A] to-[#A9DB4A] text-[#002D41] hover:brightness-110'
         )}
         aria-pressed={hasSharedQuantumMessage}
-        aria-label={hasSharedQuantumMessage ? 'Quantum Message shared' : 'Share Quantum Message'}
+        aria-label={hasSharedQuantumMessage ? 'Quantum Message shared' : 'Share'}
         disabled={isShareDisabled}
       >
         <Share2 className="mr-2 h-3.5 w-3.5" />
-        {hasSharedQuantumMessage ? 'Shared!' : 'Share Quantum Message'}
-      </Button>
+        {hasSharedQuantumMessage ? 'Shared!' : 'Share'}
+     </Button>
 
       <Button
         type="button"

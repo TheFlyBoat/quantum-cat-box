@@ -1,8 +1,8 @@
 
 'use client';
 
-import React, { createContext, useState, useContext, ReactNode, useEffect, useCallback, useMemo } from 'react';
-import { playSound } from '@/lib/audio';
+import React, { createContext, useState, useContext, ReactNode, useEffect, useCallback, useMemo, useRef } from 'react';
+import { playFeedback } from '@/lib/audio';
 import { useAuth } from './auth-context';
 import { defaultUserData, saveUserData } from '@/lib/user-data';
 import badgeData from '@/lib/badge-data.json';
@@ -17,6 +17,7 @@ interface BadgeContextType {
   isBadgeUnlocked: (badgeId: string) => boolean;
   lastUnlockedBadgeId: string | null;
   celebrationBadgeId: string | null;
+  collectBadge: (badgeId: string) => void;
   triggerCelebration: () => void;
 }
 
@@ -61,14 +62,21 @@ const haveSameMembers = (original: string[], migrated: string[]) => {
 };
 
 export const BadgeProvider = ({ children }: { children: ReactNode }) => {
-  const [lastUnlockedBadgeId, setLastUnlockedBadgeId] = useState<string | null>(null);
   const [celebrationBadgeId, setCelebrationBadgeId] = useState<string | null>(null);
-  
+  const [pendingBadges, setPendingBadges] = useState<string[]>([]);
+
+  const pendingBadgesRef = useRef<string[]>([]);
+
   const { user, userData, setUserData, storageMode } = useAuth();
+
+  useEffect(() => {
+    pendingBadgesRef.current = pendingBadges;
+  }, [pendingBadges]);
 
   const storedBadges = useMemo(() => userData?.unlockedBadges || [], [userData?.unlockedBadges]);
   const unlockedBadges = useMemo(() => migrateBadgeIds(storedBadges), [storedBadges]);
   const needsMigration = useMemo(() => !haveSameMembers(storedBadges, unlockedBadges), [storedBadges, unlockedBadges]);
+  const lastUnlockedBadgeId = useMemo(() => pendingBadges[0] ?? null, [pendingBadges]);
 
   useEffect(() => {
     if (!needsMigration) return;
@@ -90,18 +98,21 @@ export const BadgeProvider = ({ children }: { children: ReactNode }) => {
     }
   }, [needsMigration, unlockedBadges, setUserData, storageMode, user]);
 
+  const startCelebration = useCallback((badgeId: string) => {
+    if (!badgeId) return;
+
+    setCelebrationBadgeId(previous => {
+      if (previous === badgeId) return previous;
+      playFeedback('badge-unlocked');
+      return badgeId;
+    });
+  }, []);
+
   const triggerCelebration = useCallback(() => {
-    if (!lastUnlockedBadgeId) return;
-
-    setCelebrationBadgeId(lastUnlockedBadgeId);
-    playSound('badge-unlocked');
-
-    // Allow the UI to animate before clearing the active badge.
-    setTimeout(() => {
-      setCelebrationBadgeId(null);
-      setLastUnlockedBadgeId(null);
-    }, 4000);
-  }, [lastUnlockedBadgeId]);
+    const nextBadgeId = pendingBadgesRef.current[0];
+    if (!nextBadgeId) return;
+    startCelebration(nextBadgeId);
+  }, [startCelebration]);
 
   const unlockBadge = useCallback((badgeId: string, options: UnlockOptions = { celebrateImmediately: true }) => {
     const resolvedBadgeId = Object.prototype.hasOwnProperty.call(badgeMigrationMap, badgeId)
@@ -110,34 +121,63 @@ export const BadgeProvider = ({ children }: { children: ReactNode }) => {
 
     if (!resolvedBadgeId || !validBadgeIds.has(resolvedBadgeId)) return;
     if (unlockedBadges.includes(resolvedBadgeId)) return;
+    if (pendingBadgesRef.current.includes(resolvedBadgeId)) return;
 
-    const newBadges = [...unlockedBadges, resolvedBadgeId];
-    setLastUnlockedBadgeId(resolvedBadgeId); // Set the pending badge ID
-
-    if (options.celebrateImmediately) {
-        // We use a micro-task timeout to ensure the state update has propagated
-        // before we trigger the sound and visual effect.
-        setTimeout(triggerCelebration, 0);
-    }
-    
-    // Persist for logged-in users
-    setUserData(prevData => {
-      const base = prevData ?? defaultUserData;
-      return { ...base, unlockedBadges: newBadges };
+    setPendingBadges(prev => {
+      const next = [...prev, resolvedBadgeId];
+      pendingBadgesRef.current = next;
+      return next;
     });
 
-    if (storageMode === 'cloud' && user && user !== 'guest') {
-      void saveUserData(user.uid, { unlockedBadges: newBadges });
+    if (options.celebrateImmediately) {
+      const scheduleCelebration = () => triggerCelebration();
+      if (typeof queueMicrotask === 'function') {
+        queueMicrotask(scheduleCelebration);
+      } else {
+        setTimeout(scheduleCelebration, 0);
+      }
     }
-  }, [unlockedBadges, user, setUserData, triggerCelebration, storageMode]);
+  }, [triggerCelebration, unlockedBadges]);
 
+  const collectBadge = useCallback((badgeId: string) => {
+    if (!badgeId || !validBadgeIds.has(badgeId)) return;
+
+    setPendingBadges(prev => {
+      const next = prev.filter(id => id !== badgeId);
+      pendingBadgesRef.current = next;
+      return next;
+    });
+
+    setCelebrationBadgeId(current => (current === badgeId ? null : current));
+
+    let updatedBadges: string[] | null = null;
+    let didUpdate = false;
+
+    setUserData(prevData => {
+      const base = prevData ?? defaultUserData;
+      const existing = base.unlockedBadges ?? [];
+
+      if (existing.includes(badgeId)) {
+        updatedBadges = existing;
+        return base;
+      }
+
+      updatedBadges = [...existing, badgeId];
+      didUpdate = true;
+      return { ...base, unlockedBadges: updatedBadges };
+    });
+
+    if (didUpdate && updatedBadges && storageMode === 'cloud' && user && user !== 'guest') {
+      void saveUserData(user.uid, { unlockedBadges: updatedBadges });
+    }
+  }, [setUserData, storageMode, user]);
 
   const isBadgeUnlocked = useCallback((badgeId: string) => {
     return unlockedBadges.includes(badgeId);
   }, [unlockedBadges]);
 
   return (
-    <BadgeContext.Provider value={{ unlockedBadges, unlockBadge, isBadgeUnlocked, lastUnlockedBadgeId, celebrationBadgeId, triggerCelebration }}>
+    <BadgeContext.Provider value={{ unlockedBadges, unlockBadge, isBadgeUnlocked, lastUnlockedBadgeId, celebrationBadgeId, collectBadge, triggerCelebration }}>
       {children}
     </BadgeContext.Provider>
   );

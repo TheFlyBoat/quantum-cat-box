@@ -1,10 +1,12 @@
 
 'use client';
 
+import * as React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Home, Cat, BoxIcon, Settings } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { playFeedback } from '@/lib/audio';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 const navItems = [
@@ -14,8 +16,30 @@ const navItems = [
     { href: '/settings', icon: Settings, label: 'Settings', hoverColorClass: 'hover:text-emerald-400', activeColorClass: 'text-emerald-400' },
 ];
 
-export function FloatingMenu() {
+const TRIPLE_CLICK_WINDOW_MS = 800;
+
+type FloatingMenuProps = {
+    onSecretCustomizeClick?: () => void;
+};
+
+export function FloatingMenu({ onSecretCustomizeClick }: FloatingMenuProps) {
     const pathname = usePathname();
+    const customizeClickRef = React.useRef<{ count: number; lastClickTs: number }>({ count: 0, lastClickTs: 0 });
+
+    const handleCustomizeClick = React.useCallback(() => {
+        const now = Date.now();
+        const { count, lastClickTs } = customizeClickRef.current;
+
+        const withinWindow = now - lastClickTs <= TRIPLE_CLICK_WINDOW_MS;
+        const nextCount = withinWindow ? count + 1 : 1;
+
+        if (nextCount >= 3) {
+            customizeClickRef.current = { count: 0, lastClickTs: 0 };
+            onSecretCustomizeClick?.();
+        } else {
+            customizeClickRef.current = { count: nextCount, lastClickTs: now };
+        }
+    }, [onSecretCustomizeClick]);
 
     return (
         <div className="mt-auto w-full">
@@ -30,6 +54,12 @@ export function FloatingMenu() {
                                 <TooltipTrigger asChild>
                                     <Link
                                         href={item.href}
+                                        onClick={() => {
+                                            playFeedback('click-1');
+                                            if (item.href === '/customize') {
+                                                handleCustomizeClick();
+                                            }
+                                        }}
                                         className={cn(
                                             'group flex h-12 w-12 items-center justify-center rounded-full text-muted-foreground transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background hover:scale-110',
                                             item.hoverColorClass,

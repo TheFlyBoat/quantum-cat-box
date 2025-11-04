@@ -11,7 +11,6 @@ import {
   TardisBoxIcon,
 } from '@/components/icons';
 import { Card } from '@/components/ui/card';
-import { cn } from '@/lib/utils';
 import { type CatState } from '@/lib/types';
 import catData from '@/lib/cat-data.json';
 
@@ -39,13 +38,6 @@ const catCatalog = (catData.cats ?? []) as Array<{
   tagline: string;
 }>;
 
-const GRADIENT_BY_TYPE: Record<string, string> = {
-  alive: 'from-[#A9DB4A]/80 via-[#3696C9]/70 to-[#A240FF]/80',
-  dead: 'from-[#002D41]/90 via-[#3696C9]/55 to-[#FF809F]/55',
-  paradox: 'from-[#FF809F]/70 via-[#A240FF]/80 to-[#D14002]/65',
-  default: 'from-[#A240FF]/60 via-[#FF809F]/60 to-[#3696C9]/60',
-};
-
 const SKIN_COMPONENTS: Record<BoxSkin, typeof BoxIcon> = {
   default: BoxIcon,
   carbon: CarbonBoxIcon,
@@ -56,74 +48,87 @@ const SKIN_COMPONENTS: Record<BoxSkin, typeof BoxIcon> = {
   tardis: TardisBoxIcon,
 };
 
-const HASH_TAG = '#thequantumcat';
+const getTitleParts = (name?: string | null) => {
+  if (!name) return { part1: 'The', part2: 'Quantum', part3: 'Cat' };
 
-const formatHeadline = (name?: string) => {
-  if (!name) return 'A Quantum Cat Appeared!';
-  return name.startsWith('The') ? name : `The ${name}`;
+  if (name === 'Void') {
+    return { part1: 'The', part2: 'Void', part3: 'Cat' };
+  }
+
+  if (name.endsWith(' Cat')) {
+    const baseName = name.replace(/ Cat$/, '');
+    const parts = baseName.split(' ');
+    if (parts.length > 1) {
+      return { part1: 'The', part2: parts.join(' '), part3: 'Cat' };
+    }
+    return { part1: 'The', part2: baseName, part3: 'Cat' };
+  }
+
+  return { part1: 'The', part2: name, part3: 'Cat' };
 };
 
 /**
- * Styled share card used for exporting Quantum Messages to social platforms.
- * Includes the revealed cat, Quantum Message, and current Quantum Box skin.
+ * Share card aligned with the in-app reveal screen styling.
+ * Presents the title, revealed cat, and message in a layout mirroring the app.
  */
 export function ShareCard({ catState, message, boxSkin }: ShareCardProps) {
   const cat = catCatalog.find(entry => entry.id === catState.catId);
-  const headline = formatHeadline(cat?.name);
-  const typeKey = cat?.type?.toLowerCase() ?? 'default';
-  const gradientClass = GRADIENT_BY_TYPE[typeKey] ?? GRADIENT_BY_TYPE.default;
+  const titleParts = getTitleParts(cat?.name ?? null);
   const BoxComponent = SKIN_COMPONENTS[boxSkin] ?? BoxIcon;
+  const sentences = message
+    .split(/\r?\n/)
+    .flatMap(segment => segment.split(/(?<=[.!?])\s+/))
+    .map(sentence => sentence.trim())
+    .filter(Boolean);
 
   return (
     <Card
-      className={cn(
-        'relative flex h-full w-full flex-col overflow-hidden bg-gradient-to-br p-6 text-center font-body shadow-2xl',
-        gradientClass
-      )}
+      className="relative flex h-full w-full flex-col items-center rounded-[32px] border border-white/20 bg-[linear-gradient(135deg,#5eead4_0%,#67e8f9_32%,#f0abfc_66%,#c4b5fd_100%)] px-6 pb-8 pt-6 text-center font-body text-white shadow-[0_25px_70px_-35px_rgba(79,70,229,0.45)]"
     >
-      <div className="flex h-full w-full flex-col items-center justify-between space-y-4">
-        <header className="flex w-full flex-col items-center space-y-2 text-[#002D41]/80">
+      <div className="flex h-full w-full flex-col items-center justify-between gap-4">
+        <header className="flex w-full flex-col items-center gap-3">
           <Image
             src="/favicon.svg"
             alt="The Quantum Cat logo"
-            width={40}
-            height={40}
-            className="h-10 w-10"
+            width={48}
+            height={48}
+            className="h-12 w-12"
           />
-          <p className="rounded-full bg-white/70 px-3 py-1 text-xs font-semibold uppercase tracking-[0.35em] text-[#002D41]">
-            Quantum Message
-          </p>
-          <h3 className="rounded-lg bg-[#002D41]/80 px-4 py-1 font-headline text-xl font-semibold text-white shadow-sm">
-            {headline}
-          </h3>
-          {cat?.tagline && (
-            <p className="max-w-sm text-sm text-white/80">{cat.tagline}</p>
-          )}
+          <div className="flex items-center justify-center space-x-2 font-headline text-3xl font-bold tracking-tight text-black">
+            <span>{titleParts.part1}</span>
+            <span>{titleParts.part2}</span>
+            <span>{titleParts.part3}</span>
+          </div>
         </header>
 
-        <div className="flex w-full flex-1 flex-col items-center justify-center">
-          <div className="relative h-44 w-44">
+        <div className="flex w-full flex-col items-center gap-4">
+          <div className="relative h-40 w-40">
             <BoxComponent className="h-full w-full" isOpen />
             <div className="absolute inset-0 flex items-end justify-center">
-              <div className="h-full w-full translate-y-[20%] scale-[0.62]">
+              <div className="h-full w-full translate-y-[25%] scale-[0.6]">
                 <CatDisplay state={catState} />
+              </div>
+            </div>
+          </div>
+
+          <div className="w-full max-w-[260px]">
+            <div className="rounded-xl bg-white/85 px-4 py-4 text-center shadow-sm backdrop-blur">
+              <div className="font-fortune text-lg font-semibold leading-relaxed text-primary sm:text-xl">
+                {sentences.length > 0 ? (
+                  sentences.map((sentence, index) => (
+                    <p key={`${sentence}-${index}`} className="mb-1 last:mb-0">
+                      {sentence}
+                    </p>
+                  ))
+                ) : (
+                  <p>A curious fortune emerges.</p>
+                )}
               </div>
             </div>
           </div>
         </div>
 
-        <div className="w-full px-2">
-          <div className="flex min-h-[6.5rem] items-center justify-center rounded-xl bg-white/75 p-4 text-[#002D41] shadow-inner backdrop-blur">
-            <p className="font-semibold leading-tight">
-              &ldquo;{message.trim()}&rdquo;
-            </p>
-          </div>
-          <p className="mt-3 text-right text-xs font-semibold uppercase tracking-[0.25em] text-white drop-shadow">
-            {HASH_TAG}
-          </p>
-        </div>
-
-        <footer className="pt-1 font-headline text-sm font-semibold uppercase tracking-[0.3em] text-white/85">
+        <footer className="w-full pt-4 text-xs font-semibold uppercase tracking-[0.3em] text-white/80">
           thequantumcat.app
         </footer>
       </div>

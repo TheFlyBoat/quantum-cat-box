@@ -12,7 +12,7 @@ import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Slider } from '@/components/ui/slider';
 import { Volume2, VolumeX, Moon, Sun, RotateCcw, Accessibility, Vibrate, HelpCircle, MessageSquare } from 'lucide-react';
-import { playSound } from '@/lib/audio';
+import { playFeedback } from '@/lib/audio';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
 
@@ -22,26 +22,27 @@ export default function SettingsPage() {
     const { theme, setTheme } = useTheme();
 
     const handleSoundToggle = (checked: boolean) => {
-        playSound(checked ? 'toggle-on' : 'toggle-off');
+        playFeedback(checked ? 'toggle-on' : 'toggle-off');
         setSoundEnabled(checked);
     };
 
     const handleVibrationToggle = (checked: boolean) => {
+        playFeedback('haptic-1');
         setVibrationEnabled(checked);
     };
 
     const handleThemeToggle = (checked: boolean) => {
-        playSound(checked ? 'toggle-on' : 'toggle-off');
+        playFeedback(checked ? 'toggle-on' : 'toggle-off');
         setTheme(checked ? 'dark' : 'light');
     };
 
     const handleMotionToggle = (checked: boolean) => {
-        playSound(checked ? 'toggle-on' : 'toggle-off');
+        playFeedback(checked ? 'toggle-on' : 'toggle-off');
         setReduceMotion(checked);
     };
 
     const handleReset = () => {
-        playSound('haptic-3');
+        playFeedback('haptic-3');
         reset();
     };
 
@@ -55,7 +56,7 @@ export default function SettingsPage() {
                 <CardTitle className="page-title text-teal-500">Settings</CardTitle>
             </CardHeader>
             <CardContent>
-                <Tabs defaultValue="system" className="w-full">
+                <Tabs defaultValue="system" className="w-full" onValueChange={() => playFeedback('click-3')}>
                     {(() => {
                         const tabBaseClass =
                             'flex-1 px-3 py-1.5 font-semibold transition transform rounded-2xl hover:scale-105 hover:shadow-md data-[state=active]:bg-white data-[state=active]:font-bold data-[state=active]:text-foreground data-[state=active]:scale-[1.08] dark:data-[state=active]:bg-white';
@@ -169,7 +170,7 @@ export default function SettingsPage() {
                                     Reset Progress
                                 </p>
                                 <p className={`${bodyTextClass} mt-2 text-destructive/80`}>
-                                    Wipes cats, badges, points, and diary entries from this device.
+
                                 </p>
                                 <AlertDialog>
                                     <AlertDialogTrigger asChild>
@@ -185,7 +186,7 @@ export default function SettingsPage() {
                                             </AlertDialogDescription>
                                         </AlertDialogHeader>
                                         <AlertDialogFooter>
-                                            <AlertDialogCancel onClick={() => playSound('click-2')}>Cancel</AlertDialogCancel>
+                                            <AlertDialogCancel onClick={() => playFeedback('click-2')}>Cancel</AlertDialogCancel>
                                             <AlertDialogAction asChild>
                                                 <Button variant="destructive" onClick={handleReset}>Reset</Button>
                                             </AlertDialogAction>

@@ -9,7 +9,7 @@ import { usePoints } from '@/context/points-context';
 import { generateCatMessage } from '@/ai/flows/generate-cat-message';
 import fallbackMessages from '@/lib/fallback-messages.json';
 import catData from '@/lib/cat-data.json';
-import { playSound } from '@/lib/audio';
+import { playFeedback } from '@/lib/audio';
 import { useBoxSkin } from '@/context/box-skin-context';
 import { useTheme } from 'next-themes';
 
@@ -184,13 +184,13 @@ export function useCatLogic({ onInteraction, setRevealedCatId, onCatReveal }: {
     const handleBoxClick = async (options?: { ignoreLock?: boolean }) => {
         if (isLoading || catState.outcome !== 'initial' || isRevealing) return;
         if (isDailyLocked && !options?.ignoreLock) {
-            playSound('haptic-3');
+            playFeedback('haptic-3');
             return;
         }
 
         onInteraction?.();
 
-        playSound('click-1');
+        playFeedback('click-1');
         if (!options?.ignoreLock) {
             lockForToday();
         }
@@ -288,13 +288,13 @@ export function useCatLogic({ onInteraction, setRevealedCatId, onCatReveal }: {
 
             switch (selectedSkin) {
                 case 'carbon':
-                    playSound('reveal-carbon');
+                    playFeedback('reveal-carbon');
                     break;
                 case 'cardboard':
-                    playSound('reveal-cardboard');
+                    playFeedback('reveal-cardboard');
                     break;
                 default:
-                    playSound('reveal-default');
+                    playFeedback('reveal-default');
                     break;
             }
 
@@ -333,10 +333,10 @@ export function useCatLogic({ onInteraction, setRevealedCatId, onCatReveal }: {
     const handleReset = useCallback((options?: { ignoreLock?: boolean }) => {
         onInteraction?.();
         if (isDailyLocked && !options?.ignoreLock) {
-            playSound('haptic-3');
+            playFeedback('haptic-3');
             return;
         }
-        playSound('click-2');
+        playFeedback('click-2');
         resetState();
     }, [isDailyLocked, onInteraction, resetState]);
 
@@ -355,7 +355,7 @@ export function useCatLogic({ onInteraction, setRevealedCatId, onCatReveal }: {
         }
         setIsDailyLocked(false);
         setNextAvailableAt(null);
-        playSound('click-2');
+        playFeedback('click-2');
         resetState();
     }, [onInteraction, resetState]);
 

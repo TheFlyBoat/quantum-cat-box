@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useAuth } from '@/context/auth-context';
-import { playSound } from '@/lib/audio';
+import { playFeedback } from '@/lib/audio';
 import { cn } from '@/lib/utils';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -35,7 +35,7 @@ export function LoginCard({ className, onSuccess, onGuest, allowGuest = true }: 
     const [isLoading, setIsLoading] = useState(false);
 
     const handleGoogleSignIn = async () => {
-        playSound('click-1');
+        playFeedback('click-1');
         setAuthError(null);
         try {
             await signInWithGoogle();
@@ -48,7 +48,7 @@ export function LoginCard({ className, onSuccess, onGuest, allowGuest = true }: 
 
     const handleEmailAuth = async (e: React.FormEvent) => {
         e.preventDefault();
-        playSound('click-1');
+        playFeedback('click-1');
         setAuthError(null);
         setIsLoading(true);
 
@@ -80,7 +80,7 @@ export function LoginCard({ className, onSuccess, onGuest, allowGuest = true }: 
     };
 
     const handleGuest = () => {
-        playSound('click-1');
+        playFeedback('click-1');
         continueAsGuest();
         onGuest?.();
     };

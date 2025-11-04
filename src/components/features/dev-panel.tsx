@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
-import { soundList, playSound } from '@/lib/audio';
+import { soundList, playFeedback } from '@/lib/audio';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { type CatState } from '@/lib/types';
 
@@ -49,7 +49,7 @@ export function DevPanel({ allCats, onCatSelect, catState, quantumMessage }: Dev
                             type="button"
                             variant="outline"
                             size="sm"
-                            onClick={() => playSound(sound)}
+                            onClick={() => playFeedback(sound)}
                             aria-label={`Play ${sound} sound`}
                         >
                             {sound}

@@ -49,6 +49,8 @@ export const FeedbackProvider = ({ children }: { children: ReactNode }) => {
         if (storageMode === 'cloud' && user && user !== 'guest') {
             saveUserData(user.uid, { settings: { soundEnabled: enabled } });
         }
+        localStorage.setItem('quantum-cat-sound-enabled', JSON.stringify(enabled));
+        window.dispatchEvent(new CustomEvent('feedback-setting-changed'));
     }, [setUserData, storageMode, user]);
 
     const setVibrationEnabled = useCallback((enabled: boolean) => {
@@ -65,6 +67,8 @@ export const FeedbackProvider = ({ children }: { children: ReactNode }) => {
         if (storageMode === 'cloud' && user && user !== 'guest') {
             saveUserData(user.uid, { settings: { vibrationEnabled: enabled } });
         }
+        localStorage.setItem('quantum-cat-vibration-enabled', JSON.stringify(enabled));
+        window.dispatchEvent(new CustomEvent('feedback-setting-changed'));
     }, [setUserData, storageMode, user]);
 
     const setVolume = useCallback((volume: number) => {
@@ -81,6 +85,8 @@ export const FeedbackProvider = ({ children }: { children: ReactNode }) => {
         if (storageMode === 'cloud' && user && user !== 'guest') {
             saveUserData(user.uid, { settings: { volume } });
         }
+        localStorage.setItem('quantum-cat-volume', volume.toString());
+        window.dispatchEvent(new CustomEvent('feedback-setting-changed'));
     }, [setUserData, storageMode, user]);
 
     const setReduceMotion = useCallback((enabled: boolean) => {
@@ -97,6 +103,9 @@ export const FeedbackProvider = ({ children }: { children: ReactNode }) => {
         if (storageMode === 'cloud' && user && user !== 'guest') {
             saveUserData(user.uid, { settings: { reduceMotion: enabled } });
         }
+        // Note: reduceMotion is not directly used in audio.ts, but we do this for consistency
+        localStorage.setItem('quantum-cat-reduce-motion', JSON.stringify(enabled));
+        window.dispatchEvent(new CustomEvent('feedback-setting-changed'));
     }, [setUserData, storageMode, user]);
 
     return (

@@ -39,44 +39,47 @@
 │   │   │   ├── layout.tsx
 │   │   │   └── settings
 │   │   │       └── page.tsx
+│   │   ├── design-n-style
+│   │   │   └── page.tsx
 │   │   ├── globals.css
 │   │   ├── layout.tsx
 │   │   ├── login
 │   │   │   └── page.tsx
 │   │   └── page.tsx
 │   ├── assets
-│   │   └── badges
-│   │       ├── alive_and_kicking.png
-│   │       ├── alive_and_kicking.svg
-│   │       ├── archivist.png
-│   │       ├── archivist.svg
-│   │       ├── curious_kitten.png
-│   │       ├── curious_kitten.svg
-│   │       ├── first_peek.png
-│   │       ├── first_peek.svg
-│   │       ├── message_keeper.png
-│   │       ├── message_keeper.svg
-│   │       ├── paradox_seeker.png
-│   │       ├── paradox_seeker.svg
-│   │       ├── quantum_echo.png
-│   │       ├── quantum_echo.svg
-│   │       ├── rest_in_pieces.png
-│   │       ├── rest_in_pieces.svg
-│   │       ├── storyteller.png
-│   │       ├── storyteller.svg
-│   │       ├── viral_cat.png
-│   │       └── viral_cat.svg
+│   │   ├── badges
+│   │   │   ├── alive_and_kicking.png
+│   │   │   ├── alive_and_kicking.svg
+│   │   │   ├── archivist.png
+│   │   │   ├── archivist.svg
+│   │   │   ├── curious_kitten.png
+│   │   │   ├── curious_kitten.svg
+│   │   │   ├── first_peek.png
+│   │   │   ├── first_peek.svg
+│   │   │   ├── message_keeper.png
+│   │   │   ├── message_keeper.svg
+│   │   │   ├── paradox_seeker.png
+│   │   │   ├── paradox_seeker.svg
+│   │   │   ├── quantum_echo.png
+│   │   │   ├── quantum_echo.svg
+│   │   │   ├── rest_in_pieces.png
+│   │   │   ├── rest_in_pieces.svg
+│   │   │   ├── storyteller.png
+│   │   │   ├── storyteller.svg
+│   │   │   ├── viral_cat.png
+│   │   │   └── viral_cat.svg
+│   │   └── box-skin
+│   │       ├── tardis_box.svg
+│   │       └── tardis_lid.svg
 │   ├── components
 │   │   ├── auth
 │   │   │   ├── login-card.tsx
 │   │   │   ├── login-modal.tsx
 │   │   │   ├── login-prompt.tsx
-│   │   │   └── nickname-dialog.tsx
-│   │   ├── badge-card.tsx
-│   │   ├── cat-diary-sheet.tsx
-│   │   ├── cat-display.tsx
-│   │   ├── cat-profile-dialog.tsx
+│   │   │   ├── nickname-dialog.tsx
+│   │   │   └── user-status-label.tsx
 │   │   ├── cats
+│   │   │   ├── CatDisplay.tsx
 │   │   │   ├── alt-cat.tsx
 │   │   │   ├── anomaly-cat.tsx
 │   │   │   ├── blizzard-cat.tsx
@@ -108,27 +111,31 @@
 │   │   │   ├── voodoo-cat.tsx
 │   │   │   ├── wonder-cat.tsx
 │   │   │   └── zumbi-cat.tsx
-│   │   ├── celebration-card.tsx
-│   │   ├── dev-panel.tsx
+│   │   ├── features
+│   │   │   ├── BadgeCard.tsx
+│   │   │   ├── cat-profile-dialog.tsx
+│   │   │   ├── celebration-card.tsx
+│   │   │   ├── dev-panel.tsx
+│   │   │   ├── infinite-box-game.tsx
+│   │   │   ├── message-display.tsx
+│   │   │   ├── onboarding-modal.tsx
+│   │   │   ├── quantum-cat-box.tsx
+│   │   │   ├── quantum-message-actions.tsx
+│   │   │   ├── share-card.tsx
+│   │   │   └── tutorial-overlay.tsx
 │   │   ├── icons
 │   │   │   ├── cardboard-box-icon.tsx
 │   │   │   ├── fish-badge-icon.tsx
 │   │   │   ├── message-square-badge-icon.tsx
-│   │   │   └── share-badge-icon.tsx
+│   │   │   ├── share-badge-icon.tsx
+│   │   │   └── tardis-box-icon.tsx
 │   │   ├── icons.tsx
-│   │   ├── infinite-box-game.tsx
 │   │   ├── layout
 │   │   │   ├── app-header.tsx
 │   │   │   └── sidebar.tsx
-│   │   ├── main-actions.tsx
-│   │   ├── message-display.tsx
-│   │   ├── onboarding-modal.tsx
-│   │   ├── quantum-cat-box.tsx
-│   │   ├── share-card.tsx
 │   │   ├── splash-screen.tsx
 │   │   ├── theme-provider.tsx
 │   │   ├── title-display.tsx
-│   │   ├── tutorial-overlay.tsx
 │   │   └── ui
 │   │       ├── accordion.tsx
 │   │       ├── alert-dialog.tsx
@@ -198,7 +205,6 @@
 │       ├── user-data.ts
 │       └── utils.ts
 ├── tailwind.config.ts
-├── tsconfig.json
-└── tsconfig.tsbuildinfo
+└── tsconfig.json
 
-27 directories, 175 files
+30 directories, 178 files

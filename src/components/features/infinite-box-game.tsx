@@ -26,7 +26,7 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { playSound } from '@/lib/audio';
+import { playFeedback } from '@/lib/audio';
 
 export type InfiniteBoxGameResult = {
   totalClicks: number;
@@ -114,7 +114,7 @@ export function InfiniteBoxGame({ onComplete, onDismiss }: InfiniteBoxGameProps)
   const finalizeGame = useCallback(() => {
     if (phase !== 'playing') return;
 
-    playSound('celebration-magic');
+    playFeedback('celebration-magic');
     setResult({
       totalClicks,
       applesCollected,
@@ -179,14 +179,14 @@ export function InfiniteBoxGame({ onComplete, onDismiss }: InfiniteBoxGameProps)
 
   const handleBoxClick = useCallback(() => {
     if (phase !== 'playing') return;
-    playSound('box-shake');
+    playFeedback('box-shake');
     setTotalClicks(prev => prev + 1);
     applyIconEffect(currentIcon);
     setCurrentIcon(prev => getRandomIcon(prev.id));
   }, [phase, currentIcon, applyIconEffect]);
 
   const handleDismiss = useCallback(() => {
-    playSound('haptic-3');
+    playFeedback('haptic-3');
     onDismiss();
   }, [onDismiss]);
 

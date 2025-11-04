@@ -6,7 +6,7 @@ import { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { playSound } from '@/lib/audio';
+import { playFeedback } from '@/lib/audio';
 
 interface NicknameDialogProps {
     isOpen: boolean;
@@ -22,7 +22,7 @@ export function NicknameDialog({ isOpen, onOpenChange, onNicknameSet }: Nickname
         const trimmedNickname = nickname.trim();
         if (trimmedNickname.length > 2) {
             onNicknameSet(trimmedNickname);
-            playSound('celebration-magic');
+            playFeedback('celebration-magic');
         }
     };
 

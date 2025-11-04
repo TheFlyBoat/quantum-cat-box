@@ -2,10 +2,11 @@
 'use client';
 
 import { useEffect } from 'react';
+import { useTypewriter } from '@/hooks/use-typewriter';
 
 import { LoadingFishes } from '@/components/ui/loading-fishes';
 import { useFeedback } from '@/context/feedback-context';
-import { playSound } from '@/lib/audio';
+import { playFeedback } from '@/lib/audio';
 import { cn } from '@/lib/utils';
 import { type CatState } from '@/lib/types';
 
@@ -27,12 +28,13 @@ const SOUND_BY_OUTCOME: Record<CatState['outcome'], string> = {
  */
 export function QuantumMessageDisplay({ message, catState }: QuantumMessageDisplayProps) {
   const { reduceMotion } = useFeedback();
+  const typedMessage = useTypewriter(message, 50);
 
   useEffect(() => {
     if (!message) return;
 
     const soundId = SOUND_BY_OUTCOME[catState.outcome] ?? SOUND_BY_OUTCOME.paradox;
-    playSound(soundId);
+    playFeedback(soundId);
   }, [message, catState.outcome]);
 
   if (catState.outcome === 'initial') {
@@ -47,7 +49,7 @@ export function QuantumMessageDisplay({ message, catState }: QuantumMessageDispl
     );
   }
 
-  const sentences = message
+  const sentences = typedMessage
     .split(/(?<=[.!?])\s+/)
     .map(sentence => sentence.trim())
     .filter(Boolean);

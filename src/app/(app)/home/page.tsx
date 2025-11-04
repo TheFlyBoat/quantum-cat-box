@@ -10,15 +10,15 @@ import { ShareCard } from '@/components/features/share-card';
 import { TutorialOverlay } from '@/components/features/tutorial-overlay';
 import { TitleDisplay } from '@/components/title-display';
 import { SplashScreen } from '@/components/splash-screen';
-import { useCatLogic } from '@/lib/hooks/use-cat-logic';
-import { useDevMode } from '@/lib/hooks/use-dev-mode';
-import { ShareAsset, useShare } from '@/lib/hooks/use-share';
+import { useCatLogic } from '@/hooks/use-cat-logic';
+import { useDevMode } from '@/hooks/use-dev-mode';
+import { ShareAsset, useShare } from '@/hooks/use-share';
 import { useDiary } from '@/context/diary-context';
 import { useBadges } from '@/context/badge-context';
 import { useFeedback } from '@/context/feedback-context';
 import { useBoxSkin } from '@/context/box-skin-context';
 import { useToast } from '@/hooks/use-toast';
-import { playSound } from '@/lib/audio';
+import { playFeedback } from '@/lib/audio';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/context/auth-context';
@@ -193,7 +193,7 @@ export default function HomePage({ onInteraction, setRevealedCatId }: { onIntera
 
     const handleToggleSaveMessage = () => {
         if (!activeCatId || !message) return;
-        playSound('haptic-1');
+        playFeedback('haptic-1');
         const saved = toggleDiaryEntry(activeCatId, message);
         toast({
             description: saved
@@ -276,7 +276,7 @@ export default function HomePage({ onInteraction, setRevealedCatId }: { onIntera
 
     const handleShareRequest = async () => {
         if (isGeneratingShare) return;
-        playSound('click-2');
+        playFeedback('click-2');
 
         setIsGeneratingShare(true);
         toast({

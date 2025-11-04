@@ -1,0 +1,64 @@
+{
+  "skins": [
+    {
+      "id": "default",
+      "name": "Wooden",
+      "description": "Classic wooden crate tuned for baseline collapses."
+    },
+    {
+      "id": "carbon",
+      "name": "Carbon",
+      "description": "A sleek, dark carbon fiber box."
+    },
+    {
+      "id": "cardboard",
+      "name": "Cardboard",
+      "description": "Recycled timelines keep things whimsically unpredictable."
+    },
+    {
+      "id": "black-wooden",
+      "name": "Black Wooden",
+      "description": "A dark, mysterious wooden box."
+    },
+    {
+      "id": "special-xk6",
+      "name": "Special XK6",
+      "description": "A special edition box with a unique design."
+    },
+    {
+      "id": "stone",
+      "name": "Stone",
+      "description": "A heavy, stone box that feels ancient."
+    },
+    {
+      "id": "tardis",
+      "name": "Time Capsule",
+      "description": "Temporal shielding for cats who open boxes before they exist."
+    },
+    {
+      "id": "circuit-board",
+      "name": "Circuit Board",
+      "description": "A box made of glowing circuit boards."
+    },
+    {
+      "id": "crystal",
+      "name": "Crystal",
+      "description": "A box made of shimmering crystal."
+    },
+    {
+      "id": "galaxy",
+      "name": "Galaxy",
+      "description": "A box that contains a swirling galaxy."
+    },
+    {
+      "id": "plush",
+      "name": "Plush",
+      "description": "A soft, plush box that's perfect for napping on."
+    },
+    {
+      "id": "steampunk",
+      "name": "Steampunk",
+      "description": "A box made of brass gears and pipes."
+    }
+  ]
+}

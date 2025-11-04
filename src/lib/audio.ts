@@ -4,6 +4,7 @@
 type SoundType = 
   | 'click-1' 
   | 'click-2'
+  | 'click-3'
   | 'reveal-default'
   | 'reveal-carbon'
   | 'reveal-cardboard'
@@ -20,7 +21,7 @@ type SoundType =
   | 'celebration-long'
   | 'box-shake';
 
-export const soundList: SoundType[] = ['click-1', 'click-2', 'reveal-default', 'reveal-carbon', 'reveal-cardboard', 'haptic-1', 'haptic-2', 'haptic-3', 'toggle-on', 'toggle-off', 'badge-unlocked', 'message-alive', 'message-dead', 'message-default', 'celebration-magic', 'celebration-long', 'box-shake'];
+export const soundList: SoundType[] = ['click-1', 'click-2', 'click-3', 'reveal-default', 'reveal-carbon', 'reveal-cardboard', 'haptic-1', 'haptic-2', 'haptic-3', 'toggle-on', 'toggle-off', 'badge-unlocked', 'message-alive', 'message-dead', 'message-default', 'celebration-magic', 'celebration-long', 'box-shake'];
 
 let soundEnabled = true;
 let vibrationEnabled = true;
@@ -64,12 +65,12 @@ export const playVibration = (pattern: number | number[]) => {
     navigator.vibrate(pattern);
 }
 
-// This function generates sounds using the Web Audio API,
-// so it only works on the client-side.
-export const playSound = (type: SoundType) => {
-  // Check if window is defined (i.e., we're on the client)
-  if (typeof window === 'undefined') return;
+export const playFeedback = (type: SoundType) => {
+  playSound(type);
+  playHaptic(type);
+}
 
+export const playHaptic = (type: SoundType) => {
   if (type.startsWith('click') || type.startsWith('haptic') || type.startsWith('toggle')) {
     playVibration(50); // Short vibration for clicks
   } else if (type.startsWith('reveal')) {
@@ -77,11 +78,26 @@ export const playSound = (type: SoundType) => {
   } else if (type === 'badge-unlocked' || type === 'celebration-long') {
       playVibration([100, 30, 100, 30, 100]);
   }
+}
+
+// This function generates sounds using the Web Audio API,
+// so it only works on the client-side.
+export const playSound = (type: SoundType) => {
+  // Check if window is defined (i.e., we're on the client)
+  if (typeof window === 'undefined') return;
 
   if (!soundEnabled) return;
 
 
-  const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+  let audioContext: AudioContext | null = null;
+
+  try {
+    audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+  } catch (e) {
+    console.warn("Web Audio API is not supported in this browser.");
+    return;
+  }
+
   if (!audioContext) {
     console.warn("Web Audio API is not supported in this browser.");
     return;
@@ -133,6 +149,21 @@ export const playSound = (type: SoundType) => {
     gainNode.connect(masterGain);
     osc.start(now);
     osc.stop(now + 0.1);
+
+  } else if (type === 'click-3') {
+    const osc = audioContext.createOscillator();
+    osc.type = 'triangle';
+    osc.frequency.setValueAtTime(2000, now);
+    osc.frequency.exponentialRampToValueAtTime(100, now + 0.08);
+    
+    const gainNode = audioContext.createGain();
+    gainNode.gain.setValueAtTime(0.15, now);
+    gainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.06);
+
+    osc.connect(gainNode);
+    gainNode.connect(masterGain);
+    osc.start(now);
+    osc.stop(now + 0.08);
 
   } else if (type === 'reveal-default') {
      const gainNode = audioContext.createGain();
