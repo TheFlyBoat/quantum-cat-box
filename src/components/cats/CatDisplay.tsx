@@ -1,6 +1,7 @@
 
 import { type CatState } from '@/lib/types';
 import { catComponentMap } from '@/lib/cat-components';
+import { CosmicBackdrop } from '@/components/cats/cosmic-cat';
 
 interface CatDisplayProps {
   state: CatState;
@@ -17,9 +18,14 @@ export function CatDisplay({ state }: CatDisplayProps) {
 
   const CatComponent = catComponentMap[catId];
 
-  return CatComponent ? (
-      <div className="animate-bounce-in">
-        <CatComponent className="w-52 h-52 md:w-56 md:h-56" />
-      </div>
-  ) : null;
+  if (!CatComponent) return null;
+
+  const isCosmic = catId === 'cosmic';
+
+  return (
+    <div className="animate-bounce-in relative">
+      {isCosmic && <CosmicBackdrop />}
+      <CatComponent className="w-52 h-52 md:w-56 md:h-56" />
+    </div>
+  );
 }

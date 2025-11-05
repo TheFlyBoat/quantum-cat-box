@@ -13,15 +13,22 @@ const MYSTIC_STYLES = `
     }
 
     .mystic-figure {
-        width: 115%;
-        height: 115%;
-        transform-origin: center bottom;
+        width: 100%;
+        height: 100%;
+        transform-origin: center 85%;
         animation: mystic-float 6s infinite ease-in-out;
     }
 
+    .mystic-figure-inner {
+        width: 100%;
+        height: 100%;
+        transform-origin: center 78%;
+        transform: translateY(-10%) scale(1.18);
+    }
+
     @keyframes mystic-float {
-        0%, 100% { transform: translateY(0) scale(1); }
-        50% { transform: translateY(-4%) scale(1.04); }
+        0%, 100% { transform: translateY(0%); }
+        50% { transform: translateY(-4%); }
     }
 
     @keyframes mystic-color-cycle {
@@ -184,7 +191,9 @@ export const MysticCatIcon: React.FC<{ className?: string }> = ({ className }) =
     <div className={cn('relative cat mystic', className)}>
         <style>{MYSTIC_STYLES}</style>
         <div className="mystic-figure">
-            <MysticFigure />
+            <div className="mystic-figure-inner">
+                <MysticFigure />
+            </div>
         </div>
     </div>
 );

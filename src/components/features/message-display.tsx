@@ -6,7 +6,7 @@ import { useTypewriter } from '@/hooks/use-typewriter';
 
 import { LoadingFishes } from '@/components/ui/loading-fishes';
 import { useFeedback } from '@/context/feedback-context';
-import { playFeedback } from '@/lib/audio';
+import { playFeedback, type SoundType } from '@/lib/audio';
 import { cn } from '@/lib/utils';
 import { type CatState } from '@/lib/types';
 
@@ -15,7 +15,7 @@ type QuantumMessageDisplayProps = {
   catState: CatState;
 };
 
-const SOUND_BY_OUTCOME: Record<CatState['outcome'], string> = {
+const SOUND_BY_OUTCOME: Record<CatState['outcome'], SoundType> = {
   alive: 'message-alive',
   dead: 'message-dead',
   paradox: 'message-default',

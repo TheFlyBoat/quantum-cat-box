@@ -1,5 +1,34 @@
 import { cn } from '@/lib/utils';
 
+const WONDER_STYLES = `
+    .cat.wonder .wonder-eyes {
+        transform-box: fill-box;
+        transform-origin: 50% 55%;
+        animation: wonder-eyes-phase 12s ease-in-out infinite;
+    }
+
+    @keyframes wonder-eyes-phase {
+        0%,
+        40% {
+            opacity: 1;
+            transform: translateY(0%) scaleY(1);
+        }
+        48% {
+            opacity: 1;
+            transform: translateY(1.8%) scaleY(0.6);
+        }
+        55% {
+            opacity: 1;
+            transform: translateY(3.4%) scaleY(0.08);
+        }
+        58%,
+        100% {
+            opacity: 0;
+            transform: translateY(3.4%) scaleY(0);
+        }
+    }
+`;
+
 export const WonderCatIcon = ({ className }: { className?: string }) => {
     // Colors from original SVG
     const fil0 = '#FD369C'; // pink
@@ -10,7 +39,14 @@ export const WonderCatIcon = ({ className }: { className?: string }) => {
 
     return (
         <div className={cn("cat wonder cat--alive relative w-full h-full", className)}>
-            <svg className="h-full w-full" xmlns="http://www.w3.org/2000/svg" xmlSpace="preserve" viewBox="0 0 28657.92 23066.64">
+            <style>{WONDER_STYLES}</style>
+            <svg
+                className="h-full w-full"
+                xmlns="http://www.w3.org/2000/svg"
+                xmlSpace="preserve"
+                viewBox="0 0 28657.92 23066.64"
+                style={{ transform: 'scale(1.18)', transformOrigin: '50% 88%' }}
+            >
             <g>
                 <g className="wonder-body">
                     <g>

@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { createContext, useContext, ReactNode, useCallback } from 'react';
@@ -13,7 +12,7 @@ interface Observation {
     type: CatOutcome;
 }
 
-interface BadgeProgressContextType {
+export interface BadgeProgressContextType {
   streak: number;
   totalObservations: number;
   recordObservation: (catId: string, catType: CatOutcome) => void;

@@ -2,6 +2,13 @@
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import type { CatOutcome } from '@/lib/types';
+import boxSkinData from '@/lib/box-skin-data.json';
+
+export type BoxSkinId = (typeof boxSkinData.skins)[number]['id'];
+
+const starterSkins = boxSkinData.skins
+  .filter(skin => skin.cost === 0)
+  .map(skin => skin.id as BoxSkinId);
 
 export interface RevealHistoryEntry {
   id: string;
@@ -21,16 +28,8 @@ export interface UserData {
   streak?: number;
   totalObservations?: number;
   unlockedBadges?: string[];
-  selectedSkin?: 'default' | 'carbon' | 'cardboard' | 'black-wooden' | 'special-xk6' | 'stone' | 'tardis';
-  unlockedSkins?: (
-    | 'default'
-    | 'carbon'
-    | 'cardboard'
-    | 'black-wooden'
-    | 'special-xk6'
-    | 'stone'
-    | 'tardis'
-  )[];
+  selectedSkin?: BoxSkinId;
+  unlockedSkins?: BoxSkinId[];
   unlockedCats?: string[];
   diary?: { [catId: string]: { messages: string[]; count: number } };
   points?: number;
@@ -45,7 +44,7 @@ export const defaultUserData: UserData = {
   streak: 0,
   totalObservations: 0,
   unlockedBadges: [],
-  unlockedSkins: ['default', 'carbon', 'cardboard'],
+  unlockedSkins: starterSkins,
   selectedSkin: 'default',
   unlockedCats: [],
   diary: {},

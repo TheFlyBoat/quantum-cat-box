@@ -57,8 +57,8 @@ export function AppHeader() {
 
     return (
         <TooltipProvider>
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                <div className="flex items-center gap-4 text-muted-foreground">
+            <div className="flex flex-wrap items-start justify-between gap-3">
+                <div className="flex flex-wrap items-center gap-4 text-muted-foreground">
                     {metrics.map(({ icon: Icon, value, label, iconClass }) => (
                         <Tooltip key={label}>
                             <TooltipTrigger asChild>
@@ -73,33 +73,35 @@ export function AppHeader() {
                         </Tooltip>
                     ))}
                 </div>
-                <Popover open={userMenuOpen} onOpenChange={setUserMenuOpen}>
-                    <PopoverTrigger asChild>
-                        <button
-                            type="button"
-                            className="rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
-                        >
-                            <UserStatusLabel className="cursor-pointer select-none justify-end self-end sm:self-center" />
-                        </button>
-                    </PopoverTrigger>
-                    <PopoverContent align="end" className="w-60 space-y-4">
-                        <div className="space-y-1">
-                            <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-                                User
-                            </p>
-                            <p className="text-sm font-semibold text-foreground break-words">
-                                {fullUserIdentity}
-                            </p>
-                        </div>
-                        <Button
-                            onClick={isGuest ? handleSignIn : handleSignOut}
-                            variant={isGuest ? 'default' : 'outline'}
-                            className="w-full"
-                        >
-                            {isGuest ? 'Sign In' : 'Sign Out'}
-                        </Button>
-                    </PopoverContent>
-                </Popover>
+                <div className="flex items-center justify-end ml-auto">
+                    <Popover open={userMenuOpen} onOpenChange={setUserMenuOpen}>
+                        <PopoverTrigger asChild>
+                            <button
+                                type="button"
+                                className="rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                            >
+                                <UserStatusLabel className="cursor-pointer select-none" />
+                            </button>
+                        </PopoverTrigger>
+                        <PopoverContent align="end" className="w-60 space-y-4">
+                            <div className="space-y-1">
+                                <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                                    User
+                                </p>
+                                <p className="text-sm font-semibold text-foreground break-words">
+                                    {fullUserIdentity}
+                                </p>
+                            </div>
+                            <Button
+                                onClick={isGuest ? handleSignIn : handleSignOut}
+                                variant={isGuest ? 'default' : 'outline'}
+                                className="w-full"
+                            >
+                                {isGuest ? 'Sign In' : 'Sign Out'}
+                            </Button>
+                        </PopoverContent>
+                    </Popover>
+                </div>
             </div>
         </TooltipProvider>
     );

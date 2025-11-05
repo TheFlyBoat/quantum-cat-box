@@ -82,7 +82,7 @@ export default function AwardsPage() {
                         <TabsTrigger value="Data" className={cn(tabBaseClass, tabColorClasses['Data'])}>Data</TabsTrigger>
                     </TabsList>
                     <TabsContent value="Badges">
-                        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+                        <div className="grid grid-cols-3 gap-3">
                             {awardsDisplay.map((badge, index) => {
                                 const isPlaceholder = badge.id.startsWith('placeholder-award-');
                                 const unlocked = !isPlaceholder && isBadgeUnlocked(badge.id);
@@ -99,7 +99,7 @@ export default function AwardsPage() {
                         </div>
                     </TabsContent>
                     <TabsContent value="Data">
-                        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+                        <div className="grid grid-cols-3 gap-3">
                             {stats.map((stat, index) => (
                                 <Card key={index} className="flex aspect-[3/4] flex-col items-center justify-center rounded-3xl border border-border/40 bg-background/80 shadow-sm p-4">
                                     <p className="text-2xl font-bold text-primary">{stat.value}</p>

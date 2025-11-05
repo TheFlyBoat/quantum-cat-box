@@ -11,6 +11,8 @@ const SHARK_BASE_PROPS: CatComponentProps = {
 const SHARK_STYLES = `
     .cat.shark {
         animation: shark-swim 6s infinite ease-in-out;
+        width: 100%;
+        height: 100%;
     }
 
     @keyframes shark-swim {
@@ -18,6 +20,21 @@ const SHARK_STYLES = `
         25% { transform: translate(-52%, -2px); }
         75% { transform: translate(-48%, -2px); }
     }
+
+    .shark-figure {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+.shark-figure-inner {
+    width: 100%;
+    height: 100%;
+    transform-origin: 55% 60%;
+    transform: translate(24%, -30%) scale(0.94);
+}
 
     .shark-fin-side {
         animation: shark-fin-wobble 2.5s infinite ease-in-out;
@@ -108,6 +125,10 @@ const SharkFigure: React.FC<CatComponentProps> = ({ body, accent }) => {
 export const SharkCatIcon: React.FC<{ className?: string }> = ({ className }) => (
     <div className={cn('relative cat shark', className)}>
         <style>{SHARK_STYLES}</style>
-        <SharkFigure {...SHARK_BASE_PROPS} />
+        <div className="shark-figure">
+            <div className="shark-figure-inner">
+                <SharkFigure {...SHARK_BASE_PROPS} />
+            </div>
+        </div>
     </div>
 );

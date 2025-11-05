@@ -1,7 +1,7 @@
 
 'use client';
 
-type SoundType = 
+export type SoundType = 
   | 'click-1' 
   | 'click-2'
   | 'click-3'

@@ -10,18 +10,17 @@ import {
   StoneBoxIcon,
   TardisBoxIcon,
 } from '@/components/icons';
+import { CircuitBoardBoxIcon } from '@/components/icons/circuit-board-box-icon';
+import { CrystalBoxIcon } from '@/components/icons/crystal-box-icon';
+import { GalaxyBoxIcon } from '@/components/icons/galaxy-box-icon';
+import { PlushBoxIcon } from '@/components/icons/plush-box-icon';
+import { SteampunkBoxIcon } from '@/components/icons/steampunk-box-icon';
 import { Card } from '@/components/ui/card';
 import { type CatState } from '@/lib/types';
 import catData from '@/lib/cat-data.json';
+import type { BoxSkinId } from '@/lib/user-data';
 
-type BoxSkin =
-  | 'default'
-  | 'carbon'
-  | 'cardboard'
-  | 'black-wooden'
-  | 'special-xk6'
-  | 'stone'
-  | 'tardis';
+type BoxSkin = BoxSkinId;
 
 type ShareCardProps = {
   catState: CatState;
@@ -46,6 +45,11 @@ const SKIN_COMPONENTS: Record<BoxSkin, typeof BoxIcon> = {
   'special-xk6': SpecialXK6BoxIcon,
   stone: StoneBoxIcon,
   tardis: TardisBoxIcon,
+  'circuit-board': CircuitBoardBoxIcon,
+  crystal: CrystalBoxIcon,
+  galaxy: GalaxyBoxIcon,
+  plush: PlushBoxIcon,
+  steampunk: SteampunkBoxIcon,
 };
 
 const getTitleParts = (name?: string | null) => {
@@ -101,11 +105,11 @@ export function ShareCard({ catState, message, boxSkin }: ShareCardProps) {
           </div>
         </header>
 
-        <div className="flex w-full flex-1 flex-col items-center justify-center gap-4">
-          <div className="relative h-36 w-36">
+        <div className="flex w-full flex-1 flex-col items-center justify-center gap-5">
+          <div className="relative h-32 w-32 -translate-y-2 transform">
             <BoxComponent className="h-full w-full" isOpen />
             <div className="absolute inset-0 flex items-center justify-center">
-              <div className="h-full w-full scale-[0.8]">
+              <div className="h-full w-full scale-[0.7]">
                 <CatDisplay state={catState} />
               </div>
             </div>
@@ -129,7 +133,7 @@ export function ShareCard({ catState, message, boxSkin }: ShareCardProps) {
         </div>
 
         <footer className="w-full pt-4 text-xs font-semibold uppercase tracking-[0.3em] text-white/80">
-          thequantumcat.app
+          thequantumcat.app • #QuantumCat
         </footer>
       </div>
     </Card>

@@ -13,15 +13,67 @@ import { playFeedback } from '@/lib/audio';
 import { useBoxSkin } from '@/context/box-skin-context';
 import { useTheme } from 'next-themes';
 
-const outcomesData = catData.outcomes as Record<CatOutcome, { title: string; cats: { id: string, rarity: number }[] }>;
-const allCats = catData.cats as {id: string, name: string, description: string, type: string, points: number}[];
+type OutcomePool = { title: string; cats: { id: string; rarity: number }[] };
+
+const allCats = catData.cats as { id: string; name: string; description: string; type: string; points: number }[];
+
+const normalizeOutcome = (type: string | undefined): 'alive' | 'dead' | 'paradox' | null => {
+    if (!type) return null;
+    const lowered = type.toLowerCase();
+    if (lowered === 'alive' || lowered === 'dead' || lowered === 'paradox') {
+        return lowered;
+    }
+    return null;
+};
+
+const fallbackOutcomes: Record<'alive', OutcomePool> & Record<'dead', OutcomePool> & Record<'paradox', OutcomePool> = (() => {
+    const base: Record<'alive' | 'dead' | 'paradox', OutcomePool> = {
+        alive: { title: 'Alive', cats: [] },
+        dead: { title: 'Dead', cats: [] },
+        paradox: { title: 'Paradox', cats: [] },
+    };
+
+    allCats.forEach(cat => {
+        const normalized = normalizeOutcome(cat.type);
+        if (!normalized) {
+            return;
+        }
+        const rarity = Number.isFinite(cat.points) && cat.points > 0 ? cat.points : 1;
+        base[normalized].cats.push({ id: cat.id, rarity });
+    });
+
+    const defaultCat = allCats[0];
+    (Object.keys(base) as Array<'alive' | 'dead' | 'paradox'>).forEach(key => {
+        if (base[key].cats.length === 0 && defaultCat) {
+            base[key].cats.push({ id: defaultCat.id, rarity: 1 });
+        }
+    });
+
+    return base;
+})();
+
+const rawOutcomes = (catData as { outcomes?: Record<string, OutcomePool> }).outcomes;
+
+const getOutcomePool = (outcome: 'alive' | 'dead' | 'paradox'): OutcomePool => {
+    const configured = rawOutcomes?.[outcome];
+    if (configured && Array.isArray(configured.cats) && configured.cats.length > 0) {
+        return configured;
+    }
+    return fallbackOutcomes[outcome];
+};
 
 const LAST_OPEN_STORAGE_KEY = 'quantum-cat-last-open';
 const MESSAGE_GENERATION_TIMEOUT_MS = 6500;
 
-const FALLBACK_MESSAGE_POOL: string[] = Array.isArray(fallbackMessages)
-    ? (fallbackMessages as unknown as string[])
-    : ((fallbackMessages as { messages?: string[] }).messages ?? []);
+type FallbackMessageEntry = string | { message: string };
+
+const rawFallbackMessages = Array.isArray(fallbackMessages)
+    ? (fallbackMessages as FallbackMessageEntry[])
+    : ((fallbackMessages as { messages?: FallbackMessageEntry[] }).messages ?? []);
+
+const FALLBACK_MESSAGE_POOL: FallbackMessageEntry[] = Array.isArray(rawFallbackMessages)
+    ? rawFallbackMessages
+    : [];
 
 const DEFAULT_FALLBACK_MESSAGE = 'Embrace the mystery beyond the box.';
 
@@ -34,7 +86,7 @@ const pickFallbackMessage = () => {
         const trimmed = selection.trim();
         return trimmed.length ? trimmed : DEFAULT_FALLBACK_MESSAGE;
     }
-    if (selection && typeof selection === 'object' && 'message' in selection && typeof selection.message === 'string') {
+    if (selection && typeof selection.message === 'string') {
         const trimmed = selection.message.trim();
         return trimmed.length ? trimmed : DEFAULT_FALLBACK_MESSAGE;
     }
@@ -199,7 +251,7 @@ export function useCatLogic({ onInteraction, setRevealedCatId, onCatReveal }: {
         setRevealedCatName(null);
 
         const randomState = Math.random();
-        let determinedOutcome: CatOutcome;
+        let determinedOutcome: Exclude<CatOutcome, 'initial'>;
 
         if (randomState < 0.47) {
             determinedOutcome = 'alive';
@@ -209,7 +261,13 @@ export function useCatLogic({ onInteraction, setRevealedCatId, onCatReveal }: {
             determinedOutcome = 'paradox';
         }
 
-        const outcomeInfo = outcomesData[determinedOutcome];
+        const outcomeInfo = getOutcomePool(determinedOutcome);
+        if (!outcomeInfo?.cats?.length) {
+            console.error(`No cats configured for outcome "${determinedOutcome}". Falling back to default.`);
+            setIsRevealing(false);
+            setIsLoading(false);
+            return;
+        }
         const totalRarity = outcomeInfo.cats.reduce((sum, cat) => sum + cat.rarity, 0);
         let randomRarity = Math.random() * totalRarity;
         let selectedCatId: string | undefined;

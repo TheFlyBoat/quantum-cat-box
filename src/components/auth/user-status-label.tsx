@@ -1,9 +1,13 @@
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/context/auth-context';
+import type { User } from 'firebase/auth';
 
 type UserStatusLabelProps = {
     className?: string;
 };
+
+const isFirebaseUser = (candidate: User | 'guest' | null | undefined): candidate is User =>
+    typeof candidate === 'object' && candidate !== null && 'uid' in candidate;
 
 /**
  * Badge showing the current auth state.
@@ -11,14 +15,15 @@ type UserStatusLabelProps = {
  */
 export function UserStatusLabel({ className }: UserStatusLabelProps) {
     const { user, displayName } = useAuth();
-    const isGuest = !user || user === 'guest';
+    const firebaseUser = isFirebaseUser(user) ? user : null;
+    const isGuest = !firebaseUser;
 
     const preferredName =
         displayName?.trim() ||
-        user?.displayName?.trim() ||
-        user?.email?.split('@')[0] ||
+        firebaseUser?.displayName?.trim() ||
+        firebaseUser?.email?.split('@')[0]?.trim() ||
         null;
-    const label = isGuest ? 'Guest' : (preferredName ?? 'Guest');
+    const label = isGuest ? 'Guest' : preferredName ?? 'Guest';
 
     return (
         <span

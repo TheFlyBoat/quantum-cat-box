@@ -78,6 +78,271 @@
     --chart-5: 43 86% 58%;
   }
 
+  .aurora {
+    --background: 232 58% 8%;
+    --foreground: 196 68% 92%;
+
+    --card: 232 58% 11%;
+    --card-foreground: 196 68% 92%;
+
+    --popover: 232 58% 12%;
+    --popover-foreground: 196 68% 92%;
+
+    --primary: 278 84% 70%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 188 84% 68%;
+    --secondary-foreground: 212 48% 12%;
+
+    --muted: 230 42% 22%;
+    --muted-foreground: 198 64% 78%;
+
+    --accent: 202 92% 64%;
+    --accent-foreground: 212 48% 12%;
+
+    --destructive: 0 82% 60%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 228 48% 26%;
+    --input: 228 48% 26%;
+    --ring: 278 84% 70%;
+
+    --chart-1: 278 84% 70%;
+    --chart-2: 202 92% 64%;
+    --chart-3: 160 70% 56%;
+    --chart-4: 318 80% 72%;
+    --chart-5: 44 96% 66%;
+
+    --radius: 1rem;
+    --font-body: var(--font-fortune);
+  }
+
+  .aurora body {
+    font-family: var(--font-fortune), var(--font-body), sans-serif;
+    letter-spacing: 0.01em;
+    background-image:
+      radial-gradient(circle at 20% 20%, rgba(124, 58, 237, 0.15), transparent 55%),
+      radial-gradient(circle at 80% 10%, rgba(56, 189, 248, 0.1), transparent 50%);
+  }
+
+  .sunrise {
+    --background: 32 100% 96%;
+    --foreground: 20 64% 18%;
+
+    --card: 32 100% 98%;
+    --card-foreground: 20 64% 18%;
+
+    --popover: 32 100% 99%;
+    --popover-foreground: 20 64% 18%;
+
+    --primary: 18 86% 55%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 326 82% 72%;
+    --secondary-foreground: 322 65% 16%;
+
+    --muted: 40 68% 90%;
+    --muted-foreground: 25 44% 34%;
+
+    --accent: 205 74% 72%;
+    --accent-foreground: 208 82% 18%;
+
+    --destructive: 350 84% 60%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 32 70% 82%;
+    --input: 32 70% 82%;
+    --ring: 18 86% 55%;
+
+    --chart-1: 18 86% 55%;
+    --chart-2: 205 74% 72%;
+    --chart-3: 326 82% 72%;
+    --chart-4: 44 90% 60%;
+    --chart-5: 152 62% 58%;
+
+    --radius: 1.25rem;
+    --font-headline: var(--font-fortune);
+  }
+
+  .sunrise body {
+    font-family: var(--font-body), sans-serif;
+    background-image:
+      linear-gradient(135deg, rgba(252, 211, 77, 0.25), rgba(249, 115, 22, 0.15)),
+      radial-gradient(circle at 75% 12%, rgba(236, 72, 153, 0.25), transparent 60%);
+  }
+
+  .forest {
+    --background: 150 24% 10%;
+    --foreground: 145 46% 90%;
+
+    --card: 150 24% 14%;
+    --card-foreground: 145 46% 90%;
+
+    --popover: 150 24% 15%;
+    --popover-foreground: 145 46% 90%;
+
+    --primary: 158 70% 44%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 34 85% 56%;
+    --secondary-foreground: 26 72% 16%;
+
+    --muted: 160 20% 22%;
+    --muted-foreground: 130 32% 72%;
+
+    --accent: 82 74% 46%;
+    --accent-foreground: 150 32% 12%;
+
+    --destructive: 2 74% 52%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 160 22% 28%;
+    --input: 160 22% 28%;
+    --ring: 158 70% 44%;
+
+    --chart-1: 158 70% 44%;
+    --chart-2: 82 74% 46%;
+    --chart-3: 34 85% 56%;
+    --chart-4: 12 70% 48%;
+    --chart-5: 200 58% 46%;
+
+    --radius: 0.8rem;
+    --font-body: var(--font-headline);
+  }
+
+  .forest body {
+    font-family: var(--font-headline), var(--font-body), sans-serif;
+    letter-spacing: 0.005em;
+    background-image:
+      linear-gradient(160deg, rgba(15, 118, 110, 0.25), rgba(21, 128, 61, 0.2)),
+      radial-gradient(circle at 12% 18%, rgba(250, 204, 21, 0.12), transparent 60%);
+  }
+
+  .celestial {
+    --background: 230 65% 6%;
+    --foreground: 48 93% 92%;
+
+    --card: 230 60% 8%;
+    --card-foreground: 48 93% 92%;
+
+    --popover: 230 60% 8%;
+    --popover-foreground: 48 93% 92%;
+
+    --primary: 44 94% 54%;
+    --primary-foreground: 222 47% 11%;
+
+    --secondary: 205 82% 62%;
+    --secondary-foreground: 222 47% 11%;
+
+    --muted: 226 38% 18%;
+    --muted-foreground: 217 23% 72%;
+
+    --accent: 281 87% 64%;
+    --accent-foreground: 262 83% 12%;
+
+    --destructive: 355 85% 52%;
+    --destructive-foreground: 52 100% 95%;
+
+    --border: 228 42% 20%;
+    --input: 228 42% 20%;
+    --ring: 44 94% 54%;
+
+    --chart-1: 44 94% 54%;
+    --chart-2: 281 87% 64%;
+    --chart-3: 205 82% 62%;
+    --chart-4: 320 86% 68%;
+    --chart-5: 162 70% 56%;
+
+    --radius: 1.1rem;
+    --font-body: var(--font-fortune);
+  }
+
+  .celestial body {
+    font-family: var(--font-fortune), var(--font-body), sans-serif;
+    background-image:
+      radial-gradient(circle at 10% 15%, rgba(147, 51, 234, 0.25), transparent 60%),
+      radial-gradient(circle at 80% 5%, rgba(56, 189, 248, 0.2), transparent 65%),
+      linear-gradient(180deg, rgba(15, 23, 42, 0.85), rgba(3, 7, 18, 0.95));
+    letter-spacing: 0.015em;
+  }
+
+  .retro {
+    --background: 38 32% 92%;
+    --foreground: 20 42% 18%;
+
+    --card: 38 32% 96%;
+    --card-foreground: 20 42% 18%;
+
+    --popover: 38 32% 97%;
+    --popover-foreground: 20 42% 18%;
+
+    --primary: 7 72% 54%;
+    --primary-foreground: 48 100% 97%;
+
+    --secondary: 182 44% 44%;
+    --secondary-foreground: 38 32% 94%;
+
+    --muted: 32 28% 78%;
+    --muted-foreground: 22 30% 34%;
+
+    --accent: 316 38% 58%;
+    --accent-foreground: 20 42% 18%;
+
+    --destructive: 350 68% 48%;
+    --destructive-foreground: 48 100% 97%;
+
+    --border: 35 30% 70%;
+    --input: 35 30% 70%;
+    --ring: 7 72% 54%;
+
+    --chart-1: 7 72% 54%;
+    --chart-2: 182 44% 44%;
+    --chart-3: 316 38% 58%;
+    --chart-4: 52 64% 60%;
+    --chart-5: 205 52% 48%;
+
+    --radius: 1.8rem;
+    --font-body: var(--font-headline);
+  }
+
+  .retro body {
+    font-family: var(--font-headline), var(--font-body), sans-serif;
+    background-image:
+      linear-gradient(135deg, rgba(253, 186, 116, 0.35), rgba(255, 228, 181, 0.4)),
+      repeating-linear-gradient(
+        90deg,
+        rgba(0, 0, 0, 0.04) 0,
+        rgba(0, 0, 0, 0.04) 2px,
+        transparent 2px,
+        transparent 6px
+      );
+    letter-spacing: 0.02em;
+  }
+
+  .celestial .theme-button {
+    border-radius: 9999px;
+    box-shadow: 0 0 0 1px rgba(250, 204, 21, 0.45), 0 20px 45px -25px rgba(14, 165, 233, 0.6);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+  }
+
+  .celestial .theme-button:hover {
+    box-shadow: 0 0 0 1px rgba(250, 204, 21, 0.6), 0 24px 55px -20px rgba(56, 189, 248, 0.75);
+  }
+
+  .retro .theme-button {
+    border-radius: 0.75rem;
+    border-width: 2px;
+    border-color: rgba(20, 42, 18, 0.35);
+    box-shadow: inset 0 -4px 0 rgba(0, 0, 0, 0.08);
+    font-family: var(--font-headline), sans-serif;
+    text-transform: none;
+  }
+
+  .retro .theme-button:hover {
+    box-shadow: inset 0 -2px 0 rgba(0, 0, 0, 0.12);
+  }
+
   .reduce-motion * {
     animation-duration: 0.001ms !important;
     animation-iteration-count: 1 !important; /* Hat-tip to Bootstrap */

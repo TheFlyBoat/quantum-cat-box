@@ -11,7 +11,7 @@ const CATANKHAMUN_BASE_PROPS: CatComponentProps = {
 const CATANKHAMUN_STYLES = `
     .cat.catankhamun {
         position: relative;
-        overflow: hidden;
+        overflow: visible;
         transform: none;
     }
 
@@ -22,6 +22,13 @@ const CATANKHAMUN_STYLES = `
         width: min(88%, 280px);
         aspect-ratio: 3131 / 2957;
         transform: translateX(-50%);
+    }
+
+    .catankhamun-figure-base {
+        width: 100%;
+        height: 100%;
+        transform-origin: 52% 68%;
+        transform: translate(6%, -15%) scale(1.12);
     }
 
     .catankhamun-figure-track {
@@ -133,9 +140,11 @@ export const CatankhamunCatIcon: React.FC<{ className?: string }> = ({ className
     <div className={cn('relative cat catankhamun', className)}>
         <style>{CATANKHAMUN_STYLES}</style>
         <div className="catankhamun-figure">
-            <div className="catankhamun-figure-track">
-                <div className="catankhamun-figure-inner">
-                    <CatankhamunFigure {...CATANKHAMUN_BASE_PROPS} />
+            <div className="catankhamun-figure-base">
+                <div className="catankhamun-figure-track">
+                    <div className="catankhamun-figure-inner">
+                        <CatankhamunFigure {...CATANKHAMUN_BASE_PROPS} />
+                    </div>
                 </div>
             </div>
         </div>

@@ -3,12 +3,12 @@
 
 import React, { createContext, useContext, ReactNode, useCallback, useMemo } from 'react';
 import { useAuth } from './auth-context';
-import { defaultUserData, saveUserData } from '@/lib/user-data';
+import { defaultUserData, saveUserData, type BoxSkinId } from '@/lib/user-data';
 import boxSkinData from '@/lib/box-skin-data.json';
 import { usePoints } from './points-context';
 import { useToast } from '@/hooks/use-toast';
 
-type SkinId = typeof boxSkinData.skins[number]['id'];
+type SkinId = BoxSkinId;
 
 interface BoxSkinContextType {
   selectedSkin: SkinId;

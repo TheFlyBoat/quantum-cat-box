@@ -33,6 +33,12 @@ import {
     SharkCatIcon,
     SneekyCatIcon,
     SnowballCatIcon,
+    CursedCatIcon,
+    FrankCatIcon,
+    PharaohCatIcon,
+    PlagueCatIcon,
+    ReaperCatIcon,
+    ScarecrowCatIcon,
 } from '@/components/cats';
 import { useEffect, useMemo, useState } from 'react';
 import { cn } from '@/lib/utils';
@@ -43,6 +49,26 @@ import badgeData from '@/lib/badge-data.json';
 import { useBadges } from '@/context/badge-context';
 import { BadgeCard } from '@/components/features/BadgeCard';
 import { badgeImageMap, defaultBadgeImage } from '@/lib/badge-images';
+
+type CatInfo = {
+    id: string;
+    name: string;
+    description: string;
+    type: string;
+    tagline: string;
+    strength: string;
+    weakness: string;
+};
+
+type PlaceholderEntry = {
+    id: string;
+    placeholder: true;
+};
+
+type GalleryEntry = CatInfo | PlaceholderEntry;
+
+const isPlaceholderEntry = (entry: GalleryEntry): entry is PlaceholderEntry =>
+    'placeholder' in entry && entry.placeholder === true;
 
 const catComponentMap: { [key: string]: React.ComponentType<{ className?: string }> } = {
     'ginger': GingerCatIcon,
@@ -72,20 +98,26 @@ const catComponentMap: { [key: string]: React.ComponentType<{ className?: string
     'shark': SharkCatIcon,
     'sneeky': SneekyCatIcon,
     'snowball': SnowballCatIcon,
+    'cursed': CursedCatIcon,
+    'frank': FrankCatIcon,
+    'pharaoh': PharaohCatIcon,
+    'plague': PlagueCatIcon,
+    'reaper': ReaperCatIcon,
+    'scarecrow': ScarecrowCatIcon,
 };
 
 
 
 export default function GalleryPage() {
-    const allCats = catData.cats as {id: string, name: string, description: string, type: string, tagline: string, strength: string, weakness: string}[];
+    const allCats = catData.cats as CatInfo[];
     
-    const catGroups = allCats.reduce((acc, cat) => {
+    const catGroups = allCats.reduce<Record<string, CatInfo[]>>((acc, cat) => {
         if (!acc[cat.type]) {
             acc[cat.type] = [];
         }
         acc[cat.type].push(cat);
         return acc;
-    }, {} as Record<string, typeof allCats>);
+    }, {});
 
     const groupOrder = ['Alive', 'Dead', 'Paradox'];
 
@@ -168,20 +200,22 @@ export default function GalleryPage() {
                     </TabsList>
                     {groupOrder.map(groupName => (
                         <TabsContent key={groupName} value={groupName}>
-                            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+                            <div className="grid grid-cols-3 gap-3">
                                     {(() => {
                                         const catsInGroup = catGroups[groupName] ?? [];
                                         const placeholdersNeeded = Math.max(0, 12 - catsInGroup.length);
-                                        const displayEntries = [
+                                        const placeholders: PlaceholderEntry[] = Array.from({ length: placeholdersNeeded }, (_, index) => ({
+                                            id: `placeholder-${groupName}-${index}`,
+                                            placeholder: true,
+                                        }));
+
+                                        const displayEntries: GalleryEntry[] = [
                                             ...catsInGroup,
-                                            ...Array.from({ length: placeholdersNeeded }, (_, index) => ({
-                                                id: `placeholder-${groupName}-${index}`,
-                                                placeholder: true,
-                                            })),
+                                            ...placeholders,
                                         ];
 
                                         return displayEntries.map((entry) => {
-                                            if ('placeholder' in entry && entry.placeholder) {
+                                            if (isPlaceholderEntry(entry)) {
                                                 return (
                                                     <Card
                                                         key={entry.id}
@@ -214,25 +248,39 @@ export default function GalleryPage() {
                                                     unlocked ? "from-primary/10 via-background/80 to-background" : "from-muted/40 via-muted/30 to-background group-hover:from-muted/30"
                                                 )}>
                                                     {(() => {
-                                                        const isLocked = !unlocked;
-                                                        const catPreview = (
-                                                            <div className="flex h-full w-full items-center justify-center">
-                                                                <CatComponent
-                                                                    className={cn(
-                                                                        "h-[88px] w-[88px] transition duration-500 ease-out sm:h-[96px] sm:w-[96px]",
-                                                                        isLocked && "grayscale saturate-0 opacity-60 group-hover:grayscale-0 group-hover:saturate-100 group-hover:opacity-100"
-                                                                    )}
-                                                                />
-                                                            </div>
-                                                        );
-
-                                                        if (unlocked && CatComponent) {
+                                                        if (!CatComponent) {
                                                             return (
                                                                 <TooltipProvider delayDuration={150}>
                                                                     <Tooltip>
                                                                         <TooltipTrigger asChild>
                                                                             <div className="h-full w-full">
-                                                                                {catPreview}
+                                                                                {renderLockedSilhouette()}
+                                                                            </div>
+                                                                        </TooltipTrigger>
+                                                                        <TooltipContent side="top" className="space-y-1 text-center">
+                                                                            <p className="font-medium">{cat.name}</p>
+                                                                            <p className="text-xs text-muted-foreground">Preview not available yet.</p>
+                                                                        </TooltipContent>
+                                                                    </Tooltip>
+                                                                </TooltipProvider>
+                                                            );
+                                                        }
+
+                                                        const isLocked = !unlocked;
+                                                        if (unlocked) {
+                                                            return (
+                                                                <TooltipProvider delayDuration={150}>
+                                                                    <Tooltip>
+                                                                        <TooltipTrigger asChild>
+                                                                            <div className="h-full w-full">
+                                                                                <div className="flex h-full w-full items-center justify-center">
+                                                                                    <CatComponent
+                                                                                        className={cn(
+                                                                                            "h-[88px] w-[88px] transition duration-500 ease-out sm:h-[96px] sm:w-[96px]",
+                                                                                            isLocked && "grayscale saturate-0 opacity-60 group-hover:grayscale-0 group-hover:saturate-100 group-hover:opacity-100"
+                                                                                        )}
+                                                                                    />
+                                                                                </div>
                                                                             </div>
                                                                         </TooltipTrigger>
                                                                         <TooltipContent side="top" className="font-medium">
@@ -243,22 +291,14 @@ export default function GalleryPage() {
                                                             );
                                                         }
 
-                                                        if (!CatComponent) {
-                                                            return renderLockedSilhouette();
-                                                        }
-
                                                         return (
                                                             <TooltipProvider delayDuration={150}>
                                                                 <Tooltip>
                                                                     <TooltipTrigger asChild>
-                                                                        <div className="h-full w-full flex items-center justify-center">
-                                                                            <Image
-                                                                                src="/favicon.svg"
-                                                                                alt="Locked cat placeholder"
-                                                                                width={96}
-                                                                                height={96}
-                                                                                className="h-20 w-20 opacity-60 transition duration-300 group-hover:opacity-100"
-                                                                            />
+                                                                        <div className="h-full w-full">
+                                                                            <div className="flex h-full w-full items-center justify-center">
+                                                                                {renderLockedSilhouette()}
+                                                                            </div>
                                                                         </div>
                                                                     </TooltipTrigger>
                                                                     <TooltipContent side="top" className="font-medium">
