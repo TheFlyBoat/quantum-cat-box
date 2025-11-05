@@ -1,16 +1,5 @@
 {
   "hosting": {
-    "public": ".",
-    "ignore": [
-      "firebase.json",
-      "**/.*",
-      "**/node_modules/**"
-    ],
-    "apphosting": {
-      "source": ".",
-      "frameworksBackend": {
-        "type": "Next.js"
-      }
-    }
+    "source": "."
   }
 }
