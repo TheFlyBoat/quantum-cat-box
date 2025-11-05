@@ -25,6 +25,7 @@ export interface UserSettings {
 export interface UserData {
   nickname?: string;
   lastObservationDate?: string;
+  lastBoxOpenDate?: string;
   streak?: number;
   totalObservations?: number;
   unlockedBadges?: string[];
@@ -41,6 +42,7 @@ export interface UserData {
 export const defaultUserData: UserData = {
   nickname: undefined,
   lastObservationDate: undefined,
+  lastBoxOpenDate: undefined,
   streak: 0,
   totalObservations: 0,
   unlockedBadges: [],

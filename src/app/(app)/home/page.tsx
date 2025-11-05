@@ -429,12 +429,13 @@ export default function HomePage({ onInteraction, setRevealedCatId }: { onIntera
                                 <TutorialOverlay />
                             )}
                             <QuantumCatBox
-                                onClick={onBoxClick}
+                                onClick={handleBoxClick}
                                 isLoading={isLoading}
                                 isRevealing={isRevealing}
                                 catState={catState}
                                 isAmbientShaking={isAmbientShaking}
-                                isLocked={false}
+                                isLocked={isDailyLocked}
+                                lockMessage="The box will be back tomorrow."
                             />
                         </div>
 

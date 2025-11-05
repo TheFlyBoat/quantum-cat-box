@@ -12,6 +12,7 @@ import catData from '@/lib/cat-data.json';
 import { playFeedback } from '@/lib/audio';
 import { useBoxSkin } from '@/context/box-skin-context';
 import { useTheme } from 'next-themes';
+import { useAuth } from '@/context/auth-context';
 
 type OutcomePool = { title: string; cats: { id: string; rarity: number }[] };
 
@@ -62,7 +63,6 @@ const getOutcomePool = (outcome: 'alive' | 'dead' | 'paradox'): OutcomePool => {
     return fallbackOutcomes[outcome];
 };
 
-const LAST_OPEN_STORAGE_KEY = 'quantum-cat-last-open';
 const MESSAGE_GENERATION_TIMEOUT_MS = 6500;
 
 type FallbackMessageEntry = string | { message: string };
@@ -116,6 +116,7 @@ export function useCatLogic({ onInteraction, setRevealedCatId, onCatReveal }: {
     const { addPoints } = usePoints();
     const { selectedSkin } = useBoxSkin();
     const { setTheme } = useTheme();
+    const { user, userData, setUserData } = useAuth();
 
     useEffect(() => {
         if (setRevealedCatId) {
@@ -131,40 +132,19 @@ export function useCatLogic({ onInteraction, setRevealedCatId, onCatReveal }: {
         }
     }, [catState.catId, setRevealedCatId, setTheme]);
 
-    const lockForToday = useCallback(() => {
-        if (typeof window === 'undefined') {
-            return;
-        }
-        try {
-            const now = new Date();
-            localStorage.setItem(LAST_OPEN_STORAGE_KEY, now.toISOString());
-            setIsDailyLocked(true);
-            setNextAvailableAt(getNextMidnight(now).getTime());
-        } catch (error) {
-            console.warn('Unable to persist daily lock state', error);
-        }
-    }, []);
-
     const refreshDailyLock = useCallback(() => {
-        if (typeof window === 'undefined') {
+        if (!userData) {
             setIsDailyLocked(false);
             setNextAvailableAt(null);
             return;
-        }
-
-        let stored: string | null = null;
-        try {
-            stored = localStorage.getItem(LAST_OPEN_STORAGE_KEY);
-        } catch (error) {
-            console.warn('Unable to read daily lock state', error);
         }
 
         const now = new Date();
         const todayStart = getStartOfDay(now);
         let locked = false;
 
-        if (stored) {
-            const parsed = new Date(stored);
+        if (userData.lastBoxOpenDate) {
+            const parsed = new Date(userData.lastBoxOpenDate);
             if (!Number.isNaN(parsed.getTime())) {
                 const lastDayStart = getStartOfDay(parsed);
                 locked = lastDayStart.getTime() === todayStart.getTime();
@@ -173,22 +153,10 @@ export function useCatLogic({ onInteraction, setRevealedCatId, onCatReveal }: {
 
         setIsDailyLocked(locked);
         setNextAvailableAt(locked ? getNextMidnight(now).getTime() : null);
-    }, []);
+    }, [userData]);
 
     useEffect(() => {
-        let timeoutId: number | undefined;
-
-        if (typeof window !== 'undefined') {
-            timeoutId = window.setTimeout(() => {
-                refreshDailyLock();
-            }, 0);
-        }
-
-        return () => {
-            if (timeoutId !== undefined) {
-                window.clearTimeout(timeoutId);
-            }
-        };
+        refreshDailyLock();
     }, [refreshDailyLock]);
 
     useEffect(() => {
@@ -205,11 +173,7 @@ export function useCatLogic({ onInteraction, setRevealedCatId, onCatReveal }: {
         const delay = nextAvailableAt - now;
 
         if (delay <= 0) {
-            if (typeof window !== 'undefined') {
-                window.setTimeout(() => {
-                    refreshDailyLock();
-                }, 0);
-            }
+            refreshDailyLock();
             return;
         }
 
@@ -225,14 +189,6 @@ export function useCatLogic({ onInteraction, setRevealedCatId, onCatReveal }: {
         };
     }, [isDailyLocked, nextAvailableAt, refreshDailyLock]);
 
-    useEffect(() => {
-        return () => {
-            if (unlockTimerRef.current !== undefined) {
-                window.clearTimeout(unlockTimerRef.current);
-            }
-        };
-    }, []);
-
     const handleBoxClick = async (options?: { ignoreLock?: boolean }) => {
         if (isLoading || catState.outcome !== 'initial' || isRevealing) return;
         if (isDailyLocked && !options?.ignoreLock) {
@@ -244,7 +200,10 @@ export function useCatLogic({ onInteraction, setRevealedCatId, onCatReveal }: {
 
         playFeedback('click-1');
         if (!options?.ignoreLock) {
-            lockForToday();
+            const now = new Date();
+            setUserData(prev => ({ ...prev, lastBoxOpenDate: now.toISOString() }));
+            setIsDailyLocked(true);
+            setNextAvailableAt(getNextMidnight(now).getTime());
         }
         setIsRevealing(true);
         setMessage('');
@@ -400,22 +359,12 @@ export function useCatLogic({ onInteraction, setRevealedCatId, onCatReveal }: {
 
     const overrideDailyLock = useCallback(() => {
         onInteraction?.();
-        if (typeof window !== 'undefined') {
-            try {
-                window.localStorage.removeItem(LAST_OPEN_STORAGE_KEY);
-            } catch (error) {
-                console.warn('Unable to clear daily lock state', error);
-            }
-        }
-        if (unlockTimerRef.current !== undefined) {
-            window.clearTimeout(unlockTimerRef.current);
-            unlockTimerRef.current = undefined;
-        }
+        setUserData(prev => ({ ...prev, lastBoxOpenDate: undefined }));
         setIsDailyLocked(false);
         setNextAvailableAt(null);
         playFeedback('click-2');
         resetState();
-    }, [onInteraction, resetState]);
+    }, [onInteraction, resetState, setUserData]);
 
     return {
         catState,

@@ -222,6 +222,7 @@ const mergeUserRecords = (cloud: UserData, local: UserData): UserData => {
   const streak = Math.max(cloud.streak ?? 0, local.streak ?? 0);
   const shareCount = Math.max(cloud.shareCount ?? 0, local.shareCount ?? 0);
   const lastObservationDate = cloud.lastObservationDate ?? local.lastObservationDate;
+  const lastBoxOpenDate = cloud.lastBoxOpenDate ?? local.lastBoxOpenDate;
   const revealHistory = (local.revealHistory?.length ?? 0) > (cloud.revealHistory?.length ?? 0)
     ? local.revealHistory
     : cloud.revealHistory;
@@ -259,6 +260,7 @@ const mergeUserRecords = (cloud: UserData, local: UserData): UserData => {
     streak,
     shareCount,
     lastObservationDate,
+    lastBoxOpenDate,
     diary: mergeDiaryData(cloud.diary, local.diary),
     revealHistory,
     settings: mergedSettings,
