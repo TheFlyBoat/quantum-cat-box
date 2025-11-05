@@ -1,14 +1,7 @@
 {
   "projects": {
-<<<<<<< HEAD
-    "default": "quantum-cat-3",
-    "quantum_cat": "quantum-cat-3"
+    "default": "thequantumcatapp"
   },
   "targets": {},
   "etags": {}
 }
-=======
-    "default": "studio-5841343011-cffec"
-  }
-}
->>>>>>> 957e37b3f48dbd57181f2e1cae07716037534a68
