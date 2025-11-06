@@ -74,22 +74,22 @@ export function QuantumCatBox({
   const isGravityCat = catState.catId === 'gravity';
 
   return (
-    <button
-      type="button"
-      onClick={onClick}
-      disabled={isLoading || isOpen || isLocked}
-      className={cn(
-        'group relative rounded-2xl transition-transform duration-300 ease-out focus:outline-none focus-visible:ring-4 focus-visible:ring-[#A240FF] focus-visible:ring-offset-4 focus-visible:ring-offset-background',
-        !isOpen && !isLoading && !isLocked && 'hover:scale-105',
-        isLoading && !reduceMotion && 'animate-shake',
-        isAmbientShaking && !reduceMotion && 'animate-subtle-shake',
-        isLocked && 'cursor-not-allowed opacity-70',
-        (isLoading || isOpen) && 'cursor-default'
-      )}
-      aria-label={isLocked ? 'Quantum Box locked until tomorrow' : 'Open the Quantum Box'}
-      aria-disabled={isLoading || isOpen || isLocked}
-    >
-      <BoxComponent className="h-52 w-52 md:h-56 md:w-56" isOpen={isOpen} />
+        <button
+          type="button"
+          onClick={onClick}
+          disabled={isLoading || isOpen}
+          className={cn(
+            'group relative rounded-2xl transition-transform duration-300 ease-out focus:outline-none focus-visible:ring-4 focus-visible:ring-[#A240FF] focus-visible:ring-offset-4 focus-visible:ring-offset-background',
+            !isOpen && !isLoading && !isLocked && 'hover:scale-105',
+            isLoading && !reduceMotion && 'animate-shake',
+            isAmbientShaking && !reduceMotion && 'animate-subtle-shake',
+            isLocked && 'cursor-not-allowed',
+            (isLoading || isOpen) && !isLocked && 'cursor-pointer',
+            (isLoading || isOpen) && isLocked && 'cursor-default'
+          )}
+          aria-label={isLocked ? 'Quantum Box locked until tomorrow' : 'Open the Quantum Box'}
+          aria-disabled={isLoading || isOpen}
+        >      <BoxComponent className="h-52 w-52 md:h-56 md:w-56" isOpen={isOpen} />
 
       {catState.outcome !== 'initial' && catState.catId && !isGravityCat && (
         <div className="absolute inset-0 flex items-end justify-center">
@@ -112,15 +112,7 @@ export function QuantumCatBox({
         </div>
       )}
 
-      {isLocked && !isOpen && !isLoading && !isRevealing && lockMessage && (
-        <div className="absolute inset-0 flex flex-col items-center justify-center rounded-2xl bg-[#002D41]/85 px-4 text-center shadow-inner backdrop-blur-md">
-          <Lock className="mb-1.5 h-6 w-6 text-[#A240FF]" />
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#A9DB4A]">
-            Quantum flux stabilizing
-          </p>
-          <p className="mt-1 text-[11px] text-white/80">{lockMessage}</p>
-        </div>
-      )}
+      
     </button>
   );
 }

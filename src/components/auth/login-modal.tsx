@@ -27,16 +27,13 @@ export function LoginModal() {
   return (
     <Dialog open={loginModalOpen} onOpenChange={(open) => !open && closeLoginModal()}>
       <DialogContent className="max-w-md rounded-2xl">
-        <DialogHeader className="space-y-2">
-          <Badge variant="outline" className="w-fit">Sync Available</Badge>
-          <DialogTitle className="text-lg sm:text-xl">Sign in to keep your collection everywhere</DialogTitle>
-          <DialogDescription>
-            Your points, cats, favourites, and layout preferences will stay in sync across every device once you log in.
-          </DialogDescription>
-          {reasonLabel && (
-            <p className="text-xs text-muted-foreground uppercase tracking-wide">{reasonLabel}</p>
-          )}
-        </DialogHeader>
+        <DialogTitle>Sign in to keep your collection everywhere</DialogTitle>
+        <DialogDescription>
+          Your points, cats, favourites, and layout preferences will stay in sync across every device once you log in.
+        </DialogDescription>
+        {reasonLabel && (
+          <p className="text-xs text-muted-foreground uppercase tracking-wide">{reasonLabel}</p>
+        )}
         <LoginCard
           className="shadow-none border border-border/50 bg-card"
           allowGuest={false}

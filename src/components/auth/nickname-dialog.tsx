@@ -29,9 +29,7 @@ export function NicknameDialog({ isOpen, onOpenChange, onNicknameSet }: Nickname
     return (
         <Dialog open={isOpen} onOpenChange={onOpenChange}>
             <DialogContent>
-                <DialogHeader>
-                    <DialogTitle>Create your nickname</DialogTitle>
-                </DialogHeader>
+                <DialogTitle>Create your nickname</DialogTitle>
                 <form onSubmit={handleNicknameSubmit} className="space-y-4">
                     <Input
                         placeholder="Enter your nickname..."

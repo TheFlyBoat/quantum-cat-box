@@ -2,7 +2,8 @@
 
 import { type ComponentType, useState } from 'react';
 
-import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
+import { VisuallyHidden } from '@/components/ui/visually-hidden';
 import { cn } from '@/lib/utils';
 import { Box, Fish, Heart, Share2 } from 'lucide-react';
 
@@ -82,6 +83,9 @@ export function OnboardingModal({ open, onClose }: OnboardingModalProps) {
     return (
         <Dialog open={open} onOpenChange={handleDialogChange}>
             <DialogContent className="max-w-lg border-0 bg-transparent p-0">
+                <DialogTitle>
+                    <VisuallyHidden>{currentStep.title}</VisuallyHidden>
+                </DialogTitle>
                 <div className="flex items-center justify-center">
                     <div
                         role="button"

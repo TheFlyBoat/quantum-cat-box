@@ -408,17 +408,15 @@ export default function CustomizePage() {
                 <DialogContent className="sm:max-w-lg">
                     {selectedThemeOption && (
                         <>
-                            <DialogHeader>
-                                <DialogTitle className="flex items-center justify-between">
-                                    <span>{selectedThemeOption.name}</span>
-                                    {isThemeActive(selectedThemeOption.id) && (
-                                        <Badge variant="secondary" className="bg-primary/10 text-primary">
-                                            Active
-                                        </Badge>
-                                    )}
-                                </DialogTitle>
-                                <DialogDescription>{selectedThemeOption.description}</DialogDescription>
-                            </DialogHeader>
+                            <DialogTitle className="flex items-center justify-between">
+                                <span>{selectedThemeOption.name}</span>
+                                {isThemeActive(selectedThemeOption.id) && (
+                                    <Badge variant="secondary" className="bg-primary/10 text-primary">
+                                        Active
+                                    </Badge>
+                                )}
+                            </DialogTitle>
+                            <DialogDescription>{selectedThemeOption.description}</DialogDescription>
                             <div className="space-y-4">
                                 <div
                                     className={cn(

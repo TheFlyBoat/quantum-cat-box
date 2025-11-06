@@ -69,6 +69,9 @@ export default function HomePage({ onInteraction, setRevealedCatId }: { onIntera
         onCatReveal: (catId: string, _revealedMessage: string) => {
             setCurrentCatId(catId);
             recordReveal(catId);
+        },
+        onDailyLock: () => {
+            setLockNotice('The Quantum Box is recharging. Come back tomorrow!');
         }
     });
 
@@ -220,29 +223,7 @@ export default function HomePage({ onInteraction, setRevealedCatId }: { onIntera
         }
     };
 
-    const onBoxClick = () => {
-        if (showOnboarding) {
-            return;
-        }
-        if (isDailyLocked) {
-            overrideDailyLock();
-            setPendingAutoOpen(true);
-            if (lockNotice) {
-                setLockNotice('');
-            }
-            if (showTutorialOverlay) {
-                dismissTutorialOverlay();
-            }
-            return;
-        }
-        if (lockNotice) {
-            setLockNotice('');
-        }
-        if (showTutorialOverlay) {
-            dismissTutorialOverlay();
-        }
-        handleBoxClick({ ignoreLock: true });
-    };
+    
 
     const shareText = useMemo(() => {
         if (revealedCatName) {
@@ -435,7 +416,6 @@ export default function HomePage({ onInteraction, setRevealedCatId }: { onIntera
                                 catState={catState}
                                 isAmbientShaking={isAmbientShaking}
                                 isLocked={isDailyLocked}
-                                lockMessage="The box will be back tomorrow."
                             />
                         </div>
 
@@ -479,12 +459,10 @@ export default function HomePage({ onInteraction, setRevealedCatId }: { onIntera
                         }
                     }}>
                         <DialogContent className="sm:max-w-md">
-                            <DialogHeader>
-                                <DialogTitle>Share your discovery</DialogTitle>
-                                <DialogDescription>
-                                    Send the card to Instagram, WhatsApp, or anywhere else.
-                                </DialogDescription>
-                            </DialogHeader>
+                            <DialogTitle>Share your discovery</DialogTitle>
+                            <DialogDescription>
+                                Send the card to Instagram, WhatsApp, or anywhere else.
+                            </DialogDescription>
 
                             {shareAsset ? (
                                 <div className="space-y-4">

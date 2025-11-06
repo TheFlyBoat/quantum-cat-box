@@ -35,13 +35,10 @@ export function LoginPrompt() {
   return (
     <Dialog open={loginPromptOpen} onOpenChange={handleOpenChange}>
       <DialogContent className="max-w-md rounded-2xl">
-        <DialogHeader>
-          <Badge variant="outline" className="w-fit mb-2 text-xs font-semibold">Guest Mode</Badge>
-          <DialogTitle className="text-lg sm:text-xl">🐾 Want to keep your cats safe in this reality forever?</DialogTitle>
-          <DialogDescription>
-            Save your progress to never lose your collection, badges, and points.
-          </DialogDescription>
-        </DialogHeader>
+        <DialogTitle>🐾 Want to keep your cats safe in this reality forever?</DialogTitle>
+        <DialogDescription>
+          Save your progress to never lose your collection, badges, and points.
+        </DialogDescription>
         {supportingCopy && (
           <p className={cn('text-sm text-muted-foreground', 'mt-2')}>{supportingCopy}</p>
         )}

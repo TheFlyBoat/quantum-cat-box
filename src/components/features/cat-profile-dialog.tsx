@@ -17,6 +17,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { VisuallyHidden } from '../ui/visually-hidden';
 
 interface CatProfileDialogProps {
     cat: {
@@ -59,6 +60,9 @@ export function CatProfileDialog({ cat, open, onOpenChange }: CatProfileDialogPr
     return (
         <Dialog open={open} onOpenChange={handleOpenChange}>
             <DialogContent className="grid grid-cols-1 p-0 sm:max-w-2xl sm:grid-cols-2">
+                 <DialogTitle>
+                    <VisuallyHidden>{view === 'details' ? displayName : `${displayName}'s Diary`}</VisuallyHidden>
+                </DialogTitle>
                 <div className={cn(
                     "flex w-full items-center justify-center rounded-t-2xl bg-gradient-to-br from-primary/20 via-background to-background p-8 sm:rounded-tr-none sm:rounded-l-2xl",
                 )}>
@@ -82,9 +86,9 @@ export function CatProfileDialog({ cat, open, onOpenChange }: CatProfileDialogPr
                                 </Tooltip>
                             </TooltipProvider>
                         </div>
-                        <DialogTitle className="section-title mt-2 text-xl">
+                        <h2 className="section-title mt-2 text-xl font-headline">
                             {view === 'details' ? displayName : `${displayName}'s Diary`}
-                        </DialogTitle>
+                        </h2>
                         <DialogDescription className="body-text italic text-accent text-sm">&ldquo;{cat.tagline}&rdquo;</DialogDescription>
                     </DialogHeader>
 

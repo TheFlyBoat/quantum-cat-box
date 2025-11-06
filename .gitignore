@@ -27,3 +27,5 @@ firebase-debug.log
 
 # ignore backup env
 .env.local.backup
+
+.firebase

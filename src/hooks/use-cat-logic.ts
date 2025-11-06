@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, useReducer } from 'react'; // Added useReducer import // Added useReducer import
 import { CatState, CatOutcome } from '@/lib/types';
 import { useBadgeProgress } from '@/context/badge-progress-context';
 import { useCatCollection } from '@/context/cat-collection-context';
@@ -97,19 +97,19 @@ const getStartOfDay = (date: Date) => new Date(date.getFullYear(), date.getMonth
 
 const getNextMidnight = (date: Date) => new Date(date.getFullYear(), date.getMonth(), date.getDate() + 1);
 
-export function useCatLogic({ onInteraction, setRevealedCatId, onCatReveal }: {
+
+
+export function useCatLogic({ onInteraction, setRevealedCatId, onCatReveal, onDailyLock }: {
     onInteraction?: () => void;
     setRevealedCatId?: (id: string | null) => void;
     onCatReveal: (catId: string, message: string) => void;
+    onDailyLock?: () => void;
 }) {
     const [catState, setCatState] = useState<CatState>({ outcome: 'initial' });
     const [message, setMessage] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [isRevealing, setIsRevealing] = useState(false);
     const [revealedCatName, setRevealedCatName] = useState<string | null>(null);
-    const [isDailyLocked, setIsDailyLocked] = useState(false);
-    const [nextAvailableAt, setNextAvailableAt] = useState<number | null>(null);
-    const unlockTimerRef = useRef<number | undefined>(undefined);
 
     const { recordObservation } = useBadgeProgress();
     const { unlockCat } = useCatCollection();
@@ -132,79 +132,21 @@ export function useCatLogic({ onInteraction, setRevealedCatId, onCatReveal }: {
         }
     }, [catState.catId, setRevealedCatId, setTheme]);
 
-    const refreshDailyLock = useCallback(() => {
-        if (!userData) {
-            setIsDailyLocked(false);
-            setNextAvailableAt(null);
-            return;
-        }
-
-        const now = new Date();
-        const todayStart = getStartOfDay(now);
-        let locked = false;
-
-        if (userData.lastBoxOpenDate) {
-            const parsed = new Date(userData.lastBoxOpenDate);
-            if (!Number.isNaN(parsed.getTime())) {
-                const lastDayStart = getStartOfDay(parsed);
-                locked = lastDayStart.getTime() === todayStart.getTime();
-            }
-        }
-
-        setIsDailyLocked(locked);
-        setNextAvailableAt(locked ? getNextMidnight(now).getTime() : null);
-    }, [userData]);
-
-    useEffect(() => {
-        refreshDailyLock();
-    }, [refreshDailyLock]);
-
-    useEffect(() => {
-        if (unlockTimerRef.current !== undefined) {
-            window.clearTimeout(unlockTimerRef.current);
-            unlockTimerRef.current = undefined;
-        }
-
-        if (!isDailyLocked || !nextAvailableAt) {
-            return;
-        }
-
-        const now = Date.now();
-        const delay = nextAvailableAt - now;
-
-        if (delay <= 0) {
-            refreshDailyLock();
-            return;
-        }
-
-        unlockTimerRef.current = window.setTimeout(() => {
-            refreshDailyLock();
-        }, delay + 1000);
-
-        return () => {
-            if (unlockTimerRef.current !== undefined) {
-                window.clearTimeout(unlockTimerRef.current);
-                unlockTimerRef.current = undefined;
-            }
-        };
-    }, [isDailyLocked, nextAvailableAt, refreshDailyLock]);
-
     const handleBoxClick = async (options?: { ignoreLock?: boolean }) => {
-        if (isLoading || catState.outcome !== 'initial' || isRevealing) return;
-        if (isDailyLocked && !options?.ignoreLock) {
-            playFeedback('haptic-3');
+        console.log('handleBoxClick called');
+        console.log({ isLoading, outcome: catState.outcome, isRevealing });
+
+        if (isLoading || catState.outcome !== 'initial' || isRevealing) {
+            console.log('Box click blocked by loading/revealing state');
             return;
         }
+
+        console.log('Box click proceeding');
 
         onInteraction?.();
 
         playFeedback('click-1');
-        if (!options?.ignoreLock) {
-            const now = new Date();
-            setUserData(prev => ({ ...prev, lastBoxOpenDate: now.toISOString() }));
-            setIsDailyLocked(true);
-            setNextAvailableAt(getNextMidnight(now).getTime());
-        }
+        
         setIsRevealing(true);
         setMessage('');
         setRevealedCatName(null);
@@ -328,11 +270,19 @@ export function useCatLogic({ onInteraction, setRevealedCatId, onCatReveal }: {
                         setRevealedCatName(cat.name);
                         addPoints(cat.points);
                     }
+                    if (!options?.ignoreLock) {
+                        const now = new Date();
+                        setUserData(prev => ({ ...prev, lastBoxOpenDate: now.toISOString() }));
+                        setIsDailyLocked(true);
+                        setNextAvailableAt(getNextMidnight(now).getTime());
+                    }
                 }, 800);
 
             }, 1400);
         }, 1500);
     };
+
+
 
     const resetState = useCallback(() => {
         if (setRevealedCatId) {
@@ -349,22 +299,9 @@ export function useCatLogic({ onInteraction, setRevealedCatId, onCatReveal }: {
 
     const handleReset = useCallback((options?: { ignoreLock?: boolean }) => {
         onInteraction?.();
-        if (isDailyLocked && !options?.ignoreLock) {
-            playFeedback('haptic-3');
-            return;
-        }
         playFeedback('click-2');
         resetState();
-    }, [isDailyLocked, onInteraction, resetState]);
-
-    const overrideDailyLock = useCallback(() => {
-        onInteraction?.();
-        setUserData(prev => ({ ...prev, lastBoxOpenDate: undefined }));
-        setIsDailyLocked(false);
-        setNextAvailableAt(null);
-        playFeedback('click-2');
-        resetState();
-    }, [onInteraction, resetState, setUserData]);
+    }, [onInteraction, resetState]);
 
     return {
         catState,
@@ -377,9 +314,5 @@ export function useCatLogic({ onInteraction, setRevealedCatId, onCatReveal }: {
         setCatState,
         setMessage,
         setRevealedCatName,
-        isDailyLocked,
-        nextAvailableAt,
-        refreshDailyLock,
-        overrideDailyLock,
     };
 }

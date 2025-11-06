@@ -56,10 +56,8 @@ export function BoxSkinDialog({ open, onOpenChange, skin, onApply }: BoxSkinDial
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
-        <DialogHeader>
-          <DialogTitle>{skin.name}</DialogTitle>
-          <DialogDescription>{skin.description}</DialogDescription>
-        </DialogHeader>
+        <DialogTitle>{skin.name}</DialogTitle>
+        <DialogDescription>{skin.description}</DialogDescription>
         <div className="flex items-center justify-center p-8">
           <BoxComponent className="w-32 h-32" />
         </div>
