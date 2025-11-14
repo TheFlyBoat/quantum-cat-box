@@ -138,6 +138,7 @@ const SPLASH_STYLES = `
   color: rgba(248, 250, 255, 0.96);
   text-shadow: 0 6px 28px rgba(59, 130, 246, 0.18);
   position: relative;
+  white-space: nowrap;
 }
 
 .quantum-text__body {
@@ -595,7 +596,7 @@ export function SplashScreen({ onComplete }: { onComplete?: () => void }) {
         <QuantumCat animate={!prefersReducedMotion} />
         <div className="quantum-text">
           <h1 className="quantum-text__title">The Quantum Cat</h1>
-          <span className="quantum-text__eyebrow">Flyboat</span>
+          <span className="quantum-text__eyebrow">FlyBoat Creative</span>
         </div>
       </div>
     </div>

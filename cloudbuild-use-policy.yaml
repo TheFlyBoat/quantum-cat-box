@@ -1,0 +1,5 @@
+name: organizations/993057758999/policies/cloudbuild.useBuildServiceAccount
+spec:
+  rules:
+    - enforce: true
+

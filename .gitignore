@@ -1,31 +1,44 @@
-# Dependencies
+# Node
 node_modules/
-.pnpm-store/
-
-# Build outputs
-.next/
-out/
-dist/
-build/
-
-# Logs
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
+dist/
 
-# Env files
+# Next.js
+.next/
+out/
+.vercel/
+
+# Firebase
+.firebase/
+.firebaserc
+firebase-debug.log
+firebase-debug.*
+.firebase/
+
+# Environment files
 .env
 .env.local
 .env.*.local
+.env.development.local
+.env.production.local
 
-# Misc
+# MacOS system files
 .DS_Store
-.idea/
+.AppleDouble
+.LSOverride
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+lerna-debug.log*
+
+# IDE
 .vscode/
-firebase-debug.log
+*.swp
+*.swo
 
-# ignore backup env
-.env.local.backup
-
-.firebase
