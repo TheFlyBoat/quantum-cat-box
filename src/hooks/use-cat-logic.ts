@@ -114,11 +114,6 @@ export function useCatLogic({ onInteraction, setRevealedCatId, onCatReveal, onDa
     const [revealedCatName, setRevealedCatName] = useState<string | null>(null);
     const [isDailyLocked, setIsDailyLocked] = useState(false);
     const [nextAvailableAt, setNextAvailableAt] = useState<number | null>(null);
-    const [isGeneratingShare, setIsGeneratingShare] = useState(false);
-    const [isShared, setIsShared] = useState(false);
-
-    const shareCardRef = useRef<HTMLDivElement>(null);
-    const { createShareAsset, rewardShare } = useShare(message, shareCardRef);
 
     const { recordObservation } = useBadgeProgress();
     const { unlockCat } = useCatCollection();
@@ -249,15 +244,6 @@ export function useCatLogic({ onInteraction, setRevealedCatId, onCatReveal, onDa
             onCatReveal(resolvedCatId, finalMessage);
         };
 
-        let fallbackTimer: NodeJS.Timeout;
-
-        const clearFallbackTimer = () => {
-            if (fallbackTimer !== undefined && typeof window !== 'undefined') {
-                window.clearTimeout(fallbackTimer);
-                fallbackTimer = undefined;
-            }
-        };
-
         const fallbackTimer = setTimeout(() => {
             reportMessage();
         }, MESSAGE_GENERATION_TIMEOUT_MS);
@@ -338,7 +324,6 @@ export function useCatLogic({ onInteraction, setRevealedCatId, onCatReveal, onDa
         playFeedback('click-2');
         if (!isDailyLocked || options?.ignoreLock) {
             resetState();
-            setIsShared(false);
         }
     }, [onInteraction, resetState, isDailyLocked]);
 
@@ -348,25 +333,6 @@ export function useCatLogic({ onInteraction, setRevealedCatId, onCatReveal, onDa
         setUserData(prev => ({ ...prev, lastBoxOpenDate: undefined }));
         resetState();
     }, [resetState, setUserData]);
-
-    const handleShareRequest = useCallback(async () => {
-        if (isGeneratingShare) return;
-        setIsGeneratingShare(true);
-        try {
-            const asset = await createShareAsset();
-            onShareAssetCreated(asset);
-        } catch (error) {
-            console.error("Failed to create share asset in useCatLogic:", error);
-            throw error; // Re-throw to be caught in the component
-        } finally {
-            setIsGeneratingShare(false);
-        }
-    }, [isGeneratingShare, createShareAsset, onShareAssetCreated]);
-
-    const handleSuccessfulShare = useCallback(() => {
-        rewardShare();
-        setIsShared(true);
-    }, [rewardShare]);
 
     return {
         catState,
@@ -383,10 +349,5 @@ export function useCatLogic({ onInteraction, setRevealedCatId, onCatReveal, onDa
         nextAvailableAt,
         refreshDailyLock,
         overrideDailyLock,
-        isGeneratingShare,
-        handleShareRequest,
-        shareCardRef,
-        isShared,
-        handleSuccessfulShare,
     };
 }

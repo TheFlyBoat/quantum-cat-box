@@ -87,40 +87,41 @@ export function ShareCard({ catState, message, boxSkin }: ShareCardProps) {
 
   return (
     <Card
-      className="relative flex h-full w-full flex-col items-center rounded-[32px] border border-white/20 bg-[linear-gradient(135deg,#5eead4_0%,#67e8f9_32%,#f0abfc_66%,#c4b5fd_100%)] px-6 pb-8 pt-6 text-center font-body text-white shadow-[0_25px_70px_-35px_rgba(79,70,229,0.45)]"
+      className="relative flex h-full w-full flex-col items-center rounded-[32px] border border-white/20 bg-[linear-gradient(135deg,#67e8f9_0%,#f0abfc_50%,#c4b5fd_100%)] p-6 text-center font-body text-white shadow-[0_25px_70px_-35px_rgba(79,70,229,0.45)]"
     >
-      <div className="flex h-full w-full flex-col items-center justify-between gap-4">
-        <header className="flex w-full flex-col items-center gap-3">
+      <div className="absolute inset-0 bg-[url('/grid.svg')] bg-repeat opacity-20" />
+      <div className="relative flex h-full w-full flex-col items-center justify-between gap-4">
+        <header className="flex w-full flex-col items-center gap-2">
           <Image
             src="/favicon.svg"
             alt="The Quantum Cat logo"
-            width={48}
-            height={48}
-            className="h-12 w-12"
+            width={40}
+            height={40}
+            className="h-10 w-10"
           />
-          <div className="flex items-center justify-center space-x-2 font-headline text-3xl font-bold tracking-tight text-black">
+          <div className="flex items-center justify-center space-x-1.5 font-headline text-2xl font-bold tracking-tight text-black">
             <span>{titleParts.part1}</span>
-            <span>{titleParts.part2}</span>
+            <span className="text-white">{titleParts.part2}</span>
             <span>{titleParts.part3}</span>
           </div>
         </header>
 
-        <div className="flex w-full flex-1 flex-col items-center justify-center gap-5">
-          <div className="relative h-32 w-32 -translate-y-2 transform">
+        <div className="flex w-full flex-1 flex-col items-center justify-center gap-4">
+          <div className="relative h-36 w-36">
             <BoxComponent className="h-full w-full" isOpen />
             <div className="absolute inset-0 flex items-center justify-center">
-              <div className="h-full w-full scale-[0.7]">
+              <div className="h-full w-full scale-[0.8]">
                 <CatDisplay state={catState} />
               </div>
             </div>
           </div>
 
-          <div className="w-full max-w-[260px]">
-            <div className="rounded-xl bg-white/85 px-4 py-3 text-center shadow-sm backdrop-blur">
-              <div className="font-fortune text-base font-semibold leading-relaxed text-primary">
+          <div className="w-full max-w-[280px]">
+            <div className="rounded-xl bg-white/90 px-4 py-3 text-center shadow-lg backdrop-blur-sm">
+              <div className="font-fortune text-lg font-semibold leading-snug text-primary">
                 {sentences.length > 0 ? (
                   sentences.map((sentence, index) => (
-                    <p key={`${sentence}-${index}`} className="mb-1 last:mb-0">
+                    <p key={`${sentence}-${index}`} className="mb-1.5 last:mb-0">
                       {sentence}
                     </p>
                   ))
@@ -132,7 +133,7 @@ export function ShareCard({ catState, message, boxSkin }: ShareCardProps) {
           </div>
         </div>
 
-        <footer className="w-full pt-4 text-xs font-semibold uppercase tracking-[0.3em] text-white/80">
+        <footer className="w-full text-xs font-semibold uppercase tracking-[0.2em] text-black/60">
           thequantumcat.app • #QuantumCat
         </footer>
       </div>
