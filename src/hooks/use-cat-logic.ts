@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useEffect, useCallback, useRef, useReducer } from 'react'; // Added useReducer import // Added useReducer import
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { CatState, CatOutcome } from '@/lib/types';
 import { useBadgeProgress } from '@/context/badge-progress-context';
 import { useCatCollection } from '@/context/cat-collection-context';
@@ -13,6 +13,7 @@ import { playFeedback } from '@/lib/audio';
 import { useBoxSkin } from '@/context/box-skin-context';
 import { useTheme } from 'next-themes';
 import { useAuth } from '@/context/auth-context';
+import { useShare, type ShareAsset } from './use-share';
 
 type OutcomePool = { title: string; cats: { id: string; rarity: number }[] };
 
@@ -99,17 +100,25 @@ const getNextMidnight = (date: Date) => new Date(date.getFullYear(), date.getMon
 
 
 
-export function useCatLogic({ onInteraction, setRevealedCatId, onCatReveal, onDailyLock }: {
+export function useCatLogic({ onInteraction, setRevealedCatId, onCatReveal, onDailyLock, onShareAssetCreated }: {
     onInteraction?: () => void;
     setRevealedCatId?: (id: string | null) => void;
     onCatReveal: (catId: string, message: string) => void;
     onDailyLock?: () => void;
+    onShareAssetCreated: (asset: ShareAsset) => void;
 }) {
     const [catState, setCatState] = useState<CatState>({ outcome: 'initial' });
     const [message, setMessage] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [isRevealing, setIsRevealing] = useState(false);
     const [revealedCatName, setRevealedCatName] = useState<string | null>(null);
+    const [isDailyLocked, setIsDailyLocked] = useState(false);
+    const [nextAvailableAt, setNextAvailableAt] = useState<number | null>(null);
+    const [isGeneratingShare, setIsGeneratingShare] = useState(false);
+    const [isShared, setIsShared] = useState(false);
+
+    const shareCardRef = useRef<HTMLDivElement>(null);
+    const { createShareAsset, rewardShare } = useShare(message, shareCardRef);
 
     const { recordObservation } = useBadgeProgress();
     const { unlockCat } = useCatCollection();
@@ -117,6 +126,30 @@ export function useCatLogic({ onInteraction, setRevealedCatId, onCatReveal, onDa
     const { selectedSkin } = useBoxSkin();
     const { setTheme } = useTheme();
     const { user, userData, setUserData } = useAuth();
+
+    const refreshDailyLock = useCallback(() => {
+        if (!userData) {
+            setIsDailyLocked(false);
+            setNextAvailableAt(null);
+            return;
+        }
+
+        const now = new Date();
+        const lastOpen = userData.lastBoxOpenDate ? new Date(userData.lastBoxOpenDate) : null;
+
+        if (lastOpen && getStartOfDay(now).getTime() <= getStartOfDay(lastOpen).getTime()) {
+            setIsDailyLocked(true);
+            const nextMidnight = getNextMidnight(now);
+            setNextAvailableAt(nextMidnight.getTime());
+        } else {
+            setIsDailyLocked(false);
+            setNextAvailableAt(null);
+        }
+    }, [userData]);
+
+    useEffect(() => {
+        refreshDailyLock();
+    }, [refreshDailyLock]);
 
     useEffect(() => {
         if (setRevealedCatId) {
@@ -135,6 +168,12 @@ export function useCatLogic({ onInteraction, setRevealedCatId, onCatReveal, onDa
     const handleBoxClick = async (options?: { ignoreLock?: boolean }) => {
         console.log('handleBoxClick called');
         console.log({ isLoading, outcome: catState.outcome, isRevealing });
+
+        if (isDailyLocked && !options?.ignoreLock) {
+            onDailyLock?.();
+            playFeedback('error-1');
+            return;
+        }
 
         if (isLoading || catState.outcome !== 'initial' || isRevealing) {
             console.log('Box click blocked by loading/revealing state');
@@ -198,19 +237,19 @@ export function useCatLogic({ onInteraction, setRevealedCatId, onCatReveal, onDa
         };
 
         const resolvedCatId = selectedCatId!;
-        let hasReportedMessage = false;
+        const messageReportedRef = useRef(false);
 
         const reportMessage = (candidate?: string) => {
+            if (messageReportedRef.current) return;
+            messageReportedRef.current = true;
+
             const trimmed = typeof candidate === 'string' ? candidate.trim() : '';
             const finalMessage = trimmed.length ? trimmed : pickFallbackMessage();
             setMessage(finalMessage);
-            if (!hasReportedMessage) {
-                onCatReveal(resolvedCatId, finalMessage);
-                hasReportedMessage = true;
-            }
+            onCatReveal(resolvedCatId, finalMessage);
         };
 
-        let fallbackTimer: number | undefined;
+        let fallbackTimer: NodeJS.Timeout;
 
         const clearFallbackTimer = () => {
             if (fallbackTimer !== undefined && typeof window !== 'undefined') {
@@ -219,27 +258,24 @@ export function useCatLogic({ onInteraction, setRevealedCatId, onCatReveal, onDa
             }
         };
 
-        if (typeof window !== 'undefined') {
-            fallbackTimer = window.setTimeout(() => {
-                fallbackTimer = undefined;
-                if (!hasReportedMessage) {
+        const fallbackTimer = setTimeout(() => {
+            reportMessage();
+        }, MESSAGE_GENERATION_TIMEOUT_MS);
+
+        generateCatMessage(messageInput)
+            .then(response => {
+                clearTimeout(fallbackTimer);
+                if (response && typeof response.message === 'string') {
+                    reportMessage(response.message);
+                } else {
                     reportMessage();
                 }
-            }, MESSAGE_GENERATION_TIMEOUT_MS);
-        }
-
-        generateCatMessage(messageInput).then(response => {
-            clearFallbackTimer();
-            if (!response || typeof response.message !== 'string') {
+            })
+            .catch(error => {
+                clearTimeout(fallbackTimer);
+                console.error("AI message generation failed:", error);
                 reportMessage();
-                return;
-            }
-            reportMessage(response.message);
-        }).catch(error => {
-            clearFallbackTimer();
-            console.error("AI message generation failed:", error);
-            reportMessage();
-        });
+            });
 
         setTimeout(() => {
             setIsRevealing(false);
@@ -300,8 +336,37 @@ export function useCatLogic({ onInteraction, setRevealedCatId, onCatReveal, onDa
     const handleReset = useCallback((options?: { ignoreLock?: boolean }) => {
         onInteraction?.();
         playFeedback('click-2');
+        if (!isDailyLocked || options?.ignoreLock) {
+            resetState();
+            setIsShared(false);
+        }
+    }, [onInteraction, resetState, isDailyLocked]);
+
+    const overrideDailyLock = useCallback(() => {
+        setIsDailyLocked(false);
+        setNextAvailableAt(null);
+        setUserData(prev => ({ ...prev, lastBoxOpenDate: undefined }));
         resetState();
-    }, [onInteraction, resetState]);
+    }, [resetState, setUserData]);
+
+    const handleShareRequest = useCallback(async () => {
+        if (isGeneratingShare) return;
+        setIsGeneratingShare(true);
+        try {
+            const asset = await createShareAsset();
+            onShareAssetCreated(asset);
+        } catch (error) {
+            console.error("Failed to create share asset in useCatLogic:", error);
+            throw error; // Re-throw to be caught in the component
+        } finally {
+            setIsGeneratingShare(false);
+        }
+    }, [isGeneratingShare, createShareAsset, onShareAssetCreated]);
+
+    const handleSuccessfulShare = useCallback(() => {
+        rewardShare();
+        setIsShared(true);
+    }, [rewardShare]);
 
     return {
         catState,
@@ -314,5 +379,14 @@ export function useCatLogic({ onInteraction, setRevealedCatId, onCatReveal, onDa
         setCatState,
         setMessage,
         setRevealedCatName,
+        isDailyLocked,
+        nextAvailableAt,
+        refreshDailyLock,
+        overrideDailyLock,
+        isGeneratingShare,
+        handleShareRequest,
+        shareCardRef,
+        isShared,
+        handleSuccessfulShare,
     };
 }

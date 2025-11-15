@@ -100,8 +100,8 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
     return (
         <div className={cn("relative min-h-screen w-full bg-background", celebrationInProgress && "bg-black")}>
-            <div className="mx-auto flex w-full max-w-[400px] h-[850px] flex-col items-center p-4">
-                <main className="relative flex flex-col w-full h-full rounded-[32px] border border-border/40 bg-card/95 px-4 pb-10 pt-6 shadow-[0_25px_70px_-35px_rgba(79,70,229,0.45)] backdrop-blur-sm sm:px-6 sm:pb-12 sm:pt-8">
+            <div className="mx-auto flex w-full max-w-md flex-col items-center p-4">
+                <main className="relative flex flex-col w-full h-full rounded-[32px] border border-border/40 bg-card/95 px-4 pb-20 pt-6 shadow-[0_25px_70px_-35px_rgba(79,70,229,0.45)] backdrop-blur-sm sm:px-6 sm:pb-12 sm:pt-8">
                     <AppHeader />
                     <div className="mt-6 flex w-full flex-col gap-6 flex-grow">
                         {children}

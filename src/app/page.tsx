@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { SplashScreen } from '@/components/splash-screen';
 
@@ -19,14 +19,14 @@ export default function RootPage() {
     }
   }, [router, shouldShowSplash]);
 
-  const handleSplashComplete = () => {
+  const handleSplashComplete = useCallback(() => {
     try {
       sessionStorage.setItem('quantum-cat-splash', 'seen');
     } catch (error) {
       console.warn('Unable to persist splash state during intro', error);
     }
     router.replace('/home');
-  };
+  }, [router]);
 
   if (!shouldShowSplash) {
     return (
