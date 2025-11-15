@@ -12,7 +12,7 @@ import { TitleDisplay } from '@/components/title-display';
 import { SplashScreen } from '@/components/splash-screen';
 import { useCatLogic } from '@/hooks/use-cat-logic';
 import { useDevMode } from '@/hooks/use-dev-mode';
-import { ShareAsset, useShare } from '@/hooks/use-share';
+import { type ShareAsset } from '@/hooks/use-share';
 import { useDiary } from '@/context/diary-context';
 import { useBadges } from '@/context/badge-context';
 import { useFeedback } from '@/context/feedback-context';
@@ -27,14 +27,12 @@ import { OnboardingModal } from '@/components/features/onboarding-modal';
 export default function HomePage({ onInteraction, setRevealedCatId }: { onInteraction?: () => void; setRevealedCatId?: (id: string | null) => void; }) {
     const [showOnboarding, setShowOnboarding] = useState(false);
     const [isAmbientShaking, setIsAmbientShaking] = useState(false);
-    const [isGeneratingShare, setIsGeneratingShare] = useState(false);
     const [isShareDialogOpen, setIsShareDialogOpen] = useState(false);
     const [shareAsset, setShareAsset] = useState<ShareAsset | null>(null);
     const [currentCatId, setCurrentCatId] = useState<string | null>(null);
     const [showSplash, setShowSplash] = useState(true);
     const [lockNotice, setLockNotice] = useState('');
 
-    const [isShared, setIsShared] = useState(false);
     const [pendingAutoOpen, setPendingAutoOpen] = useState(false);
     const [showTutorialOverlay, setShowTutorialOverlay] = useState(false);
 
@@ -60,8 +58,17 @@ export default function HomePage({ onInteraction, setRevealedCatId }: { onIntera
         nextAvailableAt,
         refreshDailyLock,
         overrideDailyLock,
+        isGeneratingShare,
+        handleShareRequest,
+        shareCardRef,
+        isShared,
+        handleSuccessfulShare,
     } = useCatLogic({
         onInteraction,
+        onShareAssetCreated: (asset) => {
+            setShareAsset(asset);
+            setIsShareDialogOpen(true);
+        },
         setRevealedCatId: (id) => {
             setCurrentCatId(id);
             setRevealedCatId?.(id);
@@ -83,7 +90,6 @@ export default function HomePage({ onInteraction, setRevealedCatId }: { onIntera
         setRevealedCatId
     });
 
-    const { shareCardRef, createShareAsset, rewardShare } = useShare(message);
     const revealedCatId = catState?.catId;
     const activeCatId = catState?.catId ?? currentCatId;
     const isCurrentMessageSaved = !!(activeCatId && message && isDiaryMessageSaved(activeCatId, message));
@@ -250,25 +256,19 @@ export default function HomePage({ onInteraction, setRevealedCatId }: { onIntera
         } else {
             handleReset({ ignoreLock: true });
         }
-        setIsShared(false);
         setLockNotice('');
         setPendingAutoOpen(false);
     }, [isDailyLocked, overrideDailyLock, handleReset]);
 
     const handleShareRequest = async () => {
-        if (isGeneratingShare) return;
         playFeedback('click-2');
-
-        setIsGeneratingShare(true);
         toast({
             title: 'Generating your share card...',
             description: 'Please wait a moment.',
         });
 
         try {
-            const asset = await createShareAsset();
-            setShareAsset(asset);
-            setIsShareDialogOpen(true);
+            await handleShareRequest();
             toast({
                 title: 'Share card ready!',
                 description: 'Choose how you want to share it.',
@@ -288,8 +288,6 @@ export default function HomePage({ onInteraction, setRevealedCatId }: { onIntera
                     variant: 'destructive',
                 });
             }
-        } finally {
-            setIsGeneratingShare(false);
         }
     };
 
@@ -316,8 +314,7 @@ export default function HomePage({ onInteraction, setRevealedCatId }: { onIntera
                 url: 'https://thequantumcat.app',
             });
 
-            rewardShare();
-            setIsShared(true);
+            handleSuccessfulShare();
             toast({
                 description: '10 Fish Points awarded.',
             });
@@ -356,8 +353,7 @@ export default function HomePage({ onInteraction, setRevealedCatId }: { onIntera
                 window.open(shareAsset.dataUrl, '_blank', 'noopener,noreferrer');
             }
 
-            rewardShare();
-            setIsShared(true);
+            handleSuccessfulShare();
             toast({
                 title: 'Image saved!',
                 description: '10 Fish Points awarded. Share it from your gallery.',

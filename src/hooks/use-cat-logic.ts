@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useEffect, useCallback, useRef, useReducer } from 'react'; // Added useReducer import // Added useReducer import
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { CatState, CatOutcome } from '@/lib/types';
 import { useBadgeProgress } from '@/context/badge-progress-context';
 import { useCatCollection } from '@/context/cat-collection-context';
@@ -13,6 +13,7 @@ import { playFeedback } from '@/lib/audio';
 import { useBoxSkin } from '@/context/box-skin-context';
 import { useTheme } from 'next-themes';
 import { useAuth } from '@/context/auth-context';
+import { useShare, type ShareAsset } from './use-share';
 
 type OutcomePool = { title: string; cats: { id: string; rarity: number }[] };
 
@@ -99,11 +100,12 @@ const getNextMidnight = (date: Date) => new Date(date.getFullYear(), date.getMon
 
 
 
-export function useCatLogic({ onInteraction, setRevealedCatId, onCatReveal, onDailyLock }: {
+export function useCatLogic({ onInteraction, setRevealedCatId, onCatReveal, onDailyLock, onShareAssetCreated }: {
     onInteraction?: () => void;
     setRevealedCatId?: (id: string | null) => void;
     onCatReveal: (catId: string, message: string) => void;
     onDailyLock?: () => void;
+    onShareAssetCreated: (asset: ShareAsset) => void;
 }) {
     const [catState, setCatState] = useState<CatState>({ outcome: 'initial' });
     const [message, setMessage] = useState('');

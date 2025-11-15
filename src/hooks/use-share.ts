@@ -13,8 +13,7 @@ export interface ShareAsset {
     file: File;
 }
 
-export function useShare(message: string) {
-    const shareCardRef = useRef<HTMLDivElement>(null);
+export function useShare(message: string, shareCardRef: React.RefObject<HTMLDivElement>) {
     const { addPoints } = usePoints();
     const { isBadgeUnlocked, unlockBadge } = useBadges();
     const { user, setUserData, storageMode, userData } = useAuth();
@@ -66,5 +65,5 @@ export function useShare(message: string) {
         }
     }, [addPoints, isBadgeUnlocked, unlockBadge, setUserData, storageMode, user]);
 
-    return { shareCardRef, createShareAsset, rewardShare };
+    return { createShareAsset, rewardShare };
 }
