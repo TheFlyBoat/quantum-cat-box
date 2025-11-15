@@ -32,7 +32,7 @@ export function useShare(message: string) {
         const dataUrl = await htmlToImage.toPng(shareCardRef.current, {
             cacheBust: true,
             pixelRatio: 2,
-            fontEmbedCSS: `@import url('https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap');`
+            fontEmbedCSS: `@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&family=Patrick+Hand&family=Quicksand:wght@400;600&display=swap');`
         });
         const blob = await (await fetch(dataUrl)).blob();
         const file = new File([blob], 'quantum-cat.png', { type: 'image/png' });

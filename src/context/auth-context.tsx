@@ -310,7 +310,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, [storageMode]);
 
   const maybeOpenLoginPrompt = useCallback((reason: LoginPromptReason) => {
-    if (storageMode === 'cloud') return;
+    if (storageMode === 'cloud' || user !== 'guest') return;
     if (loginPromptDismissed) return;
 
     let opened = false;
@@ -324,7 +324,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setLoginPromptDismissed(true);
       persistPromptDismissed();
     }
-  }, [storageMode, loginPromptDismissed]);
+  }, [storageMode, loginPromptDismissed, user]);
 
   const maybeShowLoginPrompt = useCallback((reason: LoginPromptReason) => {
     maybeOpenLoginPrompt(reason);
@@ -388,57 +388,69 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     });
   }, [storageMode, maybeOpenLoginPrompt]);
 
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
-      if (firebaseUser) {
-        try {
-          sessionStorage.setItem(AUTH_STATE_KEY, 'logged-in');
-        } catch {
-          // ignore
-        }
+  const handleUserLogin = async (firebaseUser: User) => {
+    setLoading(true);
+    try {
+      sessionStorage.setItem(AUTH_STATE_KEY, 'logged-in');
+    } catch {
+      // ignore
+    }
 
-        const localData = getLocalUserData();
-        let mergedData: UserData;
+    const localData = getLocalUserData();
+    let mergedData: UserData;
 
-        try {
-          const remoteData = await loadUserData(firebaseUser.uid);
-          mergedData = hasMeaningfulProgress(localData)
-            ? mergeUserRecords(remoteData, localData)
-            : remoteData;
-          if (hasMeaningfulProgress(localData)) {
-            await saveUserData(firebaseUser.uid, mergedData);
-          }
-        } catch (error) {
-          console.error('Failed to load user data', error);
-          mergedData = hasMeaningfulProgress(localData)
-            ? mergeUserRecords({ ...defaultUserData }, localData)
-            : { ...defaultUserData };
-        }
+    try {
+      const remoteData = await loadUserData(firebaseUser.uid);
+      mergedData = hasMeaningfulProgress(localData)
+        ? mergeUserRecords(remoteData, localData)
+        : remoteData;
 
-        setUser(firebaseUser);
-        setDisplayName(firebaseUser.displayName || firebaseUser.email || null);
-        setStorageMode('cloud');
-        setLoginPromptState({ open: false, reason: null });
-        setLoginPromptDismissed(false);
-        clearPromptDismissed();
-        setUserDataState(mergedData);
-        setLoginModalOpen(false);
-        clearLocalUserData();
-      } else {
-        try {
-          sessionStorage.setItem(AUTH_STATE_KEY, 'guest');
-        } catch {
-          // ignore
-        }
-
-        const localData = getLocalUserData();
-        setUser('guest');
-        setDisplayName(null);
-        setStorageMode('local');
-        setUserDataState(localData);
-        setLoginModalOpen(false);
+      if (hasMeaningfulProgress(localData)) {
+        await saveUserData(firebaseUser.uid, mergedData);
       }
-      setLoading(false);
+    } catch (error) {
+      console.error('Failed to load user data', error);
+      mergedData = hasMeaningfulProgress(localData)
+        ? mergeUserRecords({ ...defaultUserData }, localData)
+        : { ...defaultUserData };
+    }
+
+    setUser(firebaseUser);
+    setDisplayName(firebaseUser.displayName || (firebaseUser.email ? firebaseUser.email.split('@')[0] : null));
+    setStorageMode('cloud');
+    setLoginPromptState({ open: false, reason: null });
+    setLoginPromptDismissed(false);
+    clearPromptDismissed();
+    setUserDataState(mergedData);
+    setLoginModalOpen(false);
+    clearLocalUserData();
+    setLoading(false);
+  };
+
+  const handleGuestLogin = () => {
+    setLoading(true);
+    try {
+      sessionStorage.setItem(AUTH_STATE_KEY, 'guest');
+    } catch {
+      // ignore
+    }
+
+    const localData = getLocalUserData();
+    setUser('guest');
+    setDisplayName(null);
+    setStorageMode('local');
+    setUserDataState(localData);
+    setLoginModalOpen(false);
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+      if (firebaseUser) {
+        handleUserLogin(firebaseUser);
+      } else {
+        handleGuestLogin();
+      }
     });
 
     return () => unsubscribe();

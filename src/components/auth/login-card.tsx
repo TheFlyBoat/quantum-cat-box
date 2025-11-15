@@ -56,20 +56,20 @@ export function LoginCard({ className, onSuccess, onGuest, allowGuest = true }: 
             await signInWithEmail(email, password);
             onSuccess?.();
         } catch (error: any) {
-            if (error.code === 'auth/user-not-found' || error.code === 'auth/invalid-credential') {
+            if (error.code === 'auth/user-not-found') {
                 try {
                     await signUpWithEmail(email, password);
                     onSuccess?.();
                 } catch (signupError: any) {
-                    if (signupError.code === 'auth/email-already-in-use') {
-                        setAuthError('Incorrect password. Please try again.');
-                    } else if (signupError.code === 'auth/weak-password') {
+                    if (signupError.code === 'auth/weak-password') {
                         setAuthError('Password should be at least 6 characters.');
                     } else {
-                        setAuthError('An error occurred. Please try again.');
+                        setAuthError('An error occurred during sign-up. Please try again.');
                     }
                     console.error('Error during sign-up:', signupError);
                 }
+            } else if (error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
+                setAuthError('Incorrect password. Please try again.');
             } else {
                 setAuthError('An error occurred. Please try again.');
                 console.error('Error during sign-in:', error);

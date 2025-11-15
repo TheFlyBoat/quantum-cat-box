@@ -110,6 +110,8 @@ export function useCatLogic({ onInteraction, setRevealedCatId, onCatReveal, onDa
     const [isLoading, setIsLoading] = useState(false);
     const [isRevealing, setIsRevealing] = useState(false);
     const [revealedCatName, setRevealedCatName] = useState<string | null>(null);
+    const [isDailyLocked, setIsDailyLocked] = useState(false);
+    const [nextAvailableAt, setNextAvailableAt] = useState<number | null>(null);
 
     const { recordObservation } = useBadgeProgress();
     const { unlockCat } = useCatCollection();
@@ -117,6 +119,30 @@ export function useCatLogic({ onInteraction, setRevealedCatId, onCatReveal, onDa
     const { selectedSkin } = useBoxSkin();
     const { setTheme } = useTheme();
     const { user, userData, setUserData } = useAuth();
+
+    const refreshDailyLock = useCallback(() => {
+        if (!userData) {
+            setIsDailyLocked(false);
+            setNextAvailableAt(null);
+            return;
+        }
+
+        const now = new Date();
+        const lastOpen = userData.lastBoxOpenDate ? new Date(userData.lastBoxOpenDate) : null;
+
+        if (lastOpen && getStartOfDay(now).getTime() <= getStartOfDay(lastOpen).getTime()) {
+            setIsDailyLocked(true);
+            const nextMidnight = getNextMidnight(now);
+            setNextAvailableAt(nextMidnight.getTime());
+        } else {
+            setIsDailyLocked(false);
+            setNextAvailableAt(null);
+        }
+    }, [userData]);
+
+    useEffect(() => {
+        refreshDailyLock();
+    }, [refreshDailyLock]);
 
     useEffect(() => {
         if (setRevealedCatId) {
@@ -135,6 +161,12 @@ export function useCatLogic({ onInteraction, setRevealedCatId, onCatReveal, onDa
     const handleBoxClick = async (options?: { ignoreLock?: boolean }) => {
         console.log('handleBoxClick called');
         console.log({ isLoading, outcome: catState.outcome, isRevealing });
+
+        if (isDailyLocked && !options?.ignoreLock) {
+            onDailyLock?.();
+            playFeedback('error-1');
+            return;
+        }
 
         if (isLoading || catState.outcome !== 'initial' || isRevealing) {
             console.log('Box click blocked by loading/revealing state');
@@ -198,48 +230,36 @@ export function useCatLogic({ onInteraction, setRevealedCatId, onCatReveal, onDa
         };
 
         const resolvedCatId = selectedCatId!;
-        let hasReportedMessage = false;
+        const messageReportedRef = useRef(false);
 
         const reportMessage = (candidate?: string) => {
+            if (messageReportedRef.current) return;
+            messageReportedRef.current = true;
+
             const trimmed = typeof candidate === 'string' ? candidate.trim() : '';
             const finalMessage = trimmed.length ? trimmed : pickFallbackMessage();
             setMessage(finalMessage);
-            if (!hasReportedMessage) {
-                onCatReveal(resolvedCatId, finalMessage);
-                hasReportedMessage = true;
-            }
+            onCatReveal(resolvedCatId, finalMessage);
         };
 
-        let fallbackTimer: number | undefined;
+        const fallbackTimer = setTimeout(() => {
+            reportMessage();
+        }, MESSAGE_GENERATION_TIMEOUT_MS);
 
-        const clearFallbackTimer = () => {
-            if (fallbackTimer !== undefined && typeof window !== 'undefined') {
-                window.clearTimeout(fallbackTimer);
-                fallbackTimer = undefined;
-            }
-        };
-
-        if (typeof window !== 'undefined') {
-            fallbackTimer = window.setTimeout(() => {
-                fallbackTimer = undefined;
-                if (!hasReportedMessage) {
+        generateCatMessage(messageInput)
+            .then(response => {
+                clearTimeout(fallbackTimer);
+                if (response && typeof response.message === 'string') {
+                    reportMessage(response.message);
+                } else {
                     reportMessage();
                 }
-            }, MESSAGE_GENERATION_TIMEOUT_MS);
-        }
-
-        generateCatMessage(messageInput).then(response => {
-            clearFallbackTimer();
-            if (!response || typeof response.message !== 'string') {
+            })
+            .catch(error => {
+                clearTimeout(fallbackTimer);
+                console.error("AI message generation failed:", error);
                 reportMessage();
-                return;
-            }
-            reportMessage(response.message);
-        }).catch(error => {
-            clearFallbackTimer();
-            console.error("AI message generation failed:", error);
-            reportMessage();
-        });
+            });
 
         setTimeout(() => {
             setIsRevealing(false);
@@ -300,8 +320,17 @@ export function useCatLogic({ onInteraction, setRevealedCatId, onCatReveal, onDa
     const handleReset = useCallback((options?: { ignoreLock?: boolean }) => {
         onInteraction?.();
         playFeedback('click-2');
+        if (!isDailyLocked || options?.ignoreLock) {
+            resetState();
+        }
+    }, [onInteraction, resetState, isDailyLocked]);
+
+    const overrideDailyLock = useCallback(() => {
+        setIsDailyLocked(false);
+        setNextAvailableAt(null);
+        setUserData(prev => ({ ...prev, lastBoxOpenDate: undefined }));
         resetState();
-    }, [onInteraction, resetState]);
+    }, [resetState, setUserData]);
 
     return {
         catState,
@@ -314,5 +343,9 @@ export function useCatLogic({ onInteraction, setRevealedCatId, onCatReveal, onDa
         setCatState,
         setMessage,
         setRevealedCatName,
+        isDailyLocked,
+        nextAvailableAt,
+        refreshDailyLock,
+        overrideDailyLock,
     };
 }
