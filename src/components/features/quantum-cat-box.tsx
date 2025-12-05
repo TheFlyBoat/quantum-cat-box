@@ -112,6 +112,16 @@ export function QuantumCatBox({
         </div>
       )}
 
+      {isLocked && (
+        <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 rounded-2xl bg-background/40 backdrop-blur-[2px]">
+          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-background/80 shadow-sm">
+            <Lock className="h-6 w-6 text-muted-foreground" />
+          </div>
+          <span className="rounded-full bg-background/80 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-muted-foreground shadow-sm">
+            Locked
+          </span>
+        </div>
+      )}
       
     </button>
   );
