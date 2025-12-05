@@ -13,6 +13,7 @@ import catData from '@/lib/cat-data.json';
 import { BadgeCard } from '@/components/features/BadgeCard';
 import { badgeImageMap, defaultBadgeImage } from '@/lib/badge-images';
 import { cn } from '@/lib/utils';
+import { Box, Cat, Fish, ScrollText, Skull, Sparkles } from 'lucide-react';
 
 const allCats = catData.cats as { id: string; name: string; description: string; type: string }[];
 
@@ -61,13 +62,12 @@ export default function AwardsPage() {
     };
 
     const stats = [
-        { label: 'Boxes Opened', value: totalObservations },
-        { label: 'Alive Cats', value: catTypeCounts.Alive },
-        { label: 'Dead Cats', value: catTypeCounts.Dead },
-        { label: 'Paradox Cats', value: catTypeCounts.Paradox },
-        { label: 'Saved Messages', value: totalSavedMessages },
-        { label: 'Infinite Games Played', value: 'N/A' }, // Placeholder for now
-        { label: 'Fish Points', value: points },
+        { label: 'Boxes Opened', value: totalObservations, icon: Box, color: 'text-purple-500', bg: 'bg-purple-500/10' },
+        { label: 'Fish Points', value: points, icon: Fish, color: 'text-sky-500', bg: 'bg-sky-500/10', highlight: true },
+        { label: 'Alive Cats', value: catTypeCounts.Alive, icon: Cat, color: 'text-emerald-500', bg: 'bg-emerald-500/10' },
+        { label: 'Dead Cats', value: catTypeCounts.Dead, icon: Skull, color: 'text-stone-500', bg: 'bg-stone-500/10' },
+        { label: 'Paradox Cats', value: catTypeCounts.Paradox, icon: Sparkles, color: 'text-pink-500', bg: 'bg-pink-500/10' },
+        { label: 'Saved Messages', value: totalSavedMessages, icon: ScrollText, color: 'text-amber-500', bg: 'bg-amber-500/10' },
     ];
 
     return (
@@ -99,13 +99,34 @@ export default function AwardsPage() {
                         </div>
                     </TabsContent>
                     <TabsContent value="Data">
-                        <div className="grid grid-cols-3 gap-3">
-                            {stats.map((stat, index) => (
-                                <Card key={index} className="flex aspect-[3/4] flex-col items-center justify-center rounded-3xl border border-border/40 bg-background/80 shadow-sm p-4">
-                                    <p className="text-2xl font-bold text-primary">{stat.value}</p>
-                                    <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground text-center mt-2">{stat.label}</p>
-                                </Card>
-                            ))}
+                        <div className="grid grid-cols-2 gap-4 py-2">
+                            {stats.map((stat, index) => {
+                                const Icon = stat.icon;
+                                return (
+                                    <div 
+                                        key={index} 
+                                        className={cn(
+                                            "flex flex-col items-center justify-center rounded-3xl border p-6 transition-all hover:scale-[1.02]",
+                                            stat.highlight 
+                                                ? "col-span-2 border-sky-200 bg-sky-50 dark:border-sky-800 dark:bg-sky-900/20" 
+                                                : "border-border/40 bg-card/50 shadow-sm backdrop-blur-sm"
+                                        )}
+                                    >
+                                        <div className={cn("mb-3 flex h-12 w-12 items-center justify-center rounded-2xl", stat.bg)}>
+                                            <Icon className={cn("h-6 w-6", stat.color)} />
+                                        </div>
+                                        <p className={cn(
+                                            "font-headline font-bold",
+                                            stat.highlight ? "text-4xl text-sky-600 dark:text-sky-400" : "text-2xl text-foreground"
+                                        )}>
+                                            {stat.value}
+                                        </p>
+                                        <p className="mt-1 text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+                                            {stat.label}
+                                        </p>
+                                    </div>
+                                );
+                            })}
                         </div>
                     </TabsContent>
                 </Tabs>
