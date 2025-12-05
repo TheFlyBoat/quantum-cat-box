@@ -136,9 +136,10 @@ export function useCatLogic({
         }
 
         const now = new Date();
-        const lastOpen = userData.lastBoxOpenDate ? new Date(userData.lastBoxOpenDate) : null;
+        const lastOpenDateStr = userData.lastBoxOpenDate ? new Date(userData.lastBoxOpenDate).toDateString() : null;
+        const todayStr = now.toDateString();
 
-        if (lastOpen && getStartOfDay(now).getTime() <= getStartOfDay(lastOpen).getTime()) {
+        if (lastOpenDateStr === todayStr) {
             setIsDailyLocked(true);
             const nextMidnight = getNextMidnight(now);
             setNextAvailableAt(nextMidnight.getTime());
