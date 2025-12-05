@@ -22,7 +22,7 @@ import { playFeedback } from '@/lib/audio';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/context/auth-context';
-import { OnboardingModal } from '@/components/features/onboarding-modal';
+import { OracleIntro } from '@/components/features/oracle-intro';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Loader2 } from 'lucide-react';
 
@@ -118,6 +118,8 @@ export default function HomePage({ onInteraction, setRevealedCatId }: { onIntera
             const onboardingSeen = localStorage.getItem('quantum-cat-onboarding-v2');
             if (!onboardingSeen) {
                 setShowOnboarding(true);
+                // If showing onboarding, don't show splash
+                setShowSplash(false);
             }
         } catch (error) {
             console.error('Could not access localStorage for onboarding', error);
@@ -226,7 +228,7 @@ export default function HomePage({ onInteraction, setRevealedCatId }: { onIntera
         }
     };
 
-    const handleOnboardingDismiss = () => {
+    const handleOnboardingComplete = () => {
         setShowOnboarding(false);
         try {
             localStorage.setItem('quantum-cat-onboarding-v2', 'true');
@@ -385,22 +387,22 @@ export default function HomePage({ onInteraction, setRevealedCatId }: { onIntera
 
     return (
         <>
-            {showSplash ? (
-            <SplashScreen onComplete={handleSplashComplete} />
-        ) : (
-            <>
-                <OnboardingModal open={showOnboarding} onClose={handleOnboardingDismiss} />
-
-                {/* Hidden Share Cards */}
-                <div className="absolute left-[-9999px] top-[-9999px] overflow-hidden">
-                    <div ref={storyRef} style={{ width: '1080px', height: '1920px' }}>
-                        <ShareCard catState={catState} message={message} boxSkin={selectedSkin} format="story" />
+            {showOnboarding ? (
+                <OracleIntro onComplete={handleOnboardingComplete} />
+            ) : showSplash ? (
+                <SplashScreen onComplete={handleSplashComplete} />
+            ) : (
+                <>
+                    {/* Hidden Share Cards */}
+                    <div className="absolute left-[-9999px] top-[-9999px] overflow-hidden">
+                        <div ref={storyRef} style={{ width: '1080px', height: '1920px' }}>
+                            <ShareCard catState={catState} message={message} boxSkin={selectedSkin} format="story" />
+                        </div>
+                        <div ref={squareRef} style={{ width: '1080px', height: '1080px' }}>
+                            <ShareCard catState={catState} message={message} boxSkin={selectedSkin} format="square" />
+                        </div>
                     </div>
-                    <div ref={squareRef} style={{ width: '1080px', height: '1080px' }}>
-                        <ShareCard catState={catState} message={message} boxSkin={selectedSkin} format="square" />
-                    </div>
-                </div>
-
+    
                     <div className="mx-auto flex w-full max-w-full flex-col items-center text-center">
                         <TitleDisplay name={revealedCatName} onTitleClick={handleTitleClick} reduceMotion={reduceMotion} />
 
