@@ -1,0 +1,64 @@
+{
+    "badges": [
+        {
+            "id": "curious-kitten",
+            "name": "Curious Kitten",
+            "description": "Open boxes 3 days in a row.",
+            "icon": "FishBadgeIcon"
+        },
+        {
+            "id": "infinite-chaser",
+            "name": "Infinite Chaser",
+            "description": "Discover and complete the Infinite Box challenge.",
+            "icon": "FishBadgeIcon"
+        },
+        {
+            "id": "alive-kicking",
+            "name": "Alive & Kicking",
+            "description": "Discover your third Alive Cat.",
+            "icon": "FishBadgeIcon"
+        },
+        {
+            "id": "rest-in-pieces",
+            "name": "Rest in Pieces",
+            "description": "Discover your third Dead Cat.",
+            "icon": "FishBadgeIcon"
+        },
+        {
+            "id": "paradox-seeker",
+            "name": "Paradox Seeker",
+            "description": "Discover your third Paradox Cat.",
+            "icon": "FishBadgeIcon"
+        },
+        {
+            "id": "the-archivist",
+            "name": "The Archivist",
+            "description": "Complete a full set of Alive, Dead, or Paradox cats.",
+            "icon": "ShareBadgeIcon"
+        },
+        {
+            "id": "message-keeper",
+            "name": "Message Keeper",
+            "description": "Save 5 messages to the diary.",
+            "icon": "MessageSquareBadgeIcon"
+        },
+        {
+            "id": "storyteller",
+            "name": "Storyteller",
+            "description": "Share your first outcome.",
+            "icon": "ShareBadgeIcon"
+        },
+        {
+            "id": "viral-cat",
+            "name": "Viral Cat",
+            "description": "Share 5 times.",
+            "icon": "ShareBadgeIcon"
+        },
+        {
+            "id": "quantum-echo",
+            "name": "Quantum Echo",
+            "description": "Reveal the same cat 3 times in a row.",
+            "icon": "MessageSquareBadgeIcon"
+        }
+    ]
+}

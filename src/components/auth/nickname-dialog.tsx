@@ -1,0 +1,45 @@
+
+'use client';
+
+import * as React from 'react';
+import { useState } from 'react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { playFeedback } from '@/lib/audio';
+
+interface NicknameDialogProps {
+    isOpen: boolean;
+    onOpenChange: (isOpen: boolean) => void;
+    onNicknameSet: (nickname: string) => void;
+}
+
+export function NicknameDialog({ isOpen, onOpenChange, onNicknameSet }: NicknameDialogProps) {
+    const [nickname, setNickname] = useState('');
+
+    const handleNicknameSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        const trimmedNickname = nickname.trim();
+        if (trimmedNickname.length > 2) {
+            onNicknameSet(trimmedNickname);
+            playFeedback('celebration-magic');
+        }
+    };
+
+    return (
+        <Dialog open={isOpen} onOpenChange={onOpenChange}>
+            <DialogContent>
+                <DialogTitle>Create your nickname</DialogTitle>
+                <form onSubmit={handleNicknameSubmit} className="space-y-4">
+                    <Input
+                        placeholder="Enter your nickname..."
+                        value={nickname}
+                        onChange={(e) => setNickname(e.target.value)}
+                        maxLength={20}
+                    />
+                    <Button type="submit" className="w-full">Save Nickname</Button>
+                </form>
+            </DialogContent>
+        </Dialog>
+    );
+}
