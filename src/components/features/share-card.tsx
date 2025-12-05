@@ -27,6 +27,7 @@ type ShareCardProps = {
   message: string;
   boxSkin: BoxSkin;
   format?: 'story' | 'square';
+  userName?: string;
 };
 
 const catCatalog = (catData.cats ?? []) as Array<{
@@ -76,7 +77,7 @@ const getTitleParts = (name?: string | null) => {
  * Share card aligned with the in-app reveal screen styling.
  * Presents the title, revealed cat, and message in a layout mirroring the app.
  */
-export function ShareCard({ catState, message, boxSkin, format = 'story' }: ShareCardProps) {
+export function ShareCard({ catState, message, boxSkin, format = 'story', userName }: ShareCardProps) {
   const cat = catCatalog.find(entry => entry.id === catState.catId);
   const titleParts = getTitleParts(cat?.name ?? null);
   const BoxComponent = SKIN_COMPONENTS[boxSkin] ?? BoxIcon;
@@ -113,6 +114,7 @@ export function ShareCard({ catState, message, boxSkin, format = 'story' }: Shar
                 width={64}
                 height={64}
                 className="h-16 w-16 drop-shadow-[0_0_15px_rgba(168,85,247,0.5)]"
+                unoptimized
              />
              <span className="font-headline text-3xl font-bold tracking-widest text-purple-200 uppercase">
                 The Oracle
@@ -151,7 +153,7 @@ export function ShareCard({ catState, message, boxSkin, format = 'story' }: Shar
 
           {/* Message Card */}
           <div className="w-full max-w-2xl">
-            <div className="relative rounded-3xl border border-white/10 bg-black/30 px-10 py-8 text-center shadow-2xl backdrop-blur-md">
+            <div className="relative rounded-3xl border border-white/10 bg-black/60 px-10 py-8 text-center shadow-2xl">
               <div className="font-fortune text-3xl font-semibold leading-relaxed text-white/90 drop-shadow-sm">
                 {sentences.length > 0 ? (
                   sentences.map((sentence, index) => (
@@ -179,7 +181,7 @@ export function ShareCard({ catState, message, boxSkin, format = 'story' }: Shar
             thequantumcat.app
           </div>
           <div className="text-sm font-medium tracking-wider text-purple-300/50">
-            #OracleCat
+            {userName ? `Destiny Revealed for ${userName}` : '#OracleCat'}
           </div>
         </footer>
       </div>

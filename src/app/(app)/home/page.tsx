@@ -50,7 +50,9 @@ export default function HomePage({ onInteraction, setRevealedCatId }: { onIntera
     const { lastUnlockedBadgeId, triggerCelebration } = useBadges();
     const { reduceMotion } = useFeedback();
     const { selectedSkin } = useBoxSkin();
-    const { storageMode, localProgressMessageSeen, markLocalMessageSeen } = useAuth();
+    const { storageMode, localProgressMessageSeen, markLocalMessageSeen, userData } = useAuth();
+
+    const userNickname = userData?.nickname;
 
     const {
         catState,
@@ -393,16 +395,15 @@ export default function HomePage({ onInteraction, setRevealedCatId }: { onIntera
                 <SplashScreen onComplete={handleSplashComplete} />
             ) : (
                 <>
-                    {/* Hidden Share Cards */}
-                    <div className="absolute left-[-9999px] top-[-9999px] overflow-hidden">
-                        <div ref={storyRef} style={{ width: '1080px', height: '1920px' }}>
-                            <ShareCard catState={catState} message={message} boxSkin={selectedSkin} format="story" />
-                        </div>
-                        <div ref={squareRef} style={{ width: '1080px', height: '1080px' }}>
-                            <ShareCard catState={catState} message={message} boxSkin={selectedSkin} format="square" />
-                        </div>
-                    </div>
-    
+                                    {/* Hidden Share Cards */}
+                                    <div className="absolute left-[-9999px] top-[-9999px] overflow-hidden">
+                                        <div ref={storyRef} style={{ width: '1080px', height: '1920px' }}>
+                                            <ShareCard catState={catState} message={message} boxSkin={selectedSkin} format="story" userName={userNickname} />
+                                        </div>
+                                        <div ref={squareRef} style={{ width: '1080px', height: '1080px' }}>
+                                            <ShareCard catState={catState} message={message} boxSkin={selectedSkin} format="square" userName={userNickname} />
+                                        </div>
+                                    </div>    
                     <div className="mx-auto flex w-full max-w-full flex-col items-center text-center">
                         <TitleDisplay name={revealedCatName} onTitleClick={handleTitleClick} reduceMotion={reduceMotion} />
 
