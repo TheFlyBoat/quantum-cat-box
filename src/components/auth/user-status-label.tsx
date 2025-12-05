@@ -19,9 +19,9 @@ export function UserStatusLabel({ className }: UserStatusLabelProps) {
     const isGuest = !firebaseUser;
 
     const preferredName =
+        firebaseUser?.email?.split('@')[0]?.trim() ||
         displayName?.trim() ||
         firebaseUser?.displayName?.trim() ||
-        firebaseUser?.email?.split('@')[0]?.trim() ||
         null;
     const label = isGuest ? 'Guest' : preferredName ?? 'Guest';
 
