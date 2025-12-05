@@ -104,47 +104,30 @@ export function ShareCard({ catState, message, boxSkin, format = 'story', userNa
       <div className="absolute top-40 right-32 h-1.5 w-1.5 rounded-full bg-purple-300 opacity-50" />
       <div className="absolute bottom-32 left-1/4 h-1 w-1 rounded-full bg-blue-300 opacity-40" />
 
-      <div className="relative z-10 flex h-full w-full flex-col items-center justify-between">
+      <div className="relative z-10 flex h-full w-full flex-col items-center justify-between pt-20 pb-12">
         {/* Header */}
-        <header className="flex w-full flex-col items-center gap-6">
-          <div className="flex items-center justify-center space-x-3 opacity-90">
-             <Image
-                src="/favicon.svg"
-                alt="Logo"
-                width={64}
-                height={64}
-                className="h-16 w-16 drop-shadow-[0_0_15px_rgba(168,85,247,0.5)]"
-                unoptimized
-             />
-             <span className="font-headline text-3xl font-bold tracking-widest text-purple-200 uppercase">
-                The Oracle
-             </span>
-          </div>
-          
+        <header className="flex w-full flex-col items-center gap-2">
           <div className="flex flex-col items-center">
-            <div className="flex items-baseline justify-center space-x-3 font-headline text-6xl font-bold tracking-tight text-white drop-shadow-md">
-              <span className="text-purple-200">{titleParts.part1}</span>
-              <span className="bg-gradient-to-r from-pink-300 to-purple-300 bg-clip-text text-transparent">
+            <div className="flex items-baseline justify-center space-x-4 font-headline font-bold tracking-tight text-white drop-shadow-lg">
+              <span className="text-purple-200 text-5xl">{titleParts.part1}</span>
+              <span className="bg-gradient-to-r from-pink-300 to-purple-300 bg-clip-text text-transparent text-8xl">
                 {titleParts.part2}
               </span>
-              <span className="text-purple-200">{titleParts.part3}</span>
+              <span className="text-purple-200 text-5xl">{titleParts.part3}</span>
             </div>
-            {cat?.tagline && (
-                <span className="mt-2 font-fortune text-2xl italic text-purple-200/80">
-                    {cat.tagline}
-                </span>
-            )}
           </div>
         </header>
 
         {/* Main Visual */}
-        <div className="flex w-full flex-1 flex-col items-center justify-center gap-12">
-          <div className={`relative flex items-center justify-center ${isStory ? 'scale-150' : 'scale-125'}`}>
-             <div className="absolute inset-0 animate-pulse rounded-full bg-purple-500/20 blur-3xl" />
-             <div className="relative h-80 w-80">
+        <div className="flex w-full flex-1 flex-col items-center justify-center gap-16">
+          <div className={`relative flex items-center justify-center ${isStory ? 'scale-[1.8]' : 'scale-[1.4]'}`}>
+             {/* Glow behind the box */}
+             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-64 w-64 animate-pulse rounded-full bg-purple-500/30 blur-3xl" />
+             
+             <div className="relative h-56 w-56">
                 <BoxComponent className="h-full w-full drop-shadow-2xl" isOpen />
-                <div className="absolute inset-0 flex items-end justify-center pb-8">
-                  <div className="h-[90%] w-[90%]">
+                <div className="absolute inset-0 flex items-end justify-center">
+                  <div className="h-full w-full translate-y-[25%] scale-[0.6]">
                     <CatDisplay state={catState} />
                   </div>
                 </div>
@@ -152,12 +135,12 @@ export function ShareCard({ catState, message, boxSkin, format = 'story', userNa
           </div>
 
           {/* Message Card */}
-          <div className="w-full max-w-2xl">
-            <div className="relative rounded-3xl border border-white/10 bg-black/60 px-10 py-8 text-center shadow-2xl">
-              <div className="font-fortune text-3xl font-semibold leading-relaxed text-white/90 drop-shadow-sm">
+          <div className="w-full max-w-[80%]">
+            <div className="relative rounded-[2rem] bg-white/90 px-8 py-6 text-center shadow-xl backdrop-blur-sm">
+              <div className="font-fortune text-3xl font-semibold leading-relaxed text-slate-900">
                 {sentences.length > 0 ? (
                   sentences.map((sentence, index) => (
-                    <p key={`${sentence}-${index}`} className="mb-4 last:mb-0">
+                    <p key={`${sentence}-${index}`} className="mb-2 last:mb-0">
                       {sentence}
                     </p>
                   ))
@@ -165,22 +148,17 @@ export function ShareCard({ catState, message, boxSkin, format = 'story', userNa
                   <p>A destiny revealed.</p>
                 )}
               </div>
-              {/* Decorative corners */}
-              <div className="absolute top-4 left-4 h-4 w-4 border-l-2 border-t-2 border-purple-400/50" />
-              <div className="absolute top-4 right-4 h-4 w-4 border-r-2 border-t-2 border-purple-400/50" />
-              <div className="absolute bottom-4 left-4 h-4 w-4 border-l-2 border-b-2 border-purple-400/50" />
-              <div className="absolute bottom-4 right-4 h-4 w-4 border-r-2 border-b-2 border-purple-400/50" />
             </div>
           </div>
         </div>
 
         {/* Footer */}
-        <footer className="flex w-full flex-col items-center gap-2 pb-4 text-purple-200/60">
-          <div className="h-px w-32 bg-gradient-to-r from-transparent via-purple-500/50 to-transparent" />
-          <div className="text-xl font-bold uppercase tracking-[0.3em]">
+        <footer className="flex w-full flex-col items-center gap-3 text-purple-200/60">
+          <div className="h-px w-48 bg-gradient-to-r from-transparent via-purple-500/50 to-transparent" />
+          <div className="text-2xl font-bold uppercase tracking-[0.3em] text-white/80">
             thequantumcat.app
           </div>
-          <div className="text-sm font-medium tracking-wider text-purple-300/50">
+          <div className="text-lg font-medium tracking-wider text-purple-300/60">
             {userName ? `Destiny Revealed for ${userName}` : '#OracleCat'}
           </div>
         </footer>
