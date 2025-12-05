@@ -87,7 +87,7 @@ export function QuantumCatBox({
             (isLoading || isOpen) && !isLocked && 'cursor-pointer',
             (isLoading || isOpen) && isLocked && 'cursor-default'
           )}
-          aria-label={isLocked ? 'Quantum Box locked until tomorrow' : 'Open the Quantum Box'}
+          aria-label={isLocked ? 'Mystery Box locked until tomorrow' : 'Open the Mystery Box'}
           aria-disabled={isLoading || isOpen}
         >      <BoxComponent className="h-52 w-52 md:h-56 md:w-56" isOpen={isOpen} />
 

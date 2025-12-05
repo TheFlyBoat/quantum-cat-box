@@ -134,7 +134,7 @@ export function ShareCard({ catState, message, boxSkin }: ShareCardProps) {
         </div>
 
         <footer className="w-full text-xs font-semibold uppercase tracking-[0.2em] text-black/60">
-          thequantumcat.app • #QuantumCat
+          thequantumcat.app • #OracleCat
         </footer>
       </div>
     </Card>

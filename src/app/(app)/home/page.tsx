@@ -233,9 +233,9 @@ export default function HomePage({ onInteraction, setRevealedCatId }: { onIntera
 
     const shareText = useMemo(() => {
         if (revealedCatName) {
-            return `I opened the box and my cat is a ${revealedCatName}! What state will your cat be in?`;
+            return `I opened the box and my cat is a ${revealedCatName}! What destiny will you reveal?`;
         }
-        return 'I opened the quantum cat box! What state will your cat be in?';
+        return 'I opened the mystery box! What destiny will you reveal?';
     }, [revealedCatName]);
 
     const nativeShareAvailable = useMemo(() => {
