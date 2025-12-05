@@ -366,9 +366,9 @@ export default function SettingsPage() {
                                         <p className={sectionLabelClass}>Credits</p>
                                     </div>
                                     <p className={cn(bodyTextClass, "leading-relaxed text-muted-foreground")}>
-                                        Designed & Developed by <strong>Adam Colla</strong>.<br/>
-                                        Powered by <strong>Google Genkit</strong> & <strong>Gemini</strong>.<br/>
-                                        Special thanks to the open-source community and my friends for testing.
+                                        Designed & Developed by <strong>Adam Colla and Flyboat team</strong>.<br/>
+                                        Powered by <strong>Genkit</strong>.<br/>
+                                        Special thanks to the open-source community, ai agents and our friends for the feedbacks.
                                     </p>
                                 </div>
 
