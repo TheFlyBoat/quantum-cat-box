@@ -5,6 +5,7 @@ export type SoundType =
   | 'click-1' 
   | 'click-2'
   | 'click-3'
+  | 'error-1'
   | 'reveal-default'
   | 'reveal-carbon'
   | 'reveal-cardboard'
@@ -21,7 +22,7 @@ export type SoundType =
   | 'celebration-long'
   | 'box-shake';
 
-export const soundList: SoundType[] = ['click-1', 'click-2', 'click-3', 'reveal-default', 'reveal-carbon', 'reveal-cardboard', 'haptic-1', 'haptic-2', 'haptic-3', 'toggle-on', 'toggle-off', 'badge-unlocked', 'message-alive', 'message-dead', 'message-default', 'celebration-magic', 'celebration-long', 'box-shake'];
+export const soundList: SoundType[] = ['click-1', 'click-2', 'click-3', 'error-1', 'reveal-default', 'reveal-carbon', 'reveal-cardboard', 'haptic-1', 'haptic-2', 'haptic-3', 'toggle-on', 'toggle-off', 'badge-unlocked', 'message-alive', 'message-dead', 'message-default', 'celebration-magic', 'celebration-long', 'box-shake'];
 
 let soundEnabled = true;
 let vibrationEnabled = true;
@@ -75,6 +76,8 @@ export const playHaptic = (type: SoundType) => {
     playVibration(50); // Short vibration for clicks
   } else if (type.startsWith('reveal')) {
     playVibration([100, 50, 100]); // Pattern for reveals
+  } else if (type === 'error-1') {
+    playVibration([50, 50, 50]); // Short error pattern
   } else if (type === 'badge-unlocked' || type === 'celebration-long') {
       playVibration([100, 30, 100, 30, 100]);
   }
@@ -164,6 +167,21 @@ export const playSound = (type: SoundType) => {
     gainNode.connect(masterGain);
     osc.start(now);
     osc.stop(now + 0.08);
+
+  } else if (type === 'error-1') {
+    const osc = audioContext.createOscillator();
+    osc.type = 'sawtooth';
+    osc.frequency.setValueAtTime(150, now);
+    osc.frequency.exponentialRampToValueAtTime(100, now + 0.2);
+    
+    const gainNode = audioContext.createGain();
+    gainNode.gain.setValueAtTime(0.25, now);
+    gainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
+
+    osc.connect(gainNode);
+    gainNode.connect(masterGain);
+    osc.start(now);
+    osc.stop(now + 0.2);
 
   } else if (type === 'reveal-default') {
      const gainNode = audioContext.createGain();
