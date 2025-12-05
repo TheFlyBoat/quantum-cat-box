@@ -1,5 +1,5 @@
 
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import { Nunito, Patrick_Hand, Quicksand } from 'next/font/google';
 import { cn } from '@/lib/utils';
@@ -35,9 +35,18 @@ const quicksand = Quicksand({
   display: 'swap',
 });
 
+export const viewport: Viewport = {
+  themeColor: '#A240FF',
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+};
+
 export const metadata: Metadata = {
   title: 'The Quantum Cat',
   description: 'Open the box, if you dare.',
+  manifest: '/manifest.json',
   icons: {
     icon: [
       { url: '/favicon.ico?v=2', type: 'image/x-icon' },

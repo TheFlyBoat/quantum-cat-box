@@ -1,0 +1,21 @@
+{
+  "name": "The Quantum Cat",
+  "short_name": "Quantum Cat",
+  "description": "Open the box to reveal your cat's destiny.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#A240FF",
+  "icons": [
+    {
+      "src": "/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    },
+    {
+      "src": "/favicon.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
