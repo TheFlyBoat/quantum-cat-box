@@ -345,99 +345,71 @@ export default function SettingsPage() {
                             <div className="space-y-3 rounded-3xl border border-border/60 bg-background/80 p-6 shadow-sm">
                                 <p className={sectionLabelClass}>Contact</p>
                                 <a
-                                    href="mailto:hello@thequantumcat.app?subject=Quantum%20Cat%20Contact"
+                                    href="mailto:adam@flyboat.online?subject=Quantum%20Cat%20Contact"
                                     className="inline-flex items-center gap-2 text-sm font-semibold text-emerald-500 hover:text-emerald-400"
                                 >
                                     <MessageSquare className="h-4 w-4" />
-                                    hello@thequantumcat.app
+                                    adam@flyboat.online
                                 </a>
                             </div>
                         </div>
                     </TabsContent>
                     <TabsContent value="how">
-                        <div className="pt-2">
-                            <div
-                                className={cn(
-                                    'space-y-4 rounded-[28px] border bg-background/95 p-5 transition',
-                                    currentHowCard.borderClass,
-                                )}
-                            >
-                                <p className={cn(sectionLabelClass, 'text-pink-600 dark:text-pink-200')}>
-                                    How to Play
-                                </p>
-                                <div
-                                    role="button"
-                                    tabIndex={0}
-                                    onClick={handleAdvance}
-                                    onKeyDown={event => {
-                                        if (event.key === 'Enter' || event.key === ' ') {
-                                            event.preventDefault();
-                                            handleAdvance();
-                                        }
-                                    }}
-                                    className={cn(
-                                        'group space-y-4 rounded-3xl border border-white/15 bg-white/10 p-5 text-left outline-none transition hover:bg-white/15 focus-visible:ring-2 focus-visible:ring-primary/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background dark:border-white/10 dark:bg-white/5 dark:hover:bg-white/10',
-                                    )}
-                                >
-                                    <div className="flex items-center gap-3">
-                                        <CurrentHowIcon className={cn('h-6 w-6', currentHowCard.iconBgClass, currentHowCard.iconBgClass?.includes('text') ? '' : 'text-current')} />
-                                        <div>
-                                            <p className="text-base font-semibold text-foreground">{currentHowCard.title}</p>
-                                            <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-foreground/55">
+                        <div className="relative space-y-8 pt-4 pl-4">
+                            {/* Vertical Timeline Line */}
+                            <div className="absolute left-[27px] top-6 bottom-6 w-0.5 bg-gradient-to-b from-sky-200 via-purple-200 to-transparent opacity-50" />
+
+                            {howCards.map((card, index) => {
+                                const CardIcon = card.icon;
+                                return (
+                                    <div key={card.key} className="relative flex gap-6">
+                                        {/* Timeline Node */}
+                                        <div className={cn(
+                                            "relative z-10 flex h-6 w-6 shrink-0 items-center justify-center rounded-full border-2 bg-background ring-4 ring-background",
+                                            card.borderClass.replace('border-', 'border-').replace('/70', '').replace('/40', '')
+                                        )}>
+                                            <div className={cn("h-2 w-2 rounded-full", card.bulletClass.replace('/70', ''))} />
+                                        </div>
+
+                                        {/* Card Content */}
+                                        <div className={cn(
+                                            "flex-1 space-y-3 rounded-3xl border bg-card/50 p-5 shadow-sm backdrop-blur-sm transition-all hover:bg-card/80",
+                                            card.borderClass
+                                        )}>
+                                            <div className="flex items-center gap-3">
+                                                <div className={cn("flex h-10 w-10 items-center justify-center rounded-xl", card.iconBgClass)}>
+                                                    <CardIcon className={cn("h-5 w-5", card.iconColorClass)} />
+                                                </div>
+                                                <div>
+                                                    <h3 className="font-headline text-lg font-bold text-foreground">{card.title}</h3>
+                                                </div>
+                                            </div>
+                                            
+                                            <p className="text-sm leading-relaxed text-muted-foreground">
+                                                {card.summary}
                                             </p>
+
+                                            {card.tips.length > 0 && (
+                                                <div className="mt-3 space-y-2 rounded-2xl bg-muted/30 p-3">
+                                                    {card.tips.map((tip, i) => {
+                                                        const TipIcon = tip.icon;
+                                                        return (
+                                                            <div key={i} className="flex items-start gap-2 text-xs text-muted-foreground/90">
+                                                                {TipIcon ? (
+                                                                    <TipIcon className={cn("mt-0.5 h-3.5 w-3.5 shrink-0", tip.iconColorClass)} />
+                                                                ) : (
+                                                                    <div className={cn("mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full opacity-70", card.bulletClass)} />
+                                                                )}
+                                                                <span>{tip.text}</span>
+                                                            </div>
+                                                        )
+                                                    })}
+                                                </div>
+                                            )}
                                         </div>
                                     </div>
-                                    <p className={`${bodyTextClass} text-foreground/80`}>{currentHowCard.summary}</p>
-                                    <ul className="space-y-2 text-left">
-                                        {currentHowCard.tips.map((tip, index) => {
-                                            const TipIcon = tip.icon;
-                                            return (
-                                                <li
-                                                    key={`${currentHowCard.key}-tip-${index}`}
-                                                    className="flex items-start gap-3 text-sm text-foreground/75"
-                                                >
-                                                    {TipIcon ? (
-                                                        <TipIcon
-                                                            className={cn(
-                                                                'mt-[0.15rem] h-5 w-5 flex-shrink-0',
-                                                                tip.iconColorClass ?? 'text-foreground',
-                                                            )}
-                                                            strokeWidth={1.75}
-                                                        />
-                                                    ) : (
-                                                        <span
-                                                            className={cn(
-                                                                'mt-[0.35rem] h-2 w-2 flex-shrink-0 rounded-full',
-                                                                currentHowCard.bulletClass,
-                                                            )}
-                                                        />
-                                                    )}
-                                                    <span>{tip.text}</span>
-                                                </li>
-                                            );
-                                        })}
-                                    </ul>
-                                </div>
-                                {currentHowCard.key === 'hidden' && (
-                                    <p className="text-[11px] font-medium uppercase tracking-[0.25em] text-foreground/60">
-                                        Triple-tap Customise to launch the hidden mini-game.
-                                    </p>
-                                )}
-                                <div className="flex items-center justify-center gap-2 pt-1">
-                                    {howCards.map((card, index) => (
-                                        <button
-                                            key={card.key}
-                                            type="button"
-                                            onClick={() => goToIndex(index)}
-                                            className={cn(
-                                                'h-2 w-2 rounded-full transition',
-                                                index === currentHowIndex ? 'bg-foreground' : 'bg-foreground/20 hover:bg-foreground/40',
-                                            )}
-                                            aria-label={`Go to tutorial step ${index + 1}`}
-                                        />
-                                    ))}
-                                </div>
-                            </div>
+                                );
+                            })}
                         </div>
                     </TabsContent>
                 </Tabs>
