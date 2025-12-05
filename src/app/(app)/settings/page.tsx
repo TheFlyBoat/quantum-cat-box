@@ -1,6 +1,7 @@
 'use client';
 
 import * as React from 'react';
+import Image from 'next/image';
 import { useAuth } from '@/context/auth-context';
 import { useFeedback } from '@/context/feedback-context';
 import { useTheme } from 'next-themes';
@@ -26,6 +27,7 @@ import {
     Heart,
     BoxIcon,
     GemIcon,
+    ChevronRight,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { playFeedback } from '@/lib/audio';
@@ -327,30 +329,69 @@ export default function SettingsPage() {
                         </div>
                     </TabsContent>
                     <TabsContent value="info">
-                        <div className="space-y-6 pt-2">
-                            <div className="space-y-3 rounded-3xl border border-border/60 bg-background/80 p-6 shadow-sm">
-                                <p className={sectionLabelClass}>About</p>
-                                <div className="space-y-1">
-                                    <p className={`${rowTextClass} font-semibold`}>The Quantum Cat</p>
-                                    <p className={bodyTextClass}>Version 3.1</p>
-                                    <p className={bodyTextClass}>FlyBoat Creative 2025</p>
+                        <div className="space-y-6 pt-4">
+                            {/* Hero Section */}
+                            <div className="flex flex-col items-center gap-4 text-center">
+                                <div className="relative h-24 w-24 overflow-hidden rounded-[2rem] bg-gradient-to-br from-purple-500 to-sky-500 p-1 shadow-lg">
+                                    <div className="flex h-full w-full items-center justify-center rounded-[1.8rem] bg-background">
+                                        <Image src="/favicon.svg" alt="App Icon" width={64} height={64} className="h-16 w-16" />
+                                    </div>
+                                </div>
+                                <div>
+                                    <h3 className="font-headline text-2xl font-bold text-foreground">The Quantum Cat</h3>
+                                    <p className="text-sm font-medium text-muted-foreground">Version 4.1 • FlyBoat Creative</p>
                                 </div>
                             </div>
-                            <div className="space-y-3 rounded-3xl border border-border/60 bg-background/80 p-6 shadow-sm">
-                                <p className={sectionLabelClass}>Credits</p>
-                                <p className={bodyTextClass}>
-                                    Adam Colla, ChatGPT Codex, Gemini CLI and a Special thanks to the open-source community and to my friends testing.
-                                </p>
-                            </div>
-                            <div className="space-y-3 rounded-3xl border border-border/60 bg-background/80 p-6 shadow-sm">
-                                <p className={sectionLabelClass}>Contact</p>
-                                <a
-                                    href="mailto:adam@flyboat.online?subject=Quantum%20Cat%20Contact"
-                                    className="inline-flex items-center gap-2 text-sm font-semibold text-emerald-500 hover:text-emerald-400"
-                                >
-                                    <MessageSquare className="h-4 w-4" />
-                                    adam@flyboat.online
-                                </a>
+
+                            {/* Info Cards */}
+                            <div className="space-y-3">
+                                <div className="rounded-3xl border border-border/60 bg-background/50 p-1 shadow-sm backdrop-blur-sm">
+                                    <div className="flex flex-col divide-y divide-border/40">
+                                        <a href="#" className="flex items-center justify-between p-4 transition-colors hover:bg-muted/30">
+                                            <span className={rowTextClass}>Privacy Policy</span>
+                                            <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                                        </a>
+                                        <a href="#" className="flex items-center justify-between p-4 transition-colors hover:bg-muted/30">
+                                            <span className={rowTextClass}>Terms of Service</span>
+                                            <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                                        </a>
+                                    </div>
+                                </div>
+
+                                <div className="rounded-3xl border border-border/60 bg-background/80 p-6 shadow-sm">
+                                    <div className="flex items-center gap-3 mb-3">
+                                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-amber-100 dark:bg-amber-900/30">
+                                            <Heart className="h-4 w-4 text-amber-600 dark:text-amber-400" />
+                                        </div>
+                                        <p className={sectionLabelClass}>Credits</p>
+                                    </div>
+                                    <p className={cn(bodyTextClass, "leading-relaxed text-muted-foreground")}>
+                                        Designed & Developed by <strong>Adam Colla</strong>.<br/>
+                                        Powered by <strong>Google Genkit</strong> & <strong>Gemini</strong>.<br/>
+                                        Special thanks to the open-source community and my friends for testing.
+                                    </p>
+                                </div>
+
+                                <div className="rounded-3xl border border-border/60 bg-background/80 p-6 shadow-sm">
+                                    <div className="flex items-center gap-3 mb-3">
+                                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-100 dark:bg-emerald-900/30">
+                                            <MessageSquare className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+                                        </div>
+                                        <p className={sectionLabelClass}>Contact</p>
+                                    </div>
+                                    <a
+                                        href="mailto:adam@flyboat.online?subject=Quantum%20Cat%20Support"
+                                        className="group flex items-center gap-3 rounded-xl border border-border/40 bg-background p-3 transition-all hover:border-emerald-200 hover:bg-emerald-50 dark:hover:border-emerald-800 dark:hover:bg-emerald-900/20"
+                                    >
+                                        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-100 text-emerald-600 dark:bg-emerald-900/50 dark:text-emerald-400">
+                                            <MessageSquare className="h-5 w-5" />
+                                        </div>
+                                        <div className="flex flex-col">
+                                            <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Email Support</span>
+                                            <span className="text-sm font-bold text-foreground group-hover:text-emerald-600 dark:group-hover:text-emerald-400">adam@flyboat.online</span>
+                                        </div>
+                                    </a>
+                                </div>
                             </div>
                         </div>
                     </TabsContent>
