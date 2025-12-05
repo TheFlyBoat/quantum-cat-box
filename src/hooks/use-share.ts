@@ -13,7 +13,7 @@ export interface ShareAsset {
     file: File;
 }
 
-export function useShare(message: string, shareCardRef: React.RefObject<HTMLDivElement>) {
+export function useShare(message: string) {
     const { addPoints } = usePoints();
     const { isBadgeUnlocked, unlockBadge } = useBadges();
     const { user, setUserData, storageMode, userData } = useAuth();
@@ -23,12 +23,12 @@ export function useShare(message: string, shareCardRef: React.RefObject<HTMLDivE
         sessionShareCountRef.current = userData?.shareCount ?? 0;
     }, [userData]);
 
-    const createShareAsset = useCallback(async (): Promise<ShareAsset> => {
-        if (!shareCardRef.current || !message) {
+    const createShareAsset = useCallback(async (ref: React.RefObject<HTMLDivElement>): Promise<ShareAsset> => {
+        if (!ref.current || !message) {
             throw new Error('Share content is not ready yet.');
         }
 
-        const dataUrl = await htmlToImage.toPng(shareCardRef.current, {
+        const dataUrl = await htmlToImage.toPng(ref.current, {
             cacheBust: true,
             pixelRatio: 2,
             fontEmbedCSS: `@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&family=Patrick+Hand&family=Quicksand:wght@400;600&display=swap');`

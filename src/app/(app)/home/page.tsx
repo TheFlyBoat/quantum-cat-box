@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState, useRef } from 'react';
 import Image from 'next/image';
 import { QuantumCatBox } from '@/components/features/quantum-cat-box';
 import { QuantumMessageDisplay } from '@/components/features/message-display';
@@ -12,7 +12,7 @@ import { TitleDisplay } from '@/components/title-display';
 import { SplashScreen } from '@/components/splash-screen';
 import { useCatLogic } from '@/hooks/use-cat-logic';
 import { useDevMode } from '@/hooks/use-dev-mode';
-import { type ShareAsset } from '@/hooks/use-share';
+import { useShare, type ShareAsset } from '@/hooks/use-share';
 import { useDiary } from '@/context/diary-context';
 import { useBadges } from '@/context/badge-context';
 import { useFeedback } from '@/context/feedback-context';
@@ -23,18 +23,27 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/context/auth-context';
 import { OnboardingModal } from '@/components/features/onboarding-modal';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Loader2 } from 'lucide-react';
 
 export default function HomePage({ onInteraction, setRevealedCatId }: { onInteraction?: () => void; setRevealedCatId?: (id: string | null) => void; }) {
     const [showOnboarding, setShowOnboarding] = useState(false);
     const [isAmbientShaking, setIsAmbientShaking] = useState(false);
     const [isShareDialogOpen, setIsShareDialogOpen] = useState(false);
     const [shareAsset, setShareAsset] = useState<ShareAsset | null>(null);
+    const [shareFormat, setShareFormat] = useState<'story' | 'square'>('story');
+    const [isGeneratingShare, setIsGeneratingShare] = useState(false);
+    const [hasShared, setHasShared] = useState(false);
+    
     const [currentCatId, setCurrentCatId] = useState<string | null>(null);
     const [showSplash, setShowSplash] = useState(true);
     const [lockNotice, setLockNotice] = useState('');
 
     const [pendingAutoOpen, setPendingAutoOpen] = useState(false);
     const [showTutorialOverlay, setShowTutorialOverlay] = useState(false);
+
+    const storyRef = useRef<HTMLDivElement>(null);
+    const squareRef = useRef<HTMLDivElement>(null);
 
     const { toast } = useToast();
     const { toggleDiaryEntry, isMessageSaved: isDiaryMessageSaved, recordReveal } = useDiary();
@@ -58,16 +67,10 @@ export default function HomePage({ onInteraction, setRevealedCatId }: { onIntera
         nextAvailableAt,
         refreshDailyLock,
         overrideDailyLock,
-        isGeneratingShare,
-        handleShareRequest,
-        shareCardRef,
-        isShared,
-        handleSuccessfulShare,
     } = useCatLogic({
         onInteraction,
         onShareAssetCreated: (asset) => {
-            setShareAsset(asset);
-            setIsShareDialogOpen(true);
+            // Legacy callback, unused now but kept for compatibility if needed
         },
         setRevealedCatId: (id) => {
             setCurrentCatId(id);
@@ -76,11 +79,14 @@ export default function HomePage({ onInteraction, setRevealedCatId }: { onIntera
         onCatReveal: (catId: string, _revealedMessage: string) => {
             setCurrentCatId(catId);
             recordReveal(catId);
+            setHasShared(false); // Reset shared state on new reveal
         },
         onDailyLock: () => {
             setLockNotice('The Quantum Box is recharging. Come back tomorrow!');
         }
     });
+
+    const { createShareAsset, rewardShare } = useShare(message);
 
     const { isDevMode, handleTitleClick, handleDevCatSelect, allCats } = useDevMode({
         handleReset,
@@ -229,8 +235,6 @@ export default function HomePage({ onInteraction, setRevealedCatId }: { onIntera
         }
     };
 
-    
-
     const shareText = useMemo(() => {
         if (revealedCatName) {
             return `I opened the box and my cat is a ${revealedCatName}! What destiny will you reveal?`;
@@ -260,35 +264,37 @@ export default function HomePage({ onInteraction, setRevealedCatId }: { onIntera
         setPendingAutoOpen(false);
     }, [isDailyLocked, overrideDailyLock, handleReset]);
 
+    const generateAssetForFormat = async (format: 'story' | 'square') => {
+        setIsGeneratingShare(true);
+        setShareAsset(null); // Clear previous asset while generating
+        try {
+            const targetRef = format === 'story' ? storyRef : squareRef;
+            const asset = await createShareAsset(targetRef);
+            setShareAsset(asset);
+        } catch (error) {
+            console.error('Share generation failed:', error);
+            toast({
+                title: 'Error generating card',
+                description: 'Please try again.',
+                variant: 'destructive'
+            });
+        } finally {
+            setIsGeneratingShare(false);
+        }
+    };
+
     const onShareRequest = async () => {
         playFeedback('click-2');
-        toast({
-            title: 'Generating your share card...',
-            description: 'Please wait a moment.',
-        });
+        setIsShareDialogOpen(true);
+        setShareFormat('story');
+        // Trigger generation for default format
+        await generateAssetForFormat('story');
+    };
 
-        try {
-            await handleShareRequest();
-            toast({
-                title: 'Share card ready!',
-                description: 'Choose how you want to share it.',
-            });
-        } catch (error) {
-            if (error instanceof Error && error.message.includes('not ready')) {
-                toast({
-                    title: 'Cannot share yet',
-                    description: 'The reveal is not complete.',
-                    variant: 'destructive',
-                });
-            } else {
-                console.error('Failed to prepare share card:', error);
-                toast({
-                    title: 'Sharing Failed',
-                    description: 'Could not generate the image. Please try again.',
-                    variant: 'destructive',
-                });
-            }
-        }
+    const handleFormatChange = async (value: string) => {
+        const format = value as 'story' | 'square';
+        setShareFormat(format);
+        await generateAssetForFormat(format);
     };
 
     const handleNativeShare = async () => {
@@ -314,7 +320,8 @@ export default function HomePage({ onInteraction, setRevealedCatId }: { onIntera
                 url: 'https://thequantumcat.app',
             });
 
-            handleSuccessfulShare();
+            rewardShare();
+            setHasShared(true);
             toast({
                 description: '10 Fish Points awarded.',
             });
@@ -345,7 +352,7 @@ export default function HomePage({ onInteraction, setRevealedCatId }: { onIntera
             if (downloadAttributeSupported) {
                 const link = document.createElement('a');
                 link.href = shareAsset.dataUrl;
-                link.download = 'quantum-cat.png';
+                link.download = `quantum-cat-${shareFormat}.png`;
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
@@ -353,7 +360,8 @@ export default function HomePage({ onInteraction, setRevealedCatId }: { onIntera
                 window.open(shareAsset.dataUrl, '_blank', 'noopener,noreferrer');
             }
 
-            handleSuccessfulShare();
+            rewardShare();
+            setHasShared(true);
             toast({
                 title: 'Image saved!',
                 description: '10 Fish Points awarded. Share it from your gallery.',
@@ -383,9 +391,13 @@ export default function HomePage({ onInteraction, setRevealedCatId }: { onIntera
             <>
                 <OnboardingModal open={showOnboarding} onClose={handleOnboardingDismiss} />
 
-                <div className="absolute left-[-1000px] top-[-1000px]">
-                    <div ref={shareCardRef} style={{ width: '320px', height: '520px' }}>
-                        <ShareCard catState={catState} message={message} boxSkin={selectedSkin} />
+                {/* Hidden Share Cards */}
+                <div className="absolute left-[-9999px] top-[-9999px] overflow-hidden">
+                    <div ref={storyRef} style={{ width: '1080px', height: '1920px' }}>
+                        <ShareCard catState={catState} message={message} boxSkin={selectedSkin} format="story" />
+                    </div>
+                    <div ref={squareRef} style={{ width: '1080px', height: '1080px' }}>
+                        <ShareCard catState={catState} message={message} boxSkin={selectedSkin} format="square" />
                     </div>
                 </div>
 
@@ -437,7 +449,7 @@ export default function HomePage({ onInteraction, setRevealedCatId }: { onIntera
                                                 onShareQuantumMessage={onShareRequest}
                                                 onRequestAnotherQuantumBox={handleRequestAnotherBox}
                                                 isDiarySaved={isCurrentMessageSaved}
-                                                hasSharedQuantumMessage={isShared}
+                                                hasSharedQuantumMessage={hasShared}
                                                 reduceMotion={reduceMotion}
                                                 isShareDisabled={isGeneratingShare}
                                                 isResetDisabled={false}
@@ -454,42 +466,52 @@ export default function HomePage({ onInteraction, setRevealedCatId }: { onIntera
                             closeShareDialog();
                         }
                     }}>
-                        <DialogContent className="sm:max-w-md">
-                            <DialogTitle>Share your discovery</DialogTitle>
-                            <DialogDescription>
-                                Send the card to Instagram, WhatsApp, or anywhere else.
-                            </DialogDescription>
+                        <DialogContent className="sm:max-w-md flex flex-col gap-0 p-0 overflow-hidden">
+                            <DialogHeader className="p-6 pb-2">
+                                <DialogTitle>Share your destiny</DialogTitle>
+                                <DialogDescription>
+                                    Choose a format to share.
+                                </DialogDescription>
+                            </DialogHeader>
+                            
+                            <div className="p-6 pt-2">
+                                <Tabs defaultValue="story" value={shareFormat} onValueChange={handleFormatChange} className="w-full">
+                                    <TabsList className="grid w-full grid-cols-2 mb-4">
+                                        <TabsTrigger value="story">Story (9:16)</TabsTrigger>
+                                        <TabsTrigger value="square">Post (1:1)</TabsTrigger>
+                                    </TabsList>
 
-                            {shareAsset ? (
-                                <div className="space-y-4">
-                                    <div className="overflow-hidden rounded-lg border bg-background/50">
-                                        <Image
-                                            src={shareAsset.dataUrl}
-                                            alt="Quantum Cat share card"
-                                            width={320}
-                                            height={520}
-                                            unoptimized
-                                            className="w-full h-auto"
-                                        />
+                                    <div className="relative w-full aspect-[9/16] max-h-[50vh] bg-muted/30 rounded-lg overflow-hidden border flex items-center justify-center">
+                                         {isGeneratingShare && (
+                                             <div className="absolute inset-0 flex items-center justify-center bg-background/50 backdrop-blur-sm z-20">
+                                                 <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                                             </div>
+                                         )}
+                                         
+                                         {shareAsset ? (
+                                             <Image
+                                                 src={shareAsset.dataUrl}
+                                                 alt="Preview"
+                                                 fill
+                                                 className="object-contain"
+                                             />
+                                         ) : (
+                                             !isGeneratingShare && <span className="text-muted-foreground text-sm">Preview unavailable</span>
+                                         )}
                                     </div>
 
-                                    {nativeShareAvailable && (
-                                        <Button onClick={handleNativeShare}>
-                                            Share via device…
+                                    <div className="mt-6 flex flex-col gap-3">
+                                        {nativeShareAvailable && (
+                                            <Button onClick={handleNativeShare} className="w-full" disabled={!shareAsset || isGeneratingShare}>
+                                                Share via device…
+                                            </Button>
+                                        )}
+                                        <Button variant="outline" onClick={handleDownloadShare} className="w-full" disabled={!shareAsset || isGeneratingShare}>
+                                            Save image
                                         </Button>
-                                    )}
-
-                                    <Button variant="outline" onClick={handleDownloadShare}>
-                                        Save image to share manually
-                                    </Button>
-
-                                    <p className="text-xs text-muted-foreground text-center">
-                                        Tip: After saving, open your Photos or Files app and share the image to Instagram or WhatsApp.
-                                    </p>
-                                </div>
-                            ) : (
-                                <p className="text-sm text-muted-foreground">Preparing your card…</p>
-                            )}
+                                    </div>
+                                </Tabs>
+                            </div>
                         </DialogContent>
                     </Dialog>
                 </>
