@@ -400,31 +400,49 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     let mergedData: UserData;
 
     try {
+      // 1. Try to load remote data. If this fails, we stop to prevent overwriting.
       const remoteData = await loadUserData(firebaseUser.uid);
+
+      // 2. Merge logic
       mergedData = hasMeaningfulProgress(localData)
         ? mergeUserRecords(remoteData, localData)
         : remoteData;
 
+      // 3. Save logic (only if we have local changes to push)
       if (hasMeaningfulProgress(localData)) {
         await saveUserData(firebaseUser.uid, mergedData);
+        // 4. CRITICAL: Only clear local data after a successful save.
+        clearLocalUserData();
       }
-    } catch (error) {
-      console.error('Failed to load user data', error);
-      mergedData = hasMeaningfulProgress(localData)
-        ? mergeUserRecords({ ...defaultUserData }, localData)
-        : { ...defaultUserData };
-    }
 
-    setUser(firebaseUser);
-    setDisplayName(firebaseUser.displayName || (firebaseUser.email ? firebaseUser.email.split('@')[0] : null));
-    setStorageMode('cloud');
-    setLoginPromptState({ open: false, reason: null });
-    setLoginPromptDismissed(false);
-    clearPromptDismissed();
-    setUserDataState(mergedData);
-    setLoginModalOpen(false);
-    clearLocalUserData();
-    setLoading(false);
+      // 5. Success path
+      setUser(firebaseUser);
+      setDisplayName(firebaseUser.displayName || (firebaseUser.email ? firebaseUser.email.split('@')[0] : null));
+      setStorageMode('cloud');
+      setLoginPromptState({ open: false, reason: null });
+      setLoginPromptDismissed(false);
+      clearPromptDismissed();
+      setUserDataState(mergedData);
+      setLoginModalOpen(false);
+    } catch (error) {
+      console.error('Sync failed during login:', error);
+      // If data sync fails, we do NOT transition to 'cloud' mode to protect data integrity.
+      // We keep the user on their local data.
+      // We could optionally sign them out, but keeping them on local data is safer than data loss.
+      
+      // For now, we effectively treat this as a "guest" session with the authenticated user object
+      // but we don't switch storageMode to 'cloud' to prevent accidental partial overwrites.
+      
+      // Ideally, show a toast here, but we are in a context.
+      // We'll rely on the UI to show "Guest" or "Error" state if needed.
+      
+      // Fallback: Treat as guest-like state but do not clear anything.
+      setUser('guest'); 
+      setStorageMode('local');
+      setUserDataState(localData);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleGuestLogin = () => {

@@ -62,12 +62,8 @@ export const defaultUserData: UserData = {
 };
 
 export async function saveUserData(userId: string, data: Partial<UserData>): Promise<void> {
-  try {
-    const userDocRef = doc(db, 'users', userId);
-    await setDoc(userDocRef, data, { merge: true });
-  } catch (error) {
-    console.error('Error saving user data:', error);
-  }
+  const userDocRef = doc(db, 'users', userId);
+  await setDoc(userDocRef, data, { merge: true });
 }
 
 export async function resetUserData(userId: string): Promise<void> {
@@ -80,20 +76,15 @@ export async function resetUserData(userId: string): Promise<void> {
 }
 
 export async function loadUserData(userId: string): Promise<UserData> {
-  try {
-    const userDocRef = doc(db, 'users', userId);
-    const docSnap = await getDoc(userDocRef);
+  const userDocRef = doc(db, 'users', userId);
+  const docSnap = await getDoc(userDocRef);
 
-    if (docSnap.exists()) {
-      // Merge fetched data with defaults to ensure all keys are present
-      return { ...defaultUserData, ...docSnap.data() };
-    } else {
-      // No document for this user, create one with default data
-      await saveUserData(userId, defaultUserData);
-      return defaultUserData;
-    }
-  } catch (error) {
-    console.error('Error loading user data:', error);
-    return defaultUserData; // Return default data on error
+  if (docSnap.exists()) {
+    // Merge fetched data with defaults to ensure all keys are present
+    return { ...defaultUserData, ...docSnap.data() };
+  } else {
+    // No document for this user, create one with default data
+    await saveUserData(userId, defaultUserData);
+    return defaultUserData;
   }
 }
