@@ -603,7 +603,7 @@ export function SplashScreen({ onComplete }: { onComplete?: () => void }) {
   );
 }
 
-function QuantumCat({ animate, className }: { animate: boolean; className?: string }) {
+export function QuantumCat({ animate, className }: { animate: boolean; className?: string }) {
   const primaryGradientId = 'quantum-cat-gradient-primary';
   const secondaryGradientId = 'quantum-cat-gradient-secondary';
   const accentGradientId = 'quantum-cat-gradient-accent';
