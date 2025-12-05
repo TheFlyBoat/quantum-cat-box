@@ -376,10 +376,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         const totalObservations = next.totalObservations ?? 0;
         const pointsValue = next.points ?? 0;
 
-        if (totalObservations >= 3) {
+        if (totalObservations >= 10) {
           maybeOpenLoginPrompt('box-opens');
         }
-        if (pointsValue >= 10) {
+        if (pointsValue >= 50) {
           maybeOpenLoginPrompt('points');
         }
       }
