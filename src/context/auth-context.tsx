@@ -475,11 +475,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   const signInWithGoogle = useCallback(async () => {
-    const provider = new GoogleAuthProvider();
-    provider.setCustomParameters({
-      prompt: 'select_account',
-    });
-    await signInWithPopup(auth, provider);
+    try {
+      const provider = new GoogleAuthProvider();
+      provider.setCustomParameters({
+        prompt: 'select_account',
+      });
+      await signInWithPopup(auth, provider);
+    } catch (error) {
+      console.error('Google Sign-In Error:', error);
+      setLoading(false);
+    }
   }, []);
 
   const signInWithEmail = useCallback(async (email: string, pass: string) => {
