@@ -426,20 +426,20 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setLoginModalOpen(false);
     } catch (error) {
       console.error('Sync failed during login:', error);
-      // If data sync fails, we do NOT transition to 'cloud' mode to protect data integrity.
-      // We keep the user on their local data.
-      // We could optionally sign them out, but keeping them on local data is safer than data loss.
       
-      // For now, we effectively treat this as a "guest" session with the authenticated user object
-      // but we don't switch storageMode to 'cloud' to prevent accidental partial overwrites.
+      // Fallback: Log them in visually, but keep data local to prevent loss.
+      // This ensures the user sees they are signed in (UserStatusLabel updates),
+      // even if the database sync failed.
+      setUser(firebaseUser);
+      setDisplayName(firebaseUser.displayName || (firebaseUser.email ? firebaseUser.email.split('@')[0] : null));
       
-      // Ideally, show a toast here, but we are in a context.
-      // We'll rely on the UI to show "Guest" or "Error" state if needed.
-      
-      // Fallback: Treat as guest-like state but do not clear anything.
-      setUser('guest'); 
-      setStorageMode('local');
+      // KEEP storage as 'local' so we don't try to save to a broken cloud connection
+      // and don't wipe local data.
+      setStorageMode('local'); 
       setUserDataState(localData);
+      
+      // Ideally trigger a toast here, but we are in context. 
+      // The UI will show the user as logged in, which is better than "nothing happened".
     } finally {
       setLoading(false);
     }
