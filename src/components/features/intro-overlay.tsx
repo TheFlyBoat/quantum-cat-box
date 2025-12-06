@@ -8,7 +8,7 @@ import { cn } from '@/lib/utils';
 // Reusing the visual style from the Splash Screen
 import { QuantumCat } from '@/components/splash-screen';
 
-interface OracleIntroProps {
+interface IntroOverlayProps {
     onComplete: () => void;
 }
 
@@ -32,14 +32,14 @@ const slides = [
         icon: BookOpen,
     },
     {
-        id: 'oracle',
-        title: 'Heed the Oracle',
+        id: 'message',
+        title: 'Listen to the Void',
         body: 'With every reveal comes a message. A fortune. A warning. Listen closely to what the universe whispers.',
         icon: Star,
     },
 ];
 
-export function OracleIntro({ onComplete }: OracleIntroProps) {
+export function IntroOverlay({ onComplete }: IntroOverlayProps) {
     const [currentIndex, setCurrentIndex] = useState(0);
     const [direction, setDirection] = useState(0);
 

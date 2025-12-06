@@ -22,7 +22,7 @@ import { playFeedback } from '@/lib/audio';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/context/auth-context';
-import { OracleIntro } from '@/components/features/oracle-intro';
+import { IntroOverlay } from '@/components/features/intro-overlay';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Loader2 } from 'lucide-react';
 
@@ -301,7 +301,7 @@ export default function HomePage({ onInteraction, setRevealedCatId }: { onIntera
         
         toast({
             title: 'Share feature unavailable',
-            description: 'We are currently upgrading the Oracle\'s sharing magic. Please check back later!',
+            description: 'We are currently upgrading the sharing magic. Please check back later!',
         });
     };
 
@@ -400,7 +400,7 @@ export default function HomePage({ onInteraction, setRevealedCatId }: { onIntera
     return (
         <>
             {showOnboarding ? (
-                <OracleIntro onComplete={handleOnboardingComplete} />
+                <IntroOverlay onComplete={handleOnboardingComplete} />
             ) : showSplash ? (
                 <SplashScreen onComplete={handleSplashComplete} />
             ) : (
