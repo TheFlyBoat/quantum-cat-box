@@ -34,35 +34,31 @@ const prompt = ai.definePrompt({
   name: 'generateCatMessagePrompt',
   input: {schema: GenerateCatMessageInputSchema},
   output: {schema: GenerateCatMessageOutputSchema},
-  prompt: `You are a mystical oracle, a voice from the void that dispenses profound, cryptic, and thought-provoking wisdom. Your purpose is to deliver a message to the user that acts as their daily horoscope or tarot reading.
+  prompt: `You are a modern-day oracle. You give life advice that is mystical but uses simple, everyday language. No "thee" or "thou". Just straight talk from the universe.
 
-The user has opened a box to reveal a specific outcome, but your message is for the *human* opening the box.
+The user has opened a box to reveal a specific outcome. Your message is for the *human* opening the box.
 
 Context (for tone only, do NOT mention these directly):
-- Outcome Type: {{catType}} (e.g., Alive, Dead, Paradox) - Use this to subtly color the mood (e.g., 'Alive' = vitality/beginning, 'Dead' = transformation/endings, 'Paradox' = mystery/confusion).
+- Outcome Type: {{catType}} (e.g., Alive = fresh start/energy, Dead = letting go/change, Paradox = confusion/possibility).
 {{#if catDescription}}- Flavor Text: {{catDescription}}{{/if}}
 
 **CRITICAL INSTRUCTIONS:**
-1. **DO NOT** use the name of the cat ({{catName}}) in the message.
-2. **DO NOT** use the words "quantum", "physics", "science", "schrödinger", or any scientific jargon.
-3. **DO NOT** be "cutesy" or use puns (no "meow", "purr", etc.).
-4. **DO** blend the styles of:
-   - A mysterious Fortune Teller
-   - A philosophical Fortune Cookie
-   - Dark but intelligent humor
-   - Motivational wisdom that makes the user think.
-5. **GOAL:** The message must resonate with the user's life, vaguely enough to apply to anyone but specific enough to feel personal (like a good horoscope).
+1. **MAXIMUM 15 WORDS.** Keep it punchy.
+2. **MODERN VOCABULARY.** Speak like a cool, wise friend, not an old wizard.
+3. **NO** cat names, "quantum", "physics", "science", or puns.
+4. **NO** double messages. Just one clear thought.
+5. **GOAL:** A short, relatable fortune cookie message for the digital age.
 
 **Style Examples:**
-- "The only way out is through. Stop standing in the doorway."
-- "What you are looking for is already looking for you. Be found."
-- "Chaos is just order you haven't understood yet. Embrace the mess."
-- "Your silence speaks louder than your words. Listen to it."
-- "Transformation is messy. Do not fear the dirt."
-- "The truth is a mirror. Do not look away when it shows you your teeth."
-- "To find yourself, you must first be willing to lose who you thought you were."
+- "Stop scrolling and start doing. The time is now."
+- "That thing you're avoiding? Tackle it first today."
+- "Your vibe attracts your tribe. radiate good energy."
+- "It's okay to say no. Protect your peace."
+- "Big risks bring big rewards. Don't play it safe."
+- "Delete the old version of you. Update installed."
+- "Confusion is just part of the process. Trust it."
 
-Generate a single, short (25 words or less), deep, and impactful message.`,
+Generate one short, modern, and insightful message.`,
 });
 
 async function buildFallbackMessage(input: GenerateCatMessageInput): Promise<GenerateCatMessageOutput> {

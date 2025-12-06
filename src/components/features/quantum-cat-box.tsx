@@ -1,7 +1,7 @@
 
 'use client';
 
-import { type ComponentType } from 'react';
+import { type ComponentType, useState } from 'react';
 import { Lock } from 'lucide-react';
 
 import { CatDisplay } from '@/components/cats/CatDisplay';
@@ -73,17 +73,33 @@ export function QuantumCatBox({
   const isOpen = catState.outcome !== 'initial' && !isLoading;
   const isGravityCat = catState.catId === 'gravity';
 
+  const [showLockFeedback, setShowLockFeedback] = useState(false);
+
+  const handleClick = () => {
+    if (isLocked) {
+      setShowLockFeedback(true);
+      setTimeout(() => setShowLockFeedback(false), 2000);
+      // Still trigger the parent onClick for audio feedback if needed, 
+      // but the parent might block it if disabled. 
+      // Actually, if isLocked is true, the button is disabled in the current code.
+      // We need to ENABLE the button even if locked, so we can capture the click.
+      onClick(); 
+    } else {
+      onClick();
+    }
+  };
+
   return (
         <button
           type="button"
-          onClick={onClick}
+          onClick={handleClick}
           disabled={isLoading || isOpen}
           className={cn(
             'group relative rounded-2xl transition-transform duration-300 ease-out focus:outline-none focus-visible:ring-4 focus-visible:ring-[#A240FF] focus-visible:ring-offset-4 focus-visible:ring-offset-background',
             !isOpen && !isLoading && !isLocked && 'hover:scale-105',
             isLoading && !reduceMotion && 'animate-shake',
             isAmbientShaking && !reduceMotion && 'animate-subtle-shake',
-            isLocked && 'cursor-not-allowed',
+            isLocked && 'cursor-default', // Changed from cursor-not-allowed to let them click
             (isLoading || isOpen) && !isLocked && 'cursor-pointer',
             (isLoading || isOpen) && isLocked && 'cursor-default'
           )}
@@ -91,6 +107,7 @@ export function QuantumCatBox({
           aria-disabled={isLoading || isOpen}
         >      <BoxComponent className="h-52 w-52 md:h-56 md:w-56" isOpen={isOpen} />
 
+      {/* Always show cat if revealed, even if locked */}
       {catState.outcome !== 'initial' && catState.catId && !isGravityCat && (
         <div className="absolute inset-0 flex items-end justify-center">
           <div className="h-full w-full translate-y-[25%] scale-[0.6]">
@@ -112,13 +129,13 @@ export function QuantumCatBox({
         </div>
       )}
 
-      {isLocked && (
-        <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 rounded-2xl bg-background/40 backdrop-blur-[2px]">
-          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-background/80 shadow-sm">
-            <Lock className="h-6 w-6 text-muted-foreground" />
+      {showLockFeedback && (
+        <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 rounded-2xl bg-background/60 backdrop-blur-[2px] animate-in fade-in zoom-in duration-300">
+          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-background/90 shadow-sm">
+            <Lock className="h-6 w-6 text-rose-500" />
           </div>
-          <span className="rounded-full bg-background/80 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-muted-foreground shadow-sm">
-            Locked
+          <span className="rounded-xl bg-background/90 px-3 py-2 text-[10px] font-bold uppercase tracking-widest text-rose-500 shadow-sm text-center leading-tight max-w-[80%]">
+            The Box is closed for now.<br/>Come back tomorrow!
           </span>
         </div>
       )}
