@@ -294,10 +294,15 @@ export default function HomePage({ onInteraction, setRevealedCatId }: { onIntera
 
     const onShareRequest = async () => {
         playFeedback('click-2');
-        setIsShareDialogOpen(true);
-        setShareFormat('story');
-        // Trigger generation for default format
-        await generateAssetForFormat('story');
+        // Temporarily blocked for upgrades
+        // setIsShareDialogOpen(true);
+        // setShareFormat('story');
+        // await generateAssetForFormat('story');
+        
+        toast({
+            title: 'Share feature unavailable',
+            description: 'We are currently upgrading the Oracle\'s sharing magic. Please check back later!',
+        });
     };
 
     const handleFormatChange = async (value: string) => {
