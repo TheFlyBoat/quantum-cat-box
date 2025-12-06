@@ -260,13 +260,18 @@ export default function HomePage({ onInteraction, setRevealedCatId }: { onIntera
 
     const handleRequestAnotherBox = useCallback(() => {
         if (isDailyLocked) {
-            overrideDailyLock();
+            playFeedback('error-1');
+            toast({
+                title: 'The Box is closed',
+                description: 'Come back tomorrow to reveal your destiny.',
+                variant: 'destructive',
+            });
         } else {
             handleReset({ ignoreLock: true });
         }
         setLockNotice('');
         setPendingAutoOpen(false);
-    }, [isDailyLocked, overrideDailyLock, handleReset]);
+    }, [isDailyLocked, handleReset, toast]);
 
     const generateAssetForFormat = async (format: 'story' | 'square') => {
         setIsGeneratingShare(true);
