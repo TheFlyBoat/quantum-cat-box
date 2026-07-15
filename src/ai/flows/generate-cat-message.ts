@@ -2,27 +2,43 @@
 'use server';
 
 /**
- * @fileOverview This file defines the Genkit flow for generating a witty, motivational, or humorous message about a cat.
+ * @fileOverview Genkit flow for generating a short, human-focused fortune inspired by a revealed cat state.
  *
  * It includes:
  * - generateCatMessage: The main function to trigger the message generation flow.
- * - GenerateCatMessageInput: The input type for the generateCatMessage function (currently empty).
+ * - GenerateCatMessageInput: Validated cat context supplied to the prompt.
  * - GenerateCatMessageOutput: The output type for the generateCatMessage function, containing the generated message.
  */
 
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 
-const GenerateCatMessageInputSchema = z.object({
-  catId: z.string().describe('Unique identifier of the revealed cat'),
-  catName: z.string().describe('Display name of the revealed cat'),
-  catType: z.string().describe('Outcome type of the cat (Alive, Dead, Paradox, etc.)'),
-  catDescription: z.string().optional().describe('Brief description of the cat to inspire message variety'),
+export const GenerateCatMessageInputSchema = z.object({
+  catId: z.string().min(1).describe('Unique identifier of the revealed cat'),
+  catName: z.string().min(1).describe('Display name of the revealed cat'),
+  catType: z.enum(['Alive', 'Dead', 'Paradox']).describe("Revealed outcome used only to guide the fortune's tone"),
+  catDescription: z.string().optional().describe('Optional flavour context used only to vary tone'),
 });
 export type GenerateCatMessageInput = z.infer<typeof GenerateCatMessageInputSchema>;
 
-const GenerateCatMessageOutputSchema = z.object({
-  message: z.string().describe('A witty, motivational, or philosophical message about the cat.'),
+const FORBIDDEN_MESSAGE_TERMS = /\b(cat|cats|quantum|physics|science)\b/i;
+
+export const GenerateCatMessageOutputSchema = z.object({
+  message: z
+    .string()
+    .trim()
+    .min(1, 'Message cannot be empty.')
+    .refine(
+      text => text.split(/\s+/).filter(Boolean).length <= 15,
+      'Message must contain no more than 15 words.',
+    )
+    .refine(
+      text => !FORBIDDEN_MESSAGE_TERMS.test(text),
+      'Message must not mention cats, quantum, physics, or science.',
+    )
+    .describe(
+      'One short, modern fortune-cookie-style life message for the human, inspired by the outcome and containing no cat or science references.',
+    ),
 });
 export type GenerateCatMessageOutput = z.infer<typeof GenerateCatMessageOutputSchema>;
 
@@ -61,17 +77,23 @@ Context (for tone only, do NOT mention these directly):
 Generate one short, modern, and insightful message.`,
 });
 
-async function buildFallbackMessage(input: GenerateCatMessageInput): Promise<GenerateCatMessageOutput> {
+async function buildFallbackMessage(_input: GenerateCatMessageInput): Promise<GenerateCatMessageOutput> {
   const fallbackModule = await import('@/lib/fallback-messages.json');
   const fallbackPayload = fallbackModule.default as { messages: string[] } | string[];
   const messagePool = Array.isArray(fallbackPayload) ? fallbackPayload : fallbackPayload.messages;
-  const selectedEntry = messagePool[Math.floor(Math.random() * messagePool.length)];
-  const base =
-    typeof selectedEntry === 'string'
-      ? selectedEntry
-      : (selectedEntry as { message?: string }).message ?? 'Embrace the mystery beyond the box.';
+  const validMessages = messagePool
+    .map(entry =>
+      typeof entry === 'string'
+        ? entry
+        : (entry as { message?: string }).message ?? '',
+    )
+    .filter(message => GenerateCatMessageOutputSchema.safeParse({ message }).success);
 
-  return { message: base };
+  const selectedMessage =
+    validMessages[Math.floor(Math.random() * validMessages.length)] ??
+    'Embrace the mystery beyond the box.';
+
+  return GenerateCatMessageOutputSchema.parse({ message: selectedMessage });
 }
 
 const generateCatMessageFlow = ai.defineFlow(
@@ -89,11 +111,13 @@ const generateCatMessageFlow = ai.defineFlow(
       const response = await prompt(input);
       const promptOutput = response.output;
 
-      if (!promptOutput || typeof promptOutput.message !== 'string') {
+      const validatedOutput = GenerateCatMessageOutputSchema.safeParse(promptOutput);
+      if (!validatedOutput.success) {
+        console.warn('AI message failed validation; using fallback', validatedOutput.error.flatten());
         return buildFallbackMessage(input);
       }
 
-      return promptOutput;
+      return validatedOutput.data;
     } catch (error) {
       console.error('generateCatMessageFlow prompt failed', error);
       return buildFallbackMessage(input);
