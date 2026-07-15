@@ -5,7 +5,7 @@ import { CatState, CatOutcome } from '@/lib/types';
 import { useBadgeProgress } from '@/context/badge-progress-context';
 import { useCatCollection } from '@/context/cat-collection-context';
 import { usePoints } from '@/context/points-context';
-import { generateCatMessage } from '@/ai/flows/generate-cat-message';
+import { generateCatMessage, type GenerateCatMessageInput } from '@/ai/flows/generate-cat-message';
 import fallbackMessages from '@/lib/fallback-messages.json';
 import catData from '@/lib/cat-data.json';
 import { playFeedback } from '@/lib/audio';
@@ -231,10 +231,10 @@ export function useCatLogic({
             unlockCat(cat.id, { celebrateImmediately: false });
         }
 
-        const messageInput = {
+        const messageInput: GenerateCatMessageInput = {
             catId: selectedCatId!,
             catName: cat?.name ?? 'Quantum Cat',
-            catType: cat?.type ?? (determinedOutcome.charAt(0).toUpperCase() + determinedOutcome.slice(1)),
+            catType: determinedOutcome === 'alive' ? 'Alive' : determinedOutcome === 'dead' ? 'Dead' : 'Paradox',
             catDescription: cat?.description,
         };
 
