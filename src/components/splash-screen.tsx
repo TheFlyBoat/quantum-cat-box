@@ -1,7 +1,8 @@
 'use client';
 
 import type { CSSProperties } from 'react';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, useSyncExternalStore } from 'react';
+import { createPortal } from 'react-dom';
 import { cn } from '@/lib/utils';
 
 const SPLASH_STYLES = `
@@ -548,11 +549,17 @@ export function SplashScreen({ onComplete }: { onComplete?: () => void }) {
     };
   }, [isActive, prefersReducedMotion, onComplete]);
 
-  if (!isActive) {
+  const isMounted = useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false
+  );
+
+  if (!isActive || !isMounted) {
     return null;
   }
 
-  return (
+  return createPortal(
     <div
       className={cn(
         'quantum-splash fixed inset-0 z-[100] flex items-center justify-center overflow-hidden transition-opacity duration-700 ease-out',
@@ -599,7 +606,8 @@ export function SplashScreen({ onComplete }: { onComplete?: () => void }) {
           <span className="quantum-text__eyebrow">FlyBoat Creative</span>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
 

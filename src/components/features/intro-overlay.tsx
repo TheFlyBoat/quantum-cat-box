@@ -1,8 +1,10 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useSyncExternalStore } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowRight, Sparkles, Box, BookOpen, Star } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
 // Reusing the visual style from the Splash Screen
@@ -39,7 +41,14 @@ const slides = [
     },
 ];
 
+const emptySubscribe = () => () => {};
+
 export function IntroOverlay({ onComplete }: IntroOverlayProps) {
+    const isMounted = useSyncExternalStore(
+        emptySubscribe,
+        () => true,
+        () => false
+    );
     const [currentIndex, setCurrentIndex] = useState(0);
     const [direction, setDirection] = useState(0);
 
@@ -54,18 +63,20 @@ export function IntroOverlay({ onComplete }: IntroOverlayProps) {
 
     const currentSlide = slides[currentIndex];
 
-    return (
-        <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-slate-950 text-white overflow-hidden">
+    if (!isMounted) return null;
+
+    return createPortal(
+        <div className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-slate-950 text-white overflow-y-auto p-4 sm:p-6">
             {/* Background Effects */}
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,#4c1d95_0%,#0f172a_60%,#020617_100%)] opacity-80" />
-            <div className="absolute inset-0 bg-[url('/grid.svg')] bg-repeat opacity-10 animate-pulse" />
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,#4c1d95_0%,#0f172a_60%,#020617_100%)] opacity-80 pointer-events-none" />
+            <div className="absolute inset-0 bg-[url('/grid.svg')] bg-repeat opacity-10 animate-pulse pointer-events-none" />
             
             {/* Floating Particles */}
-            <div className="absolute top-1/4 left-1/4 h-1 w-1 rounded-full bg-purple-400 blur-[1px] animate-bounce duration-[3000ms]" />
-            <div className="absolute bottom-1/3 right-1/4 h-1.5 w-1.5 rounded-full bg-blue-400 blur-[1px] animate-bounce duration-[4000ms]" />
+            <div className="absolute top-1/4 left-1/4 h-1 w-1 rounded-full bg-purple-400 blur-[1px] animate-bounce pointer-events-none" style={{ animationDuration: '3000ms' }} />
+            <div className="absolute bottom-1/3 right-1/4 h-1.5 w-1.5 rounded-full bg-blue-400 blur-[1px] animate-bounce pointer-events-none" style={{ animationDuration: '4000ms' }} />
 
             {/* Main Content Container */}
-            <div className="relative z-10 flex w-full max-w-md flex-col items-center px-6 text-center">
+            <div className="relative z-10 flex w-full max-w-md flex-col items-center px-6 text-center my-auto">
                 
                 {/* Animated Cat Header */}
                 <div className="mb-8 scale-75 transform transition-transform duration-700">
@@ -119,15 +130,16 @@ export function IntroOverlay({ onComplete }: IntroOverlayProps) {
                     </div>
 
                     {/* Action Button */}
-                    <button
+                    <Button
                         onClick={handleNext}
-                        className="group relative flex items-center gap-3 rounded-full bg-white px-8 py-4 font-headline text-xl font-bold text-black transition-all hover:scale-105 hover:shadow-[0_0_20px_rgba(255,255,255,0.3)] active:scale-95"
+                        className="group relative flex items-center gap-3 rounded-full bg-white px-8 py-6 font-headline text-xl font-bold text-black transition-all hover:bg-white/95 hover:scale-105 hover:shadow-[0_0_20px_rgba(255,255,255,0.3)] active:scale-95 h-auto"
                     >
                         <span>{currentIndex === slides.length - 1 ? 'Begin Destiny' : 'Continue'}</span>
                         <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
-                    </button>
+                    </Button>
                 </div>
             </div>
-        </div>
+        </div>,
+        document.body
     );
 }

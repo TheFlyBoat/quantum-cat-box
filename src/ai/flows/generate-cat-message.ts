@@ -81,7 +81,12 @@ const generateCatMessageFlow = ai.defineFlow(
     outputSchema: GenerateCatMessageOutputSchema,
   },
   async input => {
-    if (!process.env.GEMINI_API_KEY) {
+    const apiKey =
+      process.env.GEMINI_API_KEY ||
+      process.env.GOOGLE_GENAI_API_KEY ||
+      process.env.GOOGLE_API_KEY;
+
+    if (!apiKey) {
       return buildFallbackMessage(input);
     }
 
@@ -89,11 +94,11 @@ const generateCatMessageFlow = ai.defineFlow(
       const response = await prompt(input);
       const promptOutput = response.output;
 
-      if (!promptOutput || typeof promptOutput.message !== 'string') {
+      if (!promptOutput || typeof promptOutput.message !== 'string' || !promptOutput.message.trim()) {
         return buildFallbackMessage(input);
       }
 
-      return promptOutput;
+      return { message: promptOutput.message.trim() };
     } catch (error) {
       console.error('generateCatMessageFlow prompt failed', error);
       return buildFallbackMessage(input);

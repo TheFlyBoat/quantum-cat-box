@@ -33,6 +33,7 @@ export function LoginCard({ className, onSuccess, onGuest, allowGuest = true }: 
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [isLoading, setIsLoading] = useState(false);
+    const [isSignUp, setIsSignUp] = useState(false);
 
     const handleGoogleSignIn = async () => {
         playFeedback('click-1');
@@ -42,7 +43,11 @@ export function LoginCard({ className, onSuccess, onGuest, allowGuest = true }: 
             onSuccess?.();
         } catch (error: any) {
             console.error('Error during Google sign-in:', error);
-            setAuthError('An unexpected error occurred during sign-in. Please try again.');
+            if (error?.code === 'auth/api-key-not-valid' || error?.code === 'auth/invalid-api-key') {
+                setAuthError('Firebase is not configured yet. Add your Firebase keys in .env.local.');
+            } else {
+                setAuthError('Google sign-in was cancelled or encountered an error.');
+            }
         }
     };
 
@@ -53,26 +58,31 @@ export function LoginCard({ className, onSuccess, onGuest, allowGuest = true }: 
         setIsLoading(true);
 
         try {
-            await signInWithEmail(email, password);
+            if (isSignUp) {
+                await signUpWithEmail(email, password);
+            } else {
+                await signInWithEmail(email, password);
+            }
             onSuccess?.();
         } catch (error: any) {
-            if (error.code === 'auth/user-not-found') {
-                try {
-                    await signUpWithEmail(email, password);
-                    onSuccess?.();
-                } catch (signupError: any) {
-                    if (signupError.code === 'auth/weak-password') {
-                        setAuthError('Password should be at least 6 characters.');
-                    } else {
-                        setAuthError('An error occurred during sign-up. Please try again.');
-                    }
-                    console.error('Error during sign-up:', signupError);
-                }
-            } else if (error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
-                setAuthError('Incorrect password. Please try again.');
+            console.error('Email auth error:', error);
+            if (error.code === 'auth/email-already-in-use') {
+                setAuthError('An account already exists with this email. Please sign in instead.');
+                setIsSignUp(false);
+            } else if (error.code === 'auth/weak-password') {
+                setAuthError('Password should be at least 6 characters.');
+            } else if (
+                error.code === 'auth/invalid-credential' ||
+                error.code === 'auth/wrong-password' ||
+                error.code === 'auth/user-not-found'
+            ) {
+                setAuthError(isSignUp ? 'Could not create account with these credentials.' : 'Incorrect email or password.');
+            } else if (error.code === 'auth/invalid-email') {
+                setAuthError('Please enter a valid email address.');
+            } else if (error.code === 'auth/api-key-not-valid' || error.code === 'auth/invalid-api-key') {
+                setAuthError('Firebase is not configured yet. Add your Firebase keys in .env.local.');
             } else {
-                setAuthError('An error occurred. Please try again.');
-                console.error('Error during sign-in:', error);
+                setAuthError('Authentication failed. Please check your credentials and try again.');
             }
         } finally {
             setIsLoading(false);
@@ -121,8 +131,22 @@ export function LoginCard({ className, onSuccess, onGuest, allowGuest = true }: 
                         />
                     </div>
                     <Button type="submit" className="w-full h-12 text-base font-bold" disabled={isLoading}>
-                        {isLoading ? 'Continuing...' : 'Continue with Email'}
+                        {isLoading ? (isSignUp ? 'Creating Account...' : 'Signing In...') : (isSignUp ? 'Create Account' : 'Sign In with Email')}
                     </Button>
+                    <div className="text-center pt-1">
+                        <Button
+                            type="button"
+                            variant="link"
+                            size="sm"
+                            onClick={() => {
+                                setIsSignUp(prev => !prev);
+                                setAuthError(null);
+                            }}
+                            className="text-xs text-muted-foreground hover:text-primary h-auto p-0"
+                        >
+                            {isSignUp ? 'Already have an account? Sign in' : "Don't have an account? Create one"}
+                        </Button>
+                    </div>
                 </form>
 
                 <div className="relative">

@@ -30,8 +30,8 @@ export function UserStatusLabel({ className }: UserStatusLabelProps) {
             className={cn(
                 'inline-flex items-center rounded-full border px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] transition-colors',
                 isGuest
-                    ? 'border-border/60 bg-muted/30 text-muted-foreground'
-                    : 'border-primary/25 bg-primary/10 text-primary',
+                    ? 'border-[#CDC1E1] bg-transparent text-[#8D52F6] dark:border-[#2F374C] dark:text-[#A8AEBD]'
+                    : 'border-transparent bg-[#F2BB33] text-[#1F1404]',
                 className,
             )}
         >

@@ -133,7 +133,7 @@ export function QuantumMessageActions({
             </Button>
           </TooltipTrigger>
           <TooltipContent>
-            <p>Reveal another cat (100 fish points)</p>
+            <p>Reveal another Quantum Box</p>
           </TooltipContent>
         </Tooltip>
       </div>

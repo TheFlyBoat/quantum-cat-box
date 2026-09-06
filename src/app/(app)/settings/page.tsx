@@ -146,7 +146,7 @@ export default function SettingsPage() {
                 tips: [
                     { text: 'The fish points will be useful for the next features.' },
                     { text: 'The app is currently in development. Check in for new features soon' },
-                    { text: 'Send us feedback on: hello@tquantumcat.app.' },
+                    { text: 'Send us feedback on: hello@thequantumcat.app.' },
                 ],
                 borderClass: 'border-lime-200/70 dark:border-lime-400/40',
                 iconColorClass: 'text-[#3F6212]',
@@ -154,34 +154,6 @@ export default function SettingsPage() {
                 bulletClass: 'bg-lime-400/70',
             },
         ];
-
-    const totalHowSteps = howCards.length;
-    const [currentHowIndex, setCurrentHowIndex] = React.useState(0);
-
-    const goToIndex = React.useCallback((index: number) => {
-        playFeedback('click-1');
-        setCurrentHowIndex(Math.max(0, Math.min(index, totalHowSteps - 1)));
-    }, [totalHowSteps]);
-
-    const goNext = React.useCallback(() => {
-        playFeedback('click-3');
-        setCurrentHowIndex(prev => (prev + 1) % totalHowSteps);
-    }, [totalHowSteps]);
-
-    const handleAdvance = React.useCallback(() => {
-        goNext();
-    }, [goNext]);
-
-    const currentHowCard = howCards[currentHowIndex];
-
-    if (!currentHowCard) {
-        // This can happen if the index is out of bounds, though theoretically covered by goNext and goToIndex.
-        // As a safeguard, reset to the first card.
-        setCurrentHowIndex(0);
-        return null;
-    }
-
-    const CurrentHowIcon = currentHowCard.icon;
 
     return (
         <Card className="border-none bg-transparent shadow-none">
@@ -302,9 +274,6 @@ export default function SettingsPage() {
                                     <RotateCcw className="h-4 w-4" />
                                     Reset Progress
                                 </p>
-                                <p className={`${bodyTextClass} mt-2 text-destructive/80`}>
-
-                                </p>
                                 <AlertDialog>
                                     <AlertDialogTrigger asChild>
                                         <Button variant="destructive" className="mt-4">
@@ -348,14 +317,14 @@ export default function SettingsPage() {
                             <div className="space-y-3">
                                 <div className="rounded-3xl border border-border/60 bg-background/50 p-1 shadow-sm backdrop-blur-sm">
                                     <div className="flex flex-col divide-y divide-border/40">
-                                        <a href="#" className="flex items-center justify-between p-4 transition-colors hover:bg-muted/30">
+                                        <Link href="/privacy" className="flex items-center justify-between p-4 transition-colors hover:bg-muted/30">
                                             <span className={rowTextClass}>Privacy Policy</span>
                                             <ChevronRight className="h-4 w-4 text-muted-foreground" />
-                                        </a>
-                                        <a href="#" className="flex items-center justify-between p-4 transition-colors hover:bg-muted/30">
+                                        </Link>
+                                        <Link href="/terms" className="flex items-center justify-between p-4 transition-colors hover:bg-muted/30">
                                             <span className={rowTextClass}>Terms of Service</span>
                                             <ChevronRight className="h-4 w-4 text-muted-foreground" />
-                                        </a>
+                                        </Link>
                                     </div>
                                 </div>
 

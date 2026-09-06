@@ -3,6 +3,7 @@
 
 import { type ComponentType, useState } from 'react';
 import { Lock } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 import { CatDisplay } from '@/components/cats/CatDisplay';
 import {
@@ -90,22 +91,24 @@ export function QuantumCatBox({
   };
 
   return (
-        <button
-          type="button"
-          onClick={handleClick}
-          disabled={isLoading || isOpen}
-          className={cn(
-            'group relative rounded-2xl transition-transform duration-300 ease-out focus:outline-none focus-visible:ring-4 focus-visible:ring-[#A240FF] focus-visible:ring-offset-4 focus-visible:ring-offset-background',
-            !isOpen && !isLoading && !isLocked && 'hover:scale-105',
-            isLoading && !reduceMotion && 'animate-shake',
-            isAmbientShaking && !reduceMotion && 'animate-subtle-shake',
-            isLocked && 'cursor-default', // Changed from cursor-not-allowed to let them click
-            (isLoading || isOpen) && !isLocked && 'cursor-pointer',
-            (isLoading || isOpen) && isLocked && 'cursor-default'
-          )}
-          aria-label={isLocked ? 'Mystery Box locked until tomorrow' : 'Open the Mystery Box'}
-          aria-disabled={isLoading || isOpen}
-        >      <BoxComponent className="h-52 w-52 md:h-56 md:w-56" isOpen={isOpen} />
+    <Button
+      type="button"
+      variant="ghost"
+      onClick={handleClick}
+      disabled={isLoading || isOpen}
+      className={cn(
+        'group relative h-52 w-52 md:h-56 md:w-56 p-0 hover:bg-transparent rounded-2xl transition-transform duration-300 ease-out focus:outline-none focus-visible:ring-4 focus-visible:ring-[#A240FF] focus-visible:ring-offset-4 focus-visible:ring-offset-background [&_svg]:!size-auto disabled:opacity-100',
+        !isOpen && !isLoading && !isLocked && 'hover:scale-105',
+        isLoading && !reduceMotion && 'animate-shake',
+        isAmbientShaking && !reduceMotion && 'animate-subtle-shake',
+        isLocked && 'cursor-default', // Changed from cursor-not-allowed to let them click
+        (isLoading || isOpen) && !isLocked && 'cursor-pointer',
+        (isLoading || isOpen) && isLocked && 'cursor-default'
+      )}
+      aria-label={isLocked ? 'Quantum Box locked until tomorrow' : 'Open the Quantum Box'}
+      aria-disabled={isLoading || isOpen}
+    >
+      <BoxComponent className="h-52 w-52 md:h-56 md:w-56" isOpen={isOpen} />
 
       {/* Always show cat if revealed, even if locked */}
       {catState.outcome !== 'initial' && catState.catId && !isGravityCat && (
@@ -140,6 +143,6 @@ export function QuantumCatBox({
         </div>
       )}
       
-    </button>
+    </Button>
   );
 }

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, useMemo, useSyncExternalStore } from 'react';
 import { CatState, CatOutcome } from '@/lib/types';
 import { useBadgeProgress } from '@/context/badge-progress-context';
 import { useCatCollection } from '@/context/cat-collection-context';
@@ -97,6 +97,8 @@ const getStartOfDay = (date: Date) => new Date(date.getFullYear(), date.getMonth
 
 const getNextMidnight = (date: Date) => new Date(date.getFullYear(), date.getMonth(), date.getDate() + 1);
 
+const emptySubscribe = () => () => {};
+
 export function useCatLogic({
     onInteraction,
     setRevealedCatId,
@@ -115,8 +117,12 @@ export function useCatLogic({
     const [isLoading, setIsLoading] = useState(false);
     const [isRevealing, setIsRevealing] = useState(false);
     const [revealedCatName, setRevealedCatName] = useState<string | null>(null);
-    const [isDailyLocked, setIsDailyLocked] = useState(false);
-    const [nextAvailableAt, setNextAvailableAt] = useState<number | null>(null);
+
+    const isMounted = useSyncExternalStore(
+        emptySubscribe,
+        () => true,
+        () => false
+    );
 
     const { recordObservation } = useBadgeProgress();
     const { unlockCat } = useCatCollection();
@@ -125,33 +131,33 @@ export function useCatLogic({
     const { setTheme } = useTheme();
     const { user, userData, setUserData } = useAuth();
 
-    // FIX: hook must be at top level of the custom hook, not inside handleBoxClick
-    const messageReportedRef = useRef(false);
-
-    const refreshDailyLock = useCallback(() => {
-        if (!userData) {
-            setIsDailyLocked(false);
-            setNextAvailableAt(null);
-            return;
+    // Derive daily lock from userData with SSR hydration safety
+    const { isDailyLocked, nextAvailableAt } = useMemo(() => {
+        if (!isMounted || !userData?.lastBoxOpenDate) {
+            return { isDailyLocked: false, nextAvailableAt: null };
         }
 
         const now = new Date();
-        const lastOpenDateStr = userData.lastBoxOpenDate ? new Date(userData.lastBoxOpenDate).toDateString() : null;
+        const lastOpenDateStr = new Date(userData.lastBoxOpenDate).toDateString();
         const todayStr = now.toDateString();
 
         if (lastOpenDateStr === todayStr) {
-            setIsDailyLocked(true);
-            const nextMidnight = getNextMidnight(now);
-            setNextAvailableAt(nextMidnight.getTime());
-        } else {
-            setIsDailyLocked(false);
-            setNextAvailableAt(null);
+            return {
+                isDailyLocked: true,
+                nextAvailableAt: getNextMidnight(now).getTime(),
+            };
         }
-    }, [userData]);
 
-    useEffect(() => {
-        refreshDailyLock();
-    }, [refreshDailyLock]);
+        return { isDailyLocked: false, nextAvailableAt: null };
+    }, [isMounted, userData]);
+
+    // Backward compatible callback
+    const refreshDailyLock = useCallback(() => {
+        // Daily lock status is automatically derived from userData.lastBoxOpenDate
+    }, []);
+
+    // FIX: hook must be at top level of the custom hook, not inside handleBoxClick
+    const messageReportedRef = useRef(false);
 
     useEffect(() => {
         if (setRevealedCatId) {
@@ -304,8 +310,6 @@ export function useCatLogic({
                     if (!options?.ignoreLock) {
                         const now = new Date();
                         setUserData(prev => ({ ...prev, lastBoxOpenDate: now.toISOString() }));
-                        setIsDailyLocked(true);
-                        setNextAvailableAt(getNextMidnight(now).getTime());
                     }
                 }, 800);
             }, 1400);
@@ -337,8 +341,6 @@ export function useCatLogic({
     );
 
     const overrideDailyLock = useCallback(() => {
-        setIsDailyLocked(false);
-        setNextAvailableAt(null);
         setUserData(prev => ({ ...prev, lastBoxOpenDate: undefined }));
         resetState();
     }, [resetState, setUserData]);

@@ -3,7 +3,7 @@
 
 import * as React from 'react';
 import { useState } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { playFeedback } from '@/lib/audio';
@@ -29,7 +29,12 @@ export function NicknameDialog({ isOpen, onOpenChange, onNicknameSet }: Nickname
     return (
         <Dialog open={isOpen} onOpenChange={onOpenChange}>
             <DialogContent>
-                <DialogTitle>Create your nickname</DialogTitle>
+                <DialogHeader>
+                    <DialogTitle>Create your nickname</DialogTitle>
+                    <DialogDescription>
+                        Choose a nickname to identify yourself in your quantum journey.
+                    </DialogDescription>
+                </DialogHeader>
                 <form onSubmit={handleNicknameSubmit} className="space-y-4">
                     <Input
                         placeholder="Enter your nickname..."

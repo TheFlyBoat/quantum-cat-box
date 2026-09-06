@@ -1,54 +1,16 @@
 'use client';
 
 import Image from 'next/image';
+import { useEffect, useState } from 'react';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import catData from '@/lib/cat-data.json';
+import { catComponentMap } from '@/lib/cat-components';
 import { useCatCollection } from '@/context/cat-collection-context';
-import {
-    GingerCatIcon,
-    GhostCatIcon,
-    ShadowCatIcon,
-    BonesCatIcon,
-    IdentityCrisisCatIcon,
-    AltCat,
-    BreuCatIcon,
-    ZumbiCatIcon,
-    BlizzardCatIcon,
-    VoodooCatIcon,
-    SleepyCatIcon,
-    HologramCatIcon,
-    GravityCatIcon,
-    GlitchCatIcon,
-    VampyCatIcon,
-    WonderCatIcon,
-    AnomalyCatIcon,
-    CatankhamunCatIcon,
-    CloudCatIcon,
-    CosmicCatIcon,
-    DominoCatIcon,
-    MysticCatIcon,
-    ParadoxCatIcon,
-    PixelCatIcon,
-    SharkCatIcon,
-    SneekyCatIcon,
-    SnowballCatIcon,
-    CursedCatIcon,
-    FrankCatIcon,
-    PharaohCatIcon,
-    PlagueCatIcon,
-    ReaperCatIcon,
-    ScarecrowCatIcon,
-} from '@/components/cats';
-import { useEffect, useMemo, useState } from 'react';
-import { cn } from '@/lib/utils';
 import { CatProfileDialog } from '@/components/features/cat-profile-dialog';
 import { useAuth } from '@/context/auth-context';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import badgeData from '@/lib/badge-data.json';
-import { useBadges } from '@/context/badge-context';
-import { BadgeCard } from '@/components/features/BadgeCard';
-import { badgeImageMap, defaultBadgeImage } from '@/lib/badge-images';
+import { cn } from '@/lib/utils';
 
 type CatInfo = {
     id: string;
@@ -70,44 +32,6 @@ type GalleryEntry = CatInfo | PlaceholderEntry;
 const isPlaceholderEntry = (entry: GalleryEntry): entry is PlaceholderEntry =>
     'placeholder' in entry && entry.placeholder === true;
 
-const catComponentMap: { [key: string]: React.ComponentType<{ className?: string }> } = {
-    'ginger': GingerCatIcon,
-    'ghost': GhostCatIcon,
-    'paradox': ParadoxCatIcon,
-    'shadow': ShadowCatIcon,
-    'bones': BonesCatIcon,
-    'identity-crisis': IdentityCrisisCatIcon,
-    'alt': AltCat,
-    'breu': BreuCatIcon,
-    'zumbi': ZumbiCatIcon,
-    'blizzard': BlizzardCatIcon,
-    'voodoo': VoodooCatIcon,
-    'sleepy': SleepyCatIcon,
-    'hologram': HologramCatIcon,
-    'gravity': GravityCatIcon,
-    'vampy': VampyCatIcon,
-    'wonder': WonderCatIcon,
-    'glitch': GlitchCatIcon,
-    'anomaly': AnomalyCatIcon,
-    'catankhamun': CatankhamunCatIcon,
-    'cloud': CloudCatIcon,
-    'cosmic': CosmicCatIcon,
-    'domino': DominoCatIcon,
-    'mystic': MysticCatIcon,
-    'pixel': PixelCatIcon,
-    'shark': SharkCatIcon,
-    'sneeky': SneekyCatIcon,
-    'snowball': SnowballCatIcon,
-    'cursed': CursedCatIcon,
-    'frank': FrankCatIcon,
-    'pharaoh': PharaohCatIcon,
-    'plague': PlagueCatIcon,
-    'reaper': ReaperCatIcon,
-    'scarecrow': ScarecrowCatIcon,
-};
-
-
-
 export default function GalleryPage() {
     const allCats = catData.cats as CatInfo[];
     
@@ -122,23 +46,8 @@ export default function GalleryPage() {
     const groupOrder = ['Alive', 'Dead', 'Paradox'];
 
     const { isUnlocked } = useCatCollection();
-    const { isBadgeUnlocked } = useBadges();
-    const badges = badgeData.badges as { id: string; name: string; description: string; icon: string }[];
-    const [selectedCat, setSelectedCat] = useState<any | null>(null);
+    const [selectedCat, setSelectedCat] = useState<CatInfo | null>(null);
     const { storageMode, maybeShowLoginPrompt } = useAuth();
-
-    const awardsDisplay = useMemo(() => {
-        const placeholdersNeeded = Math.max(0, 12 - badges.length);
-        return [
-            ...badges,
-            ...Array.from({ length: placeholdersNeeded }, (_, index) => ({
-                id: `placeholder-award-${index}`,
-                name: '???',
-                description: 'A mysterious award waiting to be discovered.',
-                icon: '',
-            })),
-        ];
-    }, [badges]);
 
     useEffect(() => {
         if (storageMode === 'local') {
@@ -146,13 +55,13 @@ export default function GalleryPage() {
         }
     }, [storageMode, maybeShowLoginPrompt]);
 
-    const handleCatClick = (cat: any) => {
+    const handleCatClick = (cat: CatInfo) => {
         if (isUnlocked(cat.id)) {
             setSelectedCat(cat);
         } else if (storageMode === 'local') {
             maybeShowLoginPrompt('gallery');
         }
-    }
+    };
 
     const renderLockedSilhouette = () => (
         <div className="relative flex h-full w-full items-center justify-center">
@@ -174,7 +83,6 @@ export default function GalleryPage() {
         Alive: 'bg-emerald-300/80 text-emerald-900 dark:bg-emerald-700 dark:text-emerald-100',
         Dead: 'bg-orange-300/80 text-orange-900 dark:bg-orange-700 dark:text-orange-100',
         Paradox: 'bg-violet-300/80 text-violet-900 dark:bg-violet-700 dark:text-violet-100',
-        Awards: 'bg-pink-300/80 text-pink-900 dark:bg-pink-700 dark:text-pink-100',
     };
 
     return (

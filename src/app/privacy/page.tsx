@@ -16,7 +16,7 @@ export default function PrivacyPage() {
           <section>
             <h2 className="mb-3 font-headline text-xl font-bold text-foreground">1. Introduction</h2>
             <p>
-              Welcome to <strong>The Quantum Cat</strong> ("we," "our," or "us"). We respect your privacy and are committed to protecting your personal data. This policy explains how we handle your information when you play our game.
+              Welcome to <strong>The Quantum Cat</strong> (&ldquo;we,&rdquo; &ldquo;our,&rdquo; or &ldquo;us&rdquo;). We respect your privacy and are committed to protecting your personal data. This policy explains how we handle your information when you play our game.
             </p>
           </section>
 
@@ -45,7 +45,7 @@ export default function PrivacyPage() {
             <p>We utilize trusted third-party services to run our app:</p>
             <ul className="list-disc pl-5 space-y-1 mt-2">
               <li><strong>Google Firebase:</strong> For authentication, database, and hosting.</li>
-              <li><strong>Google Gemini (via Genkit):</strong> For generating the creative "Quantum Messages".</li>
+              <li><strong>Google Gemini (via Genkit):</strong> For generating the creative &ldquo;Quantum Messages&rdquo;.</li>
             </ul>
             <p className="mt-2">These providers process data on our behalf and are subject to strict confidentiality agreements.</p>
           </section>
@@ -53,7 +53,7 @@ export default function PrivacyPage() {
           <section>
             <h2 className="mb-3 font-headline text-xl font-bold text-foreground">5. Your Rights</h2>
             <p>
-              You can request the deletion of your account and all associated data at any time. Currently, you can do this by contacting us directly or using the "Delete Account" feature in settings (if available).
+              You can request the deletion of your account and all associated data at any time. Currently, you can do this by contacting us directly or using the &ldquo;Delete Account&rdquo; feature in settings (if available).
             </p>
           </section>
 

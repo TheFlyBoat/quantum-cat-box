@@ -26,7 +26,7 @@ import { IntroOverlay } from '@/components/features/intro-overlay';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Loader2 } from 'lucide-react';
 
-export default function HomePage({ onInteraction, setRevealedCatId }: { onInteraction?: () => void; setRevealedCatId?: (id: string | null) => void; }) {
+export default function HomePage() {
     const [showOnboarding, setShowOnboarding] = useState(false);
     const [isAmbientShaking, setIsAmbientShaking] = useState(false);
     const [isShareDialogOpen, setIsShareDialogOpen] = useState(false);
@@ -70,13 +70,9 @@ export default function HomePage({ onInteraction, setRevealedCatId }: { onIntera
         refreshDailyLock,
         overrideDailyLock,
     } = useCatLogic({
-        onInteraction,
-        onShareAssetCreated: (asset) => {
-            // Legacy callback, unused now but kept for compatibility if needed
-        },
+        onShareAssetCreated: () => {},
         setRevealedCatId: (id) => {
             setCurrentCatId(id);
-            setRevealedCatId?.(id);
         },
         onCatReveal: (catId: string, _revealedMessage: string) => {
             setCurrentCatId(catId);
@@ -95,7 +91,7 @@ export default function HomePage({ onInteraction, setRevealedCatId }: { onIntera
         setCatState,
         setMessage,
         setRevealedCatName,
-        setRevealedCatId
+        setRevealedCatId: setCurrentCatId,
     });
 
     const revealedCatId = catState?.catId;
@@ -162,7 +158,7 @@ export default function HomePage({ onInteraction, setRevealedCatId }: { onIntera
 
         toast({
             title: 'Progress saved locally',
-            description: 'Your cats and fortunes are saved on this device.',
+            description: 'Your cats and Quantum Messages are saved on this device.',
         });
         markLocalMessageSeen();
     }, [storageMode, localProgressMessageSeen, catState?.outcome, catState?.catId, toast, markLocalMessageSeen]);
@@ -243,7 +239,7 @@ export default function HomePage({ onInteraction, setRevealedCatId }: { onIntera
         if (revealedCatName) {
             return `I opened the box and my cat is a ${revealedCatName}! What destiny will you reveal?`;
         }
-        return 'I opened the mystery box! What destiny will you reveal?';
+        return 'I opened the Quantum Box! What destiny will you reveal?';
     }, [revealedCatName]);
 
     const nativeShareAvailable = useMemo(() => {
@@ -294,15 +290,9 @@ export default function HomePage({ onInteraction, setRevealedCatId }: { onIntera
 
     const onShareRequest = async () => {
         playFeedback('click-2');
-        // Temporarily blocked for upgrades
-        // setIsShareDialogOpen(true);
-        // setShareFormat('story');
-        // await generateAssetForFormat('story');
-        
-        toast({
-            title: 'Share feature unavailable',
-            description: 'We are currently upgrading the sharing magic. Please check back later!',
-        });
+        setIsShareDialogOpen(true);
+        setShareFormat('story');
+        await generateAssetForFormat('story');
     };
 
     const handleFormatChange = async (value: string) => {
