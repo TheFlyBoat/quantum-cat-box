@@ -25,8 +25,9 @@ import { useAuth } from '@/context/auth-context';
 import { IntroOverlay } from '@/components/features/intro-overlay';
 import { usePoints } from '@/context/points-context';
 import { UnlockBoxDialog } from '@/components/features/unlock-box-dialog';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Loader2, Sparkles } from 'lucide-react';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Loader2, Sparkles, Check, Copy, Download, Share2 } from 'lucide-react';
+import { WhatsAppIcon, XTwitterIcon, InstagramIcon } from '@/components/icons/social-icons';
 
 export default function HomePage() {
     const [showOnboarding, setShowOnboarding] = useState(false);
@@ -36,6 +37,7 @@ export default function HomePage() {
     const [shareFormat, setShareFormat] = useState<'story' | 'square'>('story');
     const [isGeneratingShare, setIsGeneratingShare] = useState(false);
     const [hasShared, setHasShared] = useState(false);
+    const [hasCopiedLink, setHasCopiedLink] = useState(false);
     
     const [currentCatId, setCurrentCatId] = useState<string | null>(null);
     const [showSplash, setShowSplash] = useState(true);
@@ -239,12 +241,16 @@ export default function HomePage() {
         }
     };
 
+    const shareUrl = 'https://thequantumcat.app';
+
     const shareText = useMemo(() => {
-        if (revealedCatName) {
-            return `I opened the box and my cat is a ${revealedCatName}! What destiny will you reveal?`;
+        const outcomeWord = catState?.outcome ? catState.outcome.toUpperCase() : 'PARADOX';
+        const catTitle = revealedCatName || 'Quantum Cat';
+        if (message) {
+            return `My Quantum Cat is ${outcomeWord}: "${message}" 🐱✨ Open your box and reveal your destiny:`;
         }
-        return 'I opened the Quantum Box! What destiny will you reveal?';
-    }, [revealedCatName]);
+        return `I opened the Quantum Box and revealed the ${catTitle} (${outcomeWord})! 🐱✨ What destiny will you find?`;
+    }, [catState?.outcome, revealedCatName, message]);
 
     const nativeShareAvailable = useMemo(() => {
         return typeof navigator !== 'undefined' && typeof navigator.share === 'function';
@@ -290,10 +296,11 @@ export default function HomePage() {
         }
     }, [isDailyLocked, handleReset]);
 
-    const generateAssetForFormat = async (format: 'story' | 'square') => {
+    const generateAssetForFormat = useCallback(async (format: 'story' | 'square') => {
         setIsGeneratingShare(true);
         setShareAsset(null); // Clear previous asset while generating
         try {
+            await new Promise((resolve) => setTimeout(resolve, 80));
             const targetRef = format === 'story' ? storyRef : squareRef;
             const asset = await createShareAsset(targetRef);
             setShareAsset(asset);
@@ -302,12 +309,12 @@ export default function HomePage() {
             toast({
                 title: 'Error generating card',
                 description: 'Please try again.',
-                variant: 'destructive'
+                variant: 'destructive',
             });
         } finally {
             setIsGeneratingShare(false);
         }
-    };
+    }, [createShareAsset, toast]);
 
     const onShareRequest = async () => {
         playFeedback('click-2');
@@ -322,7 +329,130 @@ export default function HomePage() {
         await generateAssetForFormat(format);
     };
 
-    const handleNativeShare = async () => {
+    const handleDownloadShare = useCallback(() => {
+        if (!shareAsset) return;
+
+        try {
+            if (downloadAttributeSupported) {
+                const link = document.createElement('a');
+                link.href = shareAsset.dataUrl;
+                link.download = `the-quantum-cat-${shareFormat}.png`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            } else {
+                window.open(shareAsset.dataUrl, '_blank', 'noopener,noreferrer');
+            }
+
+            rewardShare();
+            setHasShared(true);
+            playFeedback('celebration-magic');
+            toast({
+                title: 'Card saved! 📥',
+                description: '10 Fish Points awarded. Share it with your friends!',
+            });
+        } catch (error) {
+            console.error('Failed to download share card:', error);
+            toast({
+                title: 'Download failed',
+                description: 'Try taking a screenshot or long-pressing the preview.',
+                variant: 'destructive',
+            });
+        }
+    }, [shareAsset, downloadAttributeSupported, shareFormat, rewardShare, toast]);
+
+    const handleCopyLink = useCallback(async () => {
+        try {
+            await navigator.clipboard.writeText(shareUrl);
+            setHasCopiedLink(true);
+            playFeedback('click-1');
+            toast({
+                title: 'Link copied! 📋',
+                description: 'Share https://thequantumcat.app with your friends!',
+            });
+            rewardShare();
+            setHasShared(true);
+            setTimeout(() => setHasCopiedLink(false), 2500);
+        } catch {
+            toast({
+                title: 'Failed to copy link',
+                description: 'Please copy https://thequantumcat.app manually.',
+                variant: 'destructive',
+            });
+        }
+    }, [rewardShare, toast]);
+
+    const handleWhatsAppShare = useCallback(() => {
+        const text = `${shareText}\n${shareUrl}`;
+        const whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
+        window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
+        rewardShare();
+        setHasShared(true);
+        playFeedback('celebration-magic');
+        toast({
+            title: 'Opening WhatsApp! 💬',
+            description: '+10 Fish Points awarded!',
+        });
+    }, [shareText, rewardShare, toast]);
+
+    const handleXShare = useCallback(() => {
+        const xUrl = `https://x.com/intent/post?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}&hashtags=${encodeURIComponent('TheQuantumCat,SchrodingersCat')}`;
+        window.open(xUrl, '_blank', 'noopener,noreferrer');
+        rewardShare();
+        setHasShared(true);
+        playFeedback('celebration-magic');
+        toast({
+            title: 'Opening X (Twitter)! 🐦',
+            description: '+10 Fish Points awarded!',
+        });
+    }, [shareText, rewardShare, toast]);
+
+    const handleInstagramShare = useCallback(async () => {
+        if (shareAsset && typeof navigator !== 'undefined' && typeof navigator.share === 'function') {
+            try {
+                if (navigator.canShare && navigator.canShare({ files: [shareAsset.file] })) {
+                    await navigator.share({
+                        files: [shareAsset.file],
+                        title: 'The Quantum Cat',
+                        text: shareText,
+                        url: shareUrl,
+                    });
+                    rewardShare();
+                    setHasShared(true);
+                    playFeedback('celebration-magic');
+                    toast({
+                        title: 'Shared!',
+                        description: '+10 Fish Points awarded!',
+                    });
+                    return;
+                }
+            } catch (error) {
+                if (error instanceof DOMException && error.name === 'AbortError') {
+                    return;
+                }
+                console.warn('Native share with file failed, proceeding to fallback:', error);
+            }
+        }
+
+        // Fallback for Instagram (save card and copy text)
+        if (shareAsset) {
+            handleDownloadShare();
+            try {
+                await navigator.clipboard.writeText(`${shareText}\n${shareUrl}`);
+                toast({
+                    title: 'Ready for Instagram! 📸',
+                    description: 'Image saved and caption copied! Open Instagram to post.',
+                });
+            } catch {
+                toast({
+                    title: 'Image saved! 📸',
+                    description: 'Open Instagram and share the card from your photos!',
+                });
+            }
+        }
+    }, [shareAsset, shareText, rewardShare, handleDownloadShare, toast]);
+
+    const handleNativeShare = useCallback(async () => {
         if (!shareAsset) return;
         if (!nativeShareAvailable) {
             toast({
@@ -334,30 +464,33 @@ export default function HomePage() {
         }
 
         try {
-            if (typeof navigator.canShare === 'function' && !navigator.canShare({ files: [shareAsset.file] })) {
-                throw new Error('Unsupported share type');
+            const canShareFile = typeof navigator.canShare === 'function' && navigator.canShare({ files: [shareAsset.file] });
+            if (canShareFile) {
+                await navigator.share({
+                    title: 'The Quantum Cat',
+                    text: shareText,
+                    files: [shareAsset.file],
+                    url: shareUrl,
+                });
+            } else {
+                await navigator.share({
+                    title: 'The Quantum Cat',
+                    text: shareText,
+                    url: shareUrl,
+                });
             }
-
-            await navigator.share({
-                title: 'The Quantum Cat',
-                text: shareText,
-                files: [shareAsset.file],
-                url: 'https://thequantumcat.app',
-            });
 
             rewardShare();
             setHasShared(true);
+            playFeedback('celebration-magic');
             toast({
+                title: 'Shared successfully! 🎉',
                 description: '10 Fish Points awarded.',
             });
             setIsShareDialogOpen(false);
             setShareAsset(null);
         } catch (error) {
             if (error instanceof DOMException && error.name === 'AbortError') {
-                toast({
-                    title: 'Share canceled',
-                    description: 'No worries—try again whenever you like.',
-                });
                 return;
             }
 
@@ -368,40 +501,7 @@ export default function HomePage() {
                 variant: 'destructive',
             });
         }
-    };
-
-    const handleDownloadShare = () => {
-        if (!shareAsset) return;
-
-        try {
-            if (downloadAttributeSupported) {
-                const link = document.createElement('a');
-                link.href = shareAsset.dataUrl;
-                link.download = `quantum-cat-${shareFormat}.png`;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-            } else {
-                window.open(shareAsset.dataUrl, '_blank', 'noopener,noreferrer');
-            }
-
-            rewardShare();
-            setHasShared(true);
-            toast({
-                title: 'Image saved!',
-                description: '10 Fish Points awarded. Share it from your gallery.',
-            });
-            setIsShareDialogOpen(false);
-            setShareAsset(null);
-        } catch (error) {
-            console.error('Failed to download share card:', error);
-            toast({
-                title: 'Download failed',
-                description: 'Try long-pressing the image or taking a screenshot.',
-                variant: 'destructive',
-            });
-        }
-    };
+    }, [shareAsset, nativeShareAvailable, shareText, rewardShare, toast]);
 
     const closeShareDialog = () => {
         setIsShareDialogOpen(false);
@@ -416,15 +516,15 @@ export default function HomePage() {
                 <SplashScreen onComplete={handleSplashComplete} />
             ) : (
                 <>
-                                    {/* Hidden Share Cards */}
-                                    <div className="absolute left-[-9999px] top-[-9999px] overflow-hidden">
-                                        <div ref={storyRef} style={{ width: '1080px', height: '1920px' }}>
-                                            <ShareCard catState={catState} message={message} boxSkin={selectedSkin} format="story" userName={userNickname} />
-                                        </div>
-                                        <div ref={squareRef} style={{ width: '1080px', height: '1080px' }}>
-                                            <ShareCard catState={catState} message={message} boxSkin={selectedSkin} format="square" userName={userNickname} />
-                                        </div>
-                                    </div>    
+                    {/* Hidden Share Cards Container - off-screen snapshot source */}
+                    <div className="fixed left-[-9999px] top-0 pointer-events-none opacity-0 overflow-hidden" aria-hidden="true">
+                        <div ref={storyRef} style={{ width: '540px', height: '960px' }}>
+                            <ShareCard catState={catState} message={message} boxSkin={selectedSkin} format="story" userName={userNickname} />
+                        </div>
+                        <div ref={squareRef} style={{ width: '600px', height: '600px' }}>
+                            <ShareCard catState={catState} message={message} boxSkin={selectedSkin} format="square" userName={userNickname} />
+                        </div>
+                    </div>    
                     <div className="mx-auto flex w-full max-w-full flex-col items-center text-center">
                         <TitleDisplay name={revealedCatName} onTitleClick={handleTitleClick} reduceMotion={reduceMotion} />
 
@@ -517,49 +617,135 @@ export default function HomePage() {
                             closeShareDialog();
                         }
                     }}>
-                        <DialogContent className="sm:max-w-md flex flex-col gap-0 p-0 overflow-hidden">
-                            <DialogHeader className="p-6 pb-2">
-                                <DialogTitle>Share your destiny</DialogTitle>
-                                <DialogDescription>
-                                    Choose a format to share.
+                        <DialogContent className="max-w-sm sm:max-w-md max-h-[92vh] overflow-y-auto flex flex-col gap-0 p-0 rounded-3xl border border-border/60 bg-background/95 backdrop-blur-md shadow-2xl">
+                            <DialogHeader className="p-5 pb-2 text-center sm:text-left">
+                                <DialogTitle className="text-xl font-headline tracking-wide flex items-center gap-2 justify-center sm:justify-start">
+                                    <Sparkles className="h-5 w-5 text-primary animate-pulse" />
+                                    Share Your Destiny
+                                </DialogTitle>
+                                <DialogDescription className="text-xs text-muted-foreground">
+                                    Share your Quantum Message and earn <strong className="text-primary font-bold">+10 Fish Points</strong>! 🐟
                                 </DialogDescription>
                             </DialogHeader>
-                            
-                            <div className="p-6 pt-2">
+
+                            <div className="p-5 pt-2 flex flex-col gap-3">
                                 <Tabs defaultValue="story" value={shareFormat} onValueChange={handleFormatChange} className="w-full">
-                                    <TabsList className="grid w-full grid-cols-2 mb-4">
-                                        <TabsTrigger value="story">Story (9:16)</TabsTrigger>
-                                        <TabsTrigger value="square">Post (1:1)</TabsTrigger>
+                                    <TabsList className="grid w-full grid-cols-2 mb-3 rounded-2xl p-1 bg-muted/60">
+                                        <TabsTrigger value="story" className="rounded-xl font-semibold text-xs py-1.5 transition-all data-[state=active]:bg-background data-[state=active]:shadow-sm">
+                                            Story (9:16)
+                                        </TabsTrigger>
+                                        <TabsTrigger value="square" className="rounded-xl font-semibold text-xs py-1.5 transition-all data-[state=active]:bg-background data-[state=active]:shadow-sm">
+                                            Post (1:1)
+                                        </TabsTrigger>
                                     </TabsList>
 
-                                    <div className="relative w-full aspect-[9/16] max-h-[50vh] bg-muted/30 rounded-lg overflow-hidden border flex items-center justify-center">
-                                         {isGeneratingShare && (
-                                             <div className="absolute inset-0 flex items-center justify-center bg-background/50 backdrop-blur-sm z-20">
-                                                 <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                                             </div>
-                                         )}
-                                         
-                                         {shareAsset ? (
-                                             <Image
-                                                 src={shareAsset.dataUrl}
-                                                 alt="Preview"
-                                                 fill
-                                                 className="object-contain"
-                                             />
-                                         ) : (
-                                             !isGeneratingShare && <span className="text-muted-foreground text-sm">Preview unavailable</span>
-                                         )}
+                                    {/* Card Preview Container */}
+                                    <div className="relative mx-auto flex items-center justify-center rounded-2xl border border-border/40 bg-black/5 dark:bg-white/5 p-2 shadow-inner overflow-hidden min-h-[220px] max-h-[250px] w-full">
+                                        {isGeneratingShare && (
+                                            <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-background/75 backdrop-blur-sm z-20">
+                                                <Loader2 className="h-7 w-7 animate-spin text-primary" />
+                                                <span className="text-xs font-semibold text-muted-foreground animate-pulse">Crafting quantum card…</span>
+                                            </div>
+                                        )}
+
+                                        {shareAsset ? (
+                                            <div
+                                                className="relative mx-auto h-[210px] transition-all duration-300"
+                                                style={{
+                                                    width: shareFormat === 'story' ? '118px' : '210px',
+                                                    aspectRatio: shareFormat === 'story' ? '9/16' : '1/1',
+                                                }}
+                                            >
+                                                <Image
+                                                    src={shareAsset.dataUrl}
+                                                    alt="Quantum Destiny Preview"
+                                                    fill
+                                                    unoptimized
+                                                    className="object-contain rounded-lg shadow-md"
+                                                />
+                                            </div>
+                                        ) : (
+                                            !isGeneratingShare && (
+                                                <span className="text-muted-foreground text-xs">Preview unavailable</span>
+                                            )
+                                        )}
                                     </div>
 
-                                    <div className="mt-6 flex flex-col gap-3">
+                                    {/* Primary 1-Click Social Sharing Actions */}
+                                    <div className="mt-3.5 flex flex-col gap-2">
+                                        {/* WhatsApp */}
+                                        <Button
+                                            onClick={handleWhatsAppShare}
+                                            disabled={!shareAsset || isGeneratingShare}
+                                            className="w-full rounded-2xl bg-[#25D366] hover:bg-[#20bd5a] text-white font-semibold shadow-sm transition-all hover:scale-[1.01] flex items-center justify-center gap-2 h-10 text-sm"
+                                        >
+                                            <WhatsAppIcon className="h-4 w-4 fill-current" />
+                                            <span>Share on WhatsApp</span>
+                                        </Button>
+
+                                        {/* X (Twitter) */}
+                                        <Button
+                                            onClick={handleXShare}
+                                            disabled={!shareAsset || isGeneratingShare}
+                                            className="w-full rounded-2xl bg-black hover:bg-neutral-800 text-white dark:bg-white dark:text-black dark:hover:bg-neutral-200 font-semibold shadow-sm transition-all hover:scale-[1.01] flex items-center justify-center gap-2 h-10 text-sm"
+                                        >
+                                            <XTwitterIcon className="h-3.5 w-3.5 fill-current" />
+                                            <span>Post to X (Twitter)</span>
+                                        </Button>
+
+                                        {/* Instagram */}
+                                        <Button
+                                            onClick={handleInstagramShare}
+                                            disabled={!shareAsset || isGeneratingShare}
+                                            className="w-full rounded-2xl bg-gradient-to-r from-[#833ab4] via-[#fd1d1d] to-[#fcb045] hover:opacity-95 text-white font-semibold shadow-sm transition-all hover:scale-[1.01] flex items-center justify-center gap-2 h-10 text-sm"
+                                        >
+                                            <InstagramIcon className="h-4 w-4 fill-current" />
+                                            <span>Share to Instagram</span>
+                                        </Button>
+
+                                        {/* Secondary Actions: Copy Link & Save Image */}
+                                        <div className="grid grid-cols-2 gap-2 pt-1">
+                                            <Button
+                                                variant="outline"
+                                                onClick={handleCopyLink}
+                                                className="rounded-2xl border-border/60 hover:bg-muted/50 font-medium text-xs flex items-center justify-center gap-1.5 h-9"
+                                            >
+                                                {hasCopiedLink ? (
+                                                    <>
+                                                        <Check className="h-3.5 w-3.5 text-emerald-500" />
+                                                        <span className="text-emerald-600 dark:text-emerald-400 font-semibold">Copied!</span>
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <Copy className="h-3.5 w-3.5 text-muted-foreground" />
+                                                        <span>Copy Link</span>
+                                                    </>
+                                                )}
+                                            </Button>
+
+                                            <Button
+                                                variant="outline"
+                                                onClick={handleDownloadShare}
+                                                disabled={!shareAsset || isGeneratingShare}
+                                                className="rounded-2xl border-border/60 hover:bg-muted/50 font-medium text-xs flex items-center justify-center gap-1.5 h-9"
+                                            >
+                                                <Download className="h-3.5 w-3.5 text-muted-foreground" />
+                                                <span>Save Image</span>
+                                            </Button>
+                                        </div>
+
+                                        {/* Device Share Sheet (Native fallback) */}
                                         {nativeShareAvailable && (
-                                            <Button onClick={handleNativeShare} className="w-full" disabled={!shareAsset || isGeneratingShare}>
-                                                Share via device…
+                                            <Button
+                                                variant="ghost"
+                                                onClick={handleNativeShare}
+                                                disabled={!shareAsset || isGeneratingShare}
+                                                className="w-full rounded-xl text-xs text-muted-foreground hover:text-foreground h-7"
+                                            >
+                                                <Share2 className="h-3 w-3 mr-1" />
+                                                More sharing options…
                                             </Button>
                                         )}
-                                        <Button variant="outline" onClick={handleDownloadShare} className="w-full" disabled={!shareAsset || isGeneratingShare}>
-                                            Save image
-                                        </Button>
                                     </div>
                                 </Tabs>
                             </div>

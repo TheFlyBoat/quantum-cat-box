@@ -44,8 +44,9 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: 'The Quantum Cat',
-  description: 'Open the box, if you dare.',
+  metadataBase: new URL('https://thequantumcat.app'),
+  title: 'The Quantum Cat — Daily Schrödinger Observation Game',
+  description: 'Open your daily Quantum Box to discover whether your cat is alive, dead, or in a state of paradox — and receive unique philosophical wisdom.',
   manifest: '/manifest.json',
   icons: {
     icon: [
@@ -53,6 +54,28 @@ export const metadata: Metadata = {
       { url: '/favicon.png?v=2', type: 'image/png', sizes: '512x512' },
     ],
     apple: [{ url: '/apple-touch-icon.png?v=2', sizes: '180x180' }],
+  },
+  openGraph: {
+    type: 'website',
+    locale: 'en_US',
+    url: 'https://thequantumcat.app',
+    siteName: 'The Quantum Cat',
+    title: 'The Quantum Cat — Daily Schrödinger Observation Game',
+    description: 'Is the cat alive, dead, or in a state of paradox? Open the Quantum Box once a day and receive unique philosophical wisdom.',
+    images: [
+      {
+        url: '/favicon.png?v=2',
+        width: 512,
+        height: 512,
+        alt: 'The Quantum Cat',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary',
+    title: 'The Quantum Cat — Daily Schrödinger Observation Game',
+    description: 'Open your daily Quantum Box to discover whether your cat is alive, dead, or in a state of paradox.',
+    images: ['/favicon.png?v=2'],
   },
 };
 
