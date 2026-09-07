@@ -1,5 +1,10 @@
 import nextConfig from 'eslint-config-next';
 
-const config = [...nextConfig];
+const config = [
+  {
+    ignores: ['.firebase/**', '.next/**', 'node_modules/**'],
+  },
+  ...nextConfig,
+];
 
 export default config;

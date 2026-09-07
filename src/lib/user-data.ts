@@ -40,9 +40,6 @@ export interface UserData {
 }
 
 export const defaultUserData: UserData = {
-  nickname: undefined,
-  lastObservationDate: undefined,
-  lastBoxOpenDate: undefined,
   streak: 0,
   totalObservations: 0,
   unlockedBadges: [],
@@ -61,15 +58,37 @@ export const defaultUserData: UserData = {
   },
 };
 
+/**
+ * Recursively removes undefined fields from an object so Firestore setDoc / updateDoc
+ * never throws "Unsupported field value: undefined".
+ */
+export function sanitizeForFirestore<T>(data: T): T {
+  if (data === null || typeof data !== 'object') {
+    return data;
+  }
+  if (Array.isArray(data)) {
+    return data.map((item) => sanitizeForFirestore(item)) as unknown as T;
+  }
+  const clean: Record<string, unknown> = {};
+  for (const [key, value] of Object.entries(data as Record<string, unknown>)) {
+    if (value !== undefined) {
+      clean[key] = sanitizeForFirestore(value);
+    }
+  }
+  return clean as T;
+}
+
 export async function saveUserData(userId: string, data: Partial<UserData>): Promise<void> {
   const userDocRef = doc(db, 'users', userId);
-  await setDoc(userDocRef, data, { merge: true });
+  const cleanData = sanitizeForFirestore(data);
+  await setDoc(userDocRef, cleanData, { merge: true });
 }
 
 export async function resetUserData(userId: string): Promise<void> {
   try {
     const userDocRef = doc(db, 'users', userId);
-    await setDoc(userDocRef, defaultUserData);
+    const cleanData = sanitizeForFirestore(defaultUserData);
+    await setDoc(userDocRef, cleanData);
   } catch (error) {
     console.error('Error resetting user data:', error);
   }

@@ -97,7 +97,7 @@ export function QuantumCatBox({
       onClick={handleClick}
       disabled={isLoading || isOpen}
       className={cn(
-        'group relative h-52 w-52 md:h-56 md:w-56 p-0 hover:bg-transparent rounded-2xl transition-transform duration-300 ease-out focus:outline-none focus-visible:ring-4 focus-visible:ring-[#A240FF] focus-visible:ring-offset-4 focus-visible:ring-offset-background [&_svg]:!size-auto disabled:opacity-100',
+        'group relative h-52 w-52 md:h-56 md:w-56 p-0 hover:bg-transparent rounded-2xl transition-transform duration-300 ease-out focus:outline-none focus-visible:ring-4 focus-visible:ring-[#A240FF] focus-visible:ring-offset-4 focus-visible:ring-offset-background [&_svg]:size-full disabled:opacity-100',
         !isOpen && !isLoading && !isLocked && 'hover:scale-105',
         isLoading && !reduceMotion && 'animate-shake',
         isAmbientShaking && !reduceMotion && 'animate-subtle-shake',
@@ -108,7 +108,9 @@ export function QuantumCatBox({
       aria-label={isLocked ? 'Quantum Box locked until tomorrow' : 'Open the Quantum Box'}
       aria-disabled={isLoading || isOpen}
     >
-      <BoxComponent className="h-52 w-52 md:h-56 md:w-56" isOpen={isOpen} />
+      <div className="relative h-full w-full flex items-center justify-center">
+        <BoxComponent className="h-full w-full" isOpen={isOpen} />
+      </div>
 
       {/* Always show cat if revealed, even if locked */}
       {catState.outcome !== 'initial' && catState.catId && !isGravityCat && (
@@ -135,7 +137,7 @@ export function QuantumCatBox({
       {showLockFeedback && (
         <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 rounded-2xl bg-background/60 backdrop-blur-[2px] animate-in fade-in zoom-in duration-300">
           <div className="flex h-12 w-12 items-center justify-center rounded-full bg-background/90 shadow-sm">
-            <Lock className="h-6 w-6 text-rose-500" />
+            <Lock className="!size-6 text-rose-500" />
           </div>
           <span className="rounded-xl bg-background/90 px-3 py-2 text-[10px] font-bold uppercase tracking-widest text-rose-500 shadow-sm text-center leading-tight max-w-[80%]">
             The Box is closed for now.<br/>Come back tomorrow!
