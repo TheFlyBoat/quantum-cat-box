@@ -33,6 +33,7 @@ interface QuantumCatBoxProps {
   catState: CatState;
   isLocked?: boolean;
   lockMessage?: string;
+  onUnlockRequested?: () => void;
 }
 
 type BoxComponentProps = {
@@ -66,6 +67,7 @@ export function QuantumCatBox({
   isAmbientShaking,
   isLocked = false,
   lockMessage,
+  onUnlockRequested,
 }: QuantumCatBoxProps) {
   const { selectedSkin } = useBoxSkin();
   const { reduceMotion } = useFeedback();
@@ -78,12 +80,12 @@ export function QuantumCatBox({
 
   const handleClick = () => {
     if (isLocked) {
+      if (onUnlockRequested) {
+        onUnlockRequested();
+        return;
+      }
       setShowLockFeedback(true);
       setTimeout(() => setShowLockFeedback(false), 2000);
-      // Still trigger the parent onClick for audio feedback if needed, 
-      // but the parent might block it if disabled. 
-      // Actually, if isLocked is true, the button is disabled in the current code.
-      // We need to ENABLE the button even if locked, so we can capture the click.
       onClick(); 
     } else {
       onClick();

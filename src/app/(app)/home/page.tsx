@@ -23,8 +23,10 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/context/auth-context';
 import { IntroOverlay } from '@/components/features/intro-overlay';
+import { usePoints } from '@/context/points-context';
+import { UnlockBoxDialog } from '@/components/features/unlock-box-dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Sparkles } from 'lucide-react';
 
 export default function HomePage() {
     const [showOnboarding, setShowOnboarding] = useState(false);
@@ -46,6 +48,8 @@ export default function HomePage() {
     const squareRef = useRef<HTMLDivElement>(null);
 
     const { toast } = useToast();
+    const { points, spendPoints } = usePoints();
+    const [isUnlockDialogOpen, setIsUnlockDialogOpen] = useState(false);
     const { toggleDiaryEntry, isMessageSaved: isDiaryMessageSaved, recordReveal } = useDiary();
     const { lastUnlockedBadgeId, triggerCelebration } = useBadges();
     const { reduceMotion } = useFeedback();
@@ -254,20 +258,37 @@ export default function HomePage() {
         return typeof anchor.download !== 'undefined';
     }, []);
 
-    const handleRequestAnotherBox = useCallback(() => {
-        if (isDailyLocked) {
+    const handleUnlockWithPoints = useCallback(() => {
+        if (points < 10) {
             playFeedback('error-1');
             toast({
-                title: 'The Box is closed',
-                description: 'Come back tomorrow to reveal your destiny.',
+                title: 'Not enough Fish Points',
+                description: 'You need 10 Fish Points to unlock the Quantum Box.',
                 variant: 'destructive',
             });
-        } else {
-            handleReset({ ignoreLock: true });
+            return;
         }
+
+        spendPoints(10);
+        overrideDailyLock();
+        playFeedback('celebration-magic');
+        toast({
+            title: 'Quantum Box Unlocked!',
+            description: 'You spent 10 Fish Points. The Quantum Box is ready to open!',
+        });
         setLockNotice('');
         setPendingAutoOpen(false);
-    }, [isDailyLocked, handleReset, toast]);
+    }, [points, spendPoints, overrideDailyLock, toast]);
+
+    const handleRequestAnotherBox = useCallback(() => {
+        if (isDailyLocked) {
+            setIsUnlockDialogOpen(true);
+        } else {
+            handleReset({ ignoreLock: true });
+            setLockNotice('');
+            setPendingAutoOpen(false);
+        }
+    }, [isDailyLocked, handleReset]);
 
     const generateAssetForFormat = async (format: 'story' | 'square') => {
         setIsGeneratingShare(true);
@@ -427,8 +448,23 @@ export default function HomePage() {
                                 catState={catState}
                                 isAmbientShaking={isAmbientShaking}
                                 isLocked={isDailyLocked}
+                                onUnlockRequested={() => setIsUnlockDialogOpen(true)}
                             />
                         </div>
+
+                        {isDailyLocked && catState.outcome === 'initial' && (
+                            <div className="mt-2 flex justify-center">
+                                <Button
+                                    type="button"
+                                    size="sm"
+                                    onClick={() => setIsUnlockDialogOpen(true)}
+                                    className="rounded-2xl font-bold bg-gradient-to-r from-[#A240FF] to-[#3696C9] text-white shadow hover:opacity-95 px-4"
+                                >
+                                    <Sparkles className="mr-1.5 h-3.5 w-3.5" />
+                                    Unlock Box (10 Fish Points)
+                                </Button>
+                            </div>
+                        )}
 
                         <div className="mt-6 flex w-full flex-col items-center gap-6">
                             {catState.outcome !== 'initial' && (
@@ -436,12 +472,24 @@ export default function HomePage() {
                                     <QuantumMessageDisplay message={message} catState={catState} />
                                     {lockNotice && (
                                         <div className="mt-4 w-full max-w-2xl">
-                                            <div className="rounded-xl border border-emerald-400 bg-emerald-500/10 px-4 py-4">
-                                                <div className="font-fortune text-center text-emerald-400 text-xl font-semibold leading-tight md:text-2xl">
-                                                    {lockNotice.split('\n').map((line, index) => (
-                                                        <div key={index}>{line}</div>
-                                                    ))}
+                                            <div className="rounded-3xl border border-[#A240FF]/30 bg-[#A240FF]/10 px-5 py-4 flex flex-col sm:flex-row items-center justify-between gap-3 shadow-sm">
+                                                <div className="text-center sm:text-left">
+                                                    <p className="font-headline font-bold text-lg text-foreground">
+                                                        The Quantum Box is closed for today.
+                                                    </p>
+                                                    <p className="text-xs text-muted-foreground">
+                                                        Reopen it now with Fish Points or wait until tomorrow!
+                                                    </p>
                                                 </div>
+                                                <Button
+                                                    type="button"
+                                                    size="sm"
+                                                    onClick={() => setIsUnlockDialogOpen(true)}
+                                                    className="rounded-2xl font-bold bg-gradient-to-r from-[#A240FF] to-[#3696C9] text-white shadow-md hover:opacity-95 shrink-0 px-4 py-2"
+                                                >
+                                                    <Sparkles className="mr-1.5 h-3.5 w-3.5" />
+                                                    Unlock (10 Fish Points)
+                                                </Button>
                                             </div>
                                         </div>
                                     )}
@@ -517,6 +565,14 @@ export default function HomePage() {
                             </div>
                         </DialogContent>
                     </Dialog>
+
+                    <UnlockBoxDialog
+                        open={isUnlockDialogOpen}
+                        onOpenChange={setIsUnlockDialogOpen}
+                        currentPoints={points}
+                        cost={10}
+                        onConfirmUnlock={handleUnlockWithPoints}
+                    />
                 </>
             )}
         </>

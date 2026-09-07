@@ -12,6 +12,7 @@ import { playFeedback } from '@/lib/audio';
 import { useBoxSkin } from '@/context/box-skin-context';
 import { useTheme } from 'next-themes';
 import { useAuth } from '@/context/auth-context';
+import { saveUserData } from '@/lib/user-data';
 import { useShare, type ShareAsset } from './use-share';
 
 type OutcomePool = { title: string; cats: { id: string; rarity: number }[] };
@@ -129,7 +130,7 @@ export function useCatLogic({
     const { addPoints } = usePoints();
     const { selectedSkin } = useBoxSkin();
     const { setTheme } = useTheme();
-    const { user, userData, setUserData } = useAuth();
+    const { user, userData, setUserData, storageMode } = useAuth();
 
     // Derive daily lock from userData with SSR hydration safety
     const { isDailyLocked, nextAvailableAt } = useMemo(() => {
@@ -309,7 +310,11 @@ export function useCatLogic({
                     }
                     if (!options?.ignoreLock) {
                         const now = new Date();
-                        setUserData(prev => ({ ...prev, lastBoxOpenDate: now.toISOString() }));
+                        const isoDate = now.toISOString();
+                        setUserData(prev => ({ ...prev, lastBoxOpenDate: isoDate }));
+                        if (storageMode === 'cloud' && user && user !== 'guest') {
+                            void saveUserData(user.uid, { lastBoxOpenDate: isoDate });
+                        }
                     }
                 }, 800);
             }, 1400);
@@ -341,9 +346,17 @@ export function useCatLogic({
     );
 
     const overrideDailyLock = useCallback(() => {
-        setUserData(prev => ({ ...prev, lastBoxOpenDate: undefined }));
+        setUserData(prev => {
+            if (!prev) return prev;
+            const updated = { ...prev };
+            delete updated.lastBoxOpenDate;
+            return updated;
+        });
+        if (storageMode === 'cloud' && user && user !== 'guest') {
+            void saveUserData(user.uid, { lastBoxOpenDate: '' });
+        }
         resetState();
-    }, [resetState, setUserData]);
+    }, [resetState, setUserData, storageMode, user]);
 
     return {
         catState,
