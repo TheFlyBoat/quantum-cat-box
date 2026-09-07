@@ -3,7 +3,7 @@ import { cn } from '@/lib/utils';
 
 const VampyBat: FC<{ className?: string }> = ({ className }) => (
     <div className={cn('bat', className)}>
-        <svg viewBox="0 0 100 60" xmlns="http://www.w3.org/2000/svg">
+        <svg viewBox="0 0 100 60" xmlns="http://www.w3.org/2000/svg" className="w-full h-full overflow-visible">
             <g className="bat-guts">
                 <path className="bat-body" d="M40 15 L45 5 L50 15 C 40 30, 40 50, 50 55 C 60 50, 60 30, 50 15 L55 5 L60 15 Z" />
                 <path className="bat-wing bat-wing-left" d="M45 25 C 20 10, 5 40, 0 30 C 10 50, 30 55, 45 40 Z" />
@@ -26,9 +26,9 @@ export const VampyCatIcon = ({ className }: { className?: string }) => {
     const rightEye = '#fff';
 
     return (
-        <div className={cn('cat vampy cat--dead relative w-full h-full', className)}>
-            <div className="vampy-cat-form">
-                <svg className="h-full w-full" xmlns="http://www.w3.org/2000/svg" xmlSpace="preserve" fillRule="evenodd" clipRule="evenodd" imageRendering="optimizeQuality" shapeRendering="geometricPrecision" textRendering="geometricPrecision" viewBox="0 0 4566 3805">
+        <div className={cn('cat vampy cat--dead relative flex items-center justify-center overflow-visible w-full h-full min-w-0 min-h-0', className)}>
+            <div className="vampy-cat-form w-full h-full flex items-center justify-center overflow-visible">
+                <svg className="w-full h-full max-w-full max-h-full overflow-visible" xmlns="http://www.w3.org/2000/svg" xmlSpace="preserve" fillRule="evenodd" clipRule="evenodd" imageRendering="optimizeQuality" shapeRendering="geometricPrecision" textRendering="geometricPrecision" viewBox="0 0 4566 3805">
                     <g>
                         <path id="capeneck" d="M2317 962c556 0 1909 13 2249 559l-7 12c-28 8 1-2-15 6-132 89-920 597-1018 615-409 88-1850 134-2343 73-2-2-1149-695-1150-694 336-585 2091-571 2284-571" fill={capeRed}/>
                         <path id="headline" d="M3449 2585c230-186 312-364 360-640 33-193 6-414-37-606-37-165-90-325-166-477-207-412-411-579-835-712-221-69-430-92-660-57-307 48-595 166-813 388-199 203-341 516-412 790-80 307-103 681 28 977 35 79 81 151 139 216 11 12 19 26 29 40-3 4-6 8-10 12l2378 68z" fill={accentFill}/>
@@ -65,7 +65,7 @@ export const VampyCatIcon = ({ className }: { className?: string }) => {
                     </g>
                 </svg>
             </div>
-            <div className="vampy-bat-form">
+            <div className="vampy-bat-form absolute inset-0 pointer-events-none overflow-visible">
                 <VampyBat className="bat-1" />
                 <VampyBat className="bat-2" />
                 <VampyBat className="bat-main" />

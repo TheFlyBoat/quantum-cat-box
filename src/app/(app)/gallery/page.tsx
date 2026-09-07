@@ -219,13 +219,9 @@ export default function GalleryPage() {
                                                 </CardContent>
                                                 <CardFooter className="bg-background/60 p-2 text-center">
                                                     {unlocked ? (
-                                                        cat.id === 'vampy' ? (
-                                                            <span className="sr-only">{cat.name}</span>
-                                                        ) : (
-                                                            <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                                                                {cat.name}
-                                                            </p>
-                                                        )
+                                                        <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                                                            {cat.name}
+                                                        </p>
                                                     ) : (
                                                         <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">???</p>
                                                     )}
