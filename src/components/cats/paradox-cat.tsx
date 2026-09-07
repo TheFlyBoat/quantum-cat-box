@@ -12,12 +12,14 @@ const PARADOX_BASE_PROPS: CatComponentProps = {
 const PARADOX_STYLES = `
     .cat.paradox {
         aspect-ratio: 21164.08 / 18861.8;
+        overflow: visible !important;
     }
 
     .paradox-container {
         width: 100%;
         height: 100%;
         position: relative;
+        overflow: visible !important;
     }
 
     .paradox-cat {
@@ -27,6 +29,7 @@ const PARADOX_STYLES = `
         width: 100%;
         height: 100%;
         will-change: transform, opacity;
+        overflow: visible !important;
     }
 
     .paradox-main {

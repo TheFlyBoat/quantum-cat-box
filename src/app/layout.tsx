@@ -1,7 +1,8 @@
 
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
-import { Nunito, Patrick_Hand, Quicksand } from 'next/font/google';
+import { Nunito, Quicksand } from 'next/font/google';
+import localFont from 'next/font/local';
 import { cn } from '@/lib/utils';
 import { Toaster } from '@/components/ui/toaster';
 import { AuthProvider } from '@/context/auth-context';
@@ -21,11 +22,11 @@ const nunito = Nunito({
   display: 'swap',
 });
 
-const patrickHand = Patrick_Hand({
-  subsets: ['latin'],
-  weight: '400',
+const patrickHand = localFont({
+  src: '../../public/fonts/patrick-hand.woff2',
   variable: '--font-headline',
   display: 'swap',
+  fallback: ['Patrick Hand', 'cursive', 'sans-serif'],
 });
 
 const quicksand = Quicksand({

@@ -18,9 +18,9 @@ export default {
     },
     extend: {
       fontFamily: {
-        body: ['var(--font-body)', 'sans-serif'],
-        headline: ['var(--font-headline)', 'sans-serif'],
-        fortune: ['var(--font-fortune)', 'sans-serif'],
+        body: ['var(--font-body)', 'Nunito', 'sans-serif'],
+        headline: ['var(--font-headline)', 'Patrick Hand', 'cursive', 'sans-serif'],
+        fortune: ['var(--font-fortune)', 'Quicksand', 'sans-serif'],
         code: ['monospace'],
       },
       colors: {

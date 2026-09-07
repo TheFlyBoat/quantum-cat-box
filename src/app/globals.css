@@ -1,4 +1,14 @@
 
+@import url('https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Nunito:wght@400;500;600;700&family=Quicksand:wght@400;600&display=swap');
+
+@font-face {
+  font-family: 'Patrick Hand';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/patrick-hand.woff2') format('woff2');
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -40,6 +50,9 @@
     --chart-5: 278 34% 50%;
 
     --radius: 0.8rem;
+    --font-headline: 'Patrick Hand', cursive;
+    --font-body: 'Nunito', sans-serif;
+    --font-fortune: 'Quicksand', sans-serif;
   }
 
   .dark {
@@ -76,6 +89,9 @@
     --chart-3: 13 74% 58%;
     --chart-4: 200 65% 55%;
     --chart-5: 43 86% 58%;
+    --font-headline: 'Patrick Hand', cursive;
+    --font-body: 'Nunito', sans-serif;
+    --font-fortune: 'Quicksand', sans-serif;
   }
 
   .aurora {
@@ -161,7 +177,6 @@
     --chart-5: 152 62% 58%;
 
     --radius: 1.25rem;
-    --font-headline: var(--font-fortune);
   }
 
   .sunrise body {
@@ -207,11 +222,10 @@
     --chart-5: 200 58% 46%;
 
     --radius: 0.8rem;
-    --font-body: var(--font-headline);
   }
 
   .forest body {
-    font-family: var(--font-headline), var(--font-body), sans-serif;
+    font-family: var(--font-body), sans-serif;
     letter-spacing: 0.005em;
     background-image:
       linear-gradient(160deg, rgba(15, 118, 110, 0.25), rgba(21, 128, 61, 0.2)),
@@ -302,11 +316,10 @@
     --chart-5: 205 52% 48%;
 
     --radius: 1.8rem;
-    --font-body: var(--font-headline);
   }
 
   .retro body {
-    font-family: var(--font-headline), var(--font-body), sans-serif;
+    font-family: var(--font-body), sans-serif;
     background-image:
       linear-gradient(135deg, rgba(253, 186, 116, 0.35), rgba(255, 228, 181, 0.4)),
       repeating-linear-gradient(
@@ -823,6 +836,218 @@
       top: 60%;
       left: 50%;
       transform: translate(-50%, -300%) scale(1) rotate(0deg);
+    }
+  }
+
+  /* ===================================================
+     LIVING FELINE ANIMATION ENGINE (Phases 1 & 4)
+     =================================================== */
+
+  /* Global Tail Swish */
+  .cat .wag-tail,
+  svg .wag-tail {
+    transform-box: fill-box;
+    -webkit-transform-box: fill-box;
+    transform-origin: 92% 88%;
+    animation: cat-tail-swish 3.6s ease-in-out infinite;
+    will-change: transform;
+  }
+
+  @keyframes cat-tail-swish {
+    0%, 100% {
+      transform: rotate(0deg);
+    }
+    28% {
+      transform: rotate(7deg);
+    }
+    72% {
+      transform: rotate(-6deg);
+    }
+  }
+
+  /* Global Natural Eye Blinking */
+  .cat .blinking-eye,
+  svg .blinking-eye {
+    transform-box: fill-box;
+    -webkit-transform-box: fill-box;
+    transform-origin: center;
+    animation: cat-eye-blink 5s ease-in-out infinite;
+    will-change: transform;
+  }
+
+  @keyframes cat-eye-blink {
+    0%, 94%, 98%, 100% {
+      transform: scaleY(1);
+    }
+    96% {
+      transform: scaleY(0.08);
+    }
+    99% {
+      transform: scaleY(0.08);
+    }
+  }
+
+  /* Left Ear Micro-Twitch */
+  .cat .ear-left,
+  svg .ear-left {
+    transform-box: fill-box;
+    -webkit-transform-box: fill-box;
+    transform-origin: 25% 90%;
+    animation: cat-ear-twitch-left 6.8s ease-in-out infinite;
+    will-change: transform;
+  }
+
+  @keyframes cat-ear-twitch-left {
+    0%, 91%, 100% {
+      transform: rotate(0deg);
+    }
+    93% {
+      transform: rotate(-7deg);
+    }
+    95% {
+      transform: rotate(3deg);
+    }
+    97% {
+      transform: rotate(0deg);
+    }
+  }
+
+  /* Right Ear Micro-Twitch */
+  .cat .ear-right,
+  svg .ear-right {
+    transform-box: fill-box;
+    -webkit-transform-box: fill-box;
+    transform-origin: 75% 90%;
+    animation: cat-ear-twitch-right 7.4s ease-in-out infinite;
+    will-change: transform;
+  }
+
+  @keyframes cat-ear-twitch-right {
+    0%, 87%, 100% {
+      transform: rotate(0deg);
+    }
+    89% {
+      transform: rotate(8deg);
+    }
+    91% {
+      transform: rotate(-3deg);
+    }
+    93% {
+      transform: rotate(0deg);
+    }
+  }
+
+  /* Whiskers Breathing Motion */
+  .cat .whisker-left,
+  svg .whisker-left {
+    transform-box: fill-box;
+    -webkit-transform-box: fill-box;
+    transform-origin: right center;
+    animation: cat-whisker-flutter-left 4s ease-in-out infinite;
+    will-change: transform;
+  }
+
+  @keyframes cat-whisker-flutter-left {
+    0%, 100% {
+      transform: rotate(0deg);
+    }
+    50% {
+      transform: rotate(-3deg);
+    }
+  }
+
+  .cat .whisker-right,
+  svg .whisker-right {
+    transform-box: fill-box;
+    -webkit-transform-box: fill-box;
+    transform-origin: left center;
+    animation: cat-whisker-flutter-right 4s ease-in-out infinite;
+    will-change: transform;
+  }
+
+  @keyframes cat-whisker-flutter-right {
+    0%, 100% {
+      transform: rotate(0deg);
+    }
+    50% {
+      transform: rotate(3deg);
+    }
+  }
+
+  /* Living Breathing & Hover Physics for revealed cats */
+  .cat-living-breathe {
+    animation: cat-breath 4.2s ease-in-out infinite;
+    transform-origin: center bottom;
+    will-change: transform;
+  }
+
+  @keyframes cat-breath {
+    0%, 100% {
+      transform: translateY(0px) scale(1, 1);
+    }
+    50% {
+      transform: translateY(-4px) scale(1.015, 0.985);
+    }
+  }
+
+  /* Interactive Petting Elastic Squish */
+  .cat-pet-squish {
+    animation: cat-squish 0.45s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+
+  @keyframes cat-squish {
+    0% {
+      transform: scale(1, 1);
+    }
+    30% {
+      transform: scale(1.12, 0.88);
+    }
+    60% {
+      transform: scale(0.95, 1.05);
+    }
+    100% {
+      transform: scale(1, 1);
+    }
+  }
+
+  /* Floating Pet Sparkles */
+  @keyframes pet-sparkle-float {
+    0% {
+      opacity: 1;
+      transform: translateY(0) scale(0.6);
+    }
+    50% {
+      opacity: 1;
+      transform: translateY(-24px) scale(1.1) rotate(15deg);
+    }
+    100% {
+      opacity: 0;
+      transform: translateY(-44px) scale(0.4) rotate(-15deg);
+    }
+  }
+
+  .animate-pet-sparkle {
+    animation: pet-sparkle-float 0.85s ease-out forwards;
+    pointer-events: none;
+  }
+
+  /* Quantum Box Reveal Particle Burst */
+  @keyframes quantum-particle-burst {
+    0% {
+      opacity: 0;
+      transform: translate(0, 0) scale(0);
+    }
+    15% {
+      opacity: 1;
+      transform: translate(calc(var(--tx) * 0.35), calc(var(--ty) * 0.35)) scale(1.25);
+    }
+    65% {
+      opacity: 0.9;
+      transform: translate(calc(var(--tx) * 0.85), calc(var(--ty) * 0.85)) scale(1);
+    }
+    100% {
+      opacity: 0;
+      transform: translate(var(--tx), var(--ty)) scale(0.2);
     }
   }
 }

@@ -1,6 +1,6 @@
 'use client';
 
-import { Sparkles } from 'lucide-react';
+import { Fish } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -10,8 +10,39 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { FishboneIcon } from '@/components/icons/fishbone-icon';
+import { Badge } from '@/components/ui/badge';
+import {
+  BoxIcon,
+  CarbonBoxIcon,
+  CardboardBoxIcon,
+  BlackWoodenBoxIcon,
+  SpecialXK6BoxIcon,
+  StoneBoxIcon,
+  TardisBoxIcon,
+} from '@/components/icons';
+import { CircuitBoardBoxIcon } from '@/components/icons/circuit-board-box-icon';
+import { CrystalBoxIcon } from '@/components/icons/crystal-box-icon';
+import { GalaxyBoxIcon } from '@/components/icons/galaxy-box-icon';
+import { PlushBoxIcon } from '@/components/icons/plush-box-icon';
+import { SteampunkBoxIcon } from '@/components/icons/steampunk-box-icon';
+import { useBoxSkin } from '@/context/box-skin-context';
 import { cn } from '@/lib/utils';
+import type { ComponentType } from 'react';
+
+const SKIN_COMPONENTS: Record<string, ComponentType<{ className?: string; isOpen?: boolean }>> = {
+  default: BoxIcon,
+  carbon: CarbonBoxIcon,
+  cardboard: CardboardBoxIcon,
+  'black-wooden': BlackWoodenBoxIcon,
+  'special-xk6': SpecialXK6BoxIcon,
+  stone: StoneBoxIcon,
+  tardis: TardisBoxIcon,
+  'circuit-board': CircuitBoardBoxIcon,
+  crystal: CrystalBoxIcon,
+  galaxy: GalaxyBoxIcon,
+  plush: PlushBoxIcon,
+  steampunk: SteampunkBoxIcon,
+};
 
 interface UnlockBoxDialogProps {
   open: boolean;
@@ -22,8 +53,8 @@ interface UnlockBoxDialogProps {
 }
 
 /**
- * Modal dialog prompting the user to unlock the daily Quantum Box
- * early by spending Fish Points.
+ * Modal confirmation dialog prompting the user to unlock the daily Quantum Box early.
+ * Follows the Box Skin purchase dialog layout and visual standards.
  */
 export function UnlockBoxDialog({
   open,
@@ -32,58 +63,50 @@ export function UnlockBoxDialog({
   cost = 10,
   onConfirmUnlock,
 }: UnlockBoxDialogProps) {
+  const { selectedSkin } = useBoxSkin();
+  const BoxComponent = SKIN_COMPONENTS[selectedSkin] ?? BoxIcon;
   const hasEnoughPoints = currentPoints >= cost;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md rounded-3xl p-6 border-border/60 bg-background/95 backdrop-blur-md">
-        <DialogHeader className="flex flex-col items-center text-center gap-3">
-          <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[#A240FF]/15 text-[#A240FF] shadow-inner">
-            <Sparkles className="h-7 w-7 animate-pulse" />
-          </div>
+        <DialogHeader className="text-center sm:text-center flex flex-col items-center gap-1">
           <DialogTitle className="text-2xl font-headline font-bold text-foreground">
-            Unlock Quantum Box
+            Unlock Quantum Box?
           </DialogTitle>
-          <DialogDescription className="text-sm text-muted-foreground max-w-xs text-center">
-            The Quantum Box is recharging until tomorrow. Recharge it immediately with <strong className="text-foreground">Fish Points</strong>!
+          <DialogDescription className="text-sm text-muted-foreground text-center">
+            This will cost <strong className="text-foreground">{cost} Fish Points</strong>. You currently have <strong className="text-foreground">{currentPoints} points</strong>.
           </DialogDescription>
         </DialogHeader>
 
-        <div className="my-3 rounded-2xl border border-border/40 bg-muted/20 p-4 space-y-3">
-          <div className="flex items-center justify-between text-sm">
-            <span className="text-muted-foreground">Unlock Cost:</span>
-            <span className="flex items-center gap-1.5 font-bold text-[#A240FF]">
-              <FishboneIcon className="h-4 w-4" />
-              {cost} Fish Points
-            </span>
+        {/* Box Component Preview with Price Tag (Box Skin style) */}
+        <div className="flex flex-col items-center justify-center p-4 my-2">
+          <div className="relative flex items-center justify-center h-32 w-32 drop-shadow-md">
+            <BoxComponent className="h-full w-full" />
           </div>
-
-          <div className="flex items-center justify-between text-sm">
-            <span className="text-muted-foreground">Your Balance:</span>
-            <span className={cn(
-              'flex items-center gap-1.5 font-bold',
-              hasEnoughPoints ? 'text-[#3696C9]' : 'text-rose-500'
-            )}>
-              <FishboneIcon className="h-4 w-4" />
-              {currentPoints} Fish Points
-            </span>
-          </div>
-
-          {!hasEnoughPoints && (
-            <p className="pt-2 text-xs text-rose-500/90 font-medium text-center border-t border-border/30">
-              You need {cost - currentPoints} more Fish Points. Observe cats or share to earn more!
-            </p>
-          )}
+          <Badge
+            variant="secondary"
+            className="mt-3 flex items-center gap-1.5 px-3 py-1 text-sm font-bold bg-[#A240FF]/15 text-[#A240FF] border border-[#A240FF]/30 rounded-full"
+          >
+            <Fish className="h-3.5 w-3.5 text-[#3696C9]" />
+            {cost} Fish Points
+          </Badge>
         </div>
 
-        <DialogFooter className="flex flex-col-reverse sm:flex-row gap-2 sm:gap-0">
+        {!hasEnoughPoints && (
+          <p className="text-xs text-rose-500 font-medium text-center -mt-1 mb-2">
+            You need {cost - currentPoints} more Fish Points to unlock. Observe cats or share to earn more!
+          </p>
+        )}
+
+        <DialogFooter className="flex flex-col-reverse sm:flex-row gap-2 sm:gap-2 justify-center">
           <Button
             type="button"
             variant="ghost"
             onClick={() => onOpenChange(false)}
             className="rounded-2xl text-muted-foreground hover:bg-muted/40"
           >
-            Keep Waiting
+            Cancel
           </Button>
           <Button
             type="button"
@@ -96,11 +119,11 @@ export function UnlockBoxDialog({
               'rounded-2xl font-bold px-5 text-white shadow-md transition transform active:scale-95',
               hasEnoughPoints
                 ? 'bg-gradient-to-r from-[#A240FF] to-[#3696C9] hover:opacity-95 hover:shadow-lg'
-                : 'bg-muted-foreground/30'
+                : 'bg-muted-foreground/30 cursor-not-allowed'
             )}
           >
-            <FishboneIcon className="mr-2 h-4 w-4" />
-            Unlock ({cost} Fish Points)
+            <Fish className="mr-1.5 h-4 w-4" />
+            Unlock for {cost} Points
           </Button>
         </DialogFooter>
       </DialogContent>

@@ -28,6 +28,10 @@ export function useShare(message: string) {
             throw new Error('Share content is not ready yet.');
         }
 
+        if (typeof document !== 'undefined' && document.fonts) {
+            await document.fonts.ready;
+        }
+
         const dataUrl = await htmlToImage.toPng(ref.current, {
             cacheBust: true,
             pixelRatio: 2,

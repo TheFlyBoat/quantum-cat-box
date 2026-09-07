@@ -537,7 +537,7 @@ export default function HomePage() {
                             />
                         )}
 
-                        <div className="relative mt-6 flex h-64 w-full items-center justify-center">
+                        <div className="relative mt-6 flex h-64 w-full items-center justify-center overflow-visible">
                             {showTutorialOverlay && !showOnboarding && !isDailyLocked && catState.outcome === 'initial' && (
                                 <TutorialOverlay />
                             )}
@@ -551,20 +551,6 @@ export default function HomePage() {
                                 onUnlockRequested={() => setIsUnlockDialogOpen(true)}
                             />
                         </div>
-
-                        {isDailyLocked && catState.outcome === 'initial' && (
-                            <div className="mt-2 flex justify-center">
-                                <Button
-                                    type="button"
-                                    size="sm"
-                                    onClick={() => setIsUnlockDialogOpen(true)}
-                                    className="rounded-2xl font-bold bg-gradient-to-r from-[#A240FF] to-[#3696C9] text-white shadow hover:opacity-95 px-4"
-                                >
-                                    <Sparkles className="mr-1.5 h-3.5 w-3.5" />
-                                    Unlock Box (10 Fish Points)
-                                </Button>
-                            </div>
-                        )}
 
                         <div className="mt-6 flex w-full flex-col items-center gap-6">
                             {catState.outcome !== 'initial' && (

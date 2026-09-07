@@ -34,6 +34,7 @@ export function TitleDisplay({ name, onTitleClick, reduceMotion }: { name: strin
     return (
         <div
             onClick={onTitleClick}
+            style={{ fontFamily: 'var(--font-headline), "Patrick Hand", cursive' }}
             className={cn(
                 "relative h-12 w-full select-none cursor-pointer flex items-center justify-center font-headline text-4xl font-bold tracking-tight"
             )}

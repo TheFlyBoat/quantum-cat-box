@@ -33,6 +33,9 @@ import {
     PlagueCatIcon,
     ReaperCatIcon,
     ScarecrowCatIcon,
+    CheshireCatIcon,
+    SchrodingerCatIcon,
+    WormholeCatIcon,
 } from '@/components/cats';
 
 export const catComponentMap: { [key: string]: React.ComponentType<{ className?: string }> } = {
@@ -69,4 +72,7 @@ export const catComponentMap: { [key: string]: React.ComponentType<{ className?:
     'plague': PlagueCatIcon,
     'reaper': ReaperCatIcon,
     'scarecrow': ScarecrowCatIcon,
+    'cheshire': CheshireCatIcon,
+    'schrodinger': SchrodingerCatIcon,
+    'wormhole': WormholeCatIcon,
 };

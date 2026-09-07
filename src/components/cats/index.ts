@@ -32,3 +32,7 @@ export * from './pharaoh-cat';
 export * from './plague-cat';
 export * from './reaper-cat';
 export * from './scarecrow-cat';
+export * from './cheshire-cat';
+export * from './schrodinger-cat';
+export * from './wormhole-cat';
+

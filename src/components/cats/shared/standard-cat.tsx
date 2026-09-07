@@ -1,4 +1,5 @@
 import React from 'react';
+import { cn } from '@/lib/utils';
 import type { CatComponentProps } from './types';
 
 export interface StandardCatProps extends CatComponentProps {
@@ -35,7 +36,8 @@ export const StandardCat: React.FC<StandardCatProps> = ({
             xmlns="http://www.w3.org/2000/svg"
             xmlSpace="preserve"
             viewBox="0 0 21164.08 18861.8"
-            className={className}
+            className={cn("overflow-visible", className)}
+            style={{ overflow: 'visible' }}
             width="100%"
             height="100%"
         >

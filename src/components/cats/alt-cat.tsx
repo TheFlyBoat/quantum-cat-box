@@ -12,7 +12,13 @@ const AltCatIcon = ({
     earTwitch?: boolean;
     eyeMove?: 'dart' | 'look';
 }) => (
-    <svg xmlns="http://www.w3.org/2000/svg" xmlSpace="preserve" viewBox="0 0 21164.08 18861.8" className={cn(className)}>
+    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        xmlSpace="preserve"
+        viewBox="0 0 21164.08 18861.8"
+        style={{ overflow: 'visible' }}
+        className={cn("overflow-visible", className)}
+    >
         <g>
             <g className="fade-group">
                 <path 
@@ -64,10 +70,10 @@ const AltCatIcon = ({
 )
 
 export const AltCat = ({className}: {className?: string}) => (
-    <div className={cn("relative cat animate-alt-shake w-full h-full", className)}>
-        <AltCatIcon className="alt-instance-1 animate-alt-main-fade w-full absolute" />
-        <AltCatIcon className="alt-instance-2 animate-alt-split-2 w-full absolute" wagSpeed="fast" eyeMove="dart" />
-        <AltCatIcon className="alt-instance-3 animate-alt-split-3 w-full absolute" earTwitch={true} eyeMove="dart" />
-        <AltCatIcon className="alt-instance-4 animate-alt-split-4 w-full absolute" eyeMove="look" />
+    <div className={cn("relative cat animate-alt-shake w-full h-full overflow-visible", className)} style={{ overflow: 'visible' }}>
+        <AltCatIcon className="alt-instance-1 animate-alt-main-fade w-full h-full absolute inset-0 overflow-visible" />
+        <AltCatIcon className="alt-instance-2 animate-alt-split-2 w-full h-full absolute inset-0 overflow-visible" wagSpeed="fast" eyeMove="dart" />
+        <AltCatIcon className="alt-instance-3 animate-alt-split-3 w-full h-full absolute inset-0 overflow-visible" earTwitch={true} eyeMove="dart" />
+        <AltCatIcon className="alt-instance-4 animate-alt-split-4 w-full h-full absolute inset-0 overflow-visible" eyeMove="look" />
     </div>
 )

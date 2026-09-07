@@ -329,6 +329,36 @@
       "tagline": "The Retro Resolution",
       "strength": "Debugs corrupted timelines at 8-bit speed.",
       "weakness": "Crashes if asked to render 4K emotions."
+    },
+    {
+      "id": "cheshire",
+      "name": "Cheshire Cat",
+      "description": "A whimsical quantum entity that fades between visibility and the void, leaving only an indelible, glowing turquoise smile.",
+      "type": "Paradox",
+      "points": 5,
+      "tagline": "The Detached Grin",
+      "strength": "Can vanish entirely from any situation, leaving only pure charm behind.",
+      "weakness": "Its glowing smile gives away its hiding spot in dark rooms."
+    },
+    {
+      "id": "schrodinger",
+      "name": "Schrödinger Kitty",
+      "description": "The architect of quantum feline thought. Split precisely between vitality and probability, holding the cosmic vial like a ball of yarn.",
+      "type": "Paradox",
+      "points": 5,
+      "tagline": "The Box Master",
+      "strength": "Calculates every possible timeline before taking a single step.",
+      "weakness": "Refuses to decide whether it wants to be inside or outside the room."
+    },
+    {
+      "id": "wormhole",
+      "name": "Wormhole Cat",
+      "description": "An entangled cosmic explorer whose head emerges joyfully from one galactic rift while its tail wags out of another.",
+      "type": "Paradox",
+      "points": 5,
+      "tagline": "The Portal Pouncer",
+      "strength": "Can steal treats from across the galaxy without leaving the rug.",
+      "weakness": "Occasionally pounces on its own tail across space-time."
     }
   ]
 }

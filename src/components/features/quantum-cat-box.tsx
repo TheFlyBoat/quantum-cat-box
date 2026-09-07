@@ -1,11 +1,18 @@
 
 'use client';
-
-import { type ComponentType, useState } from 'react';
-import { Lock } from 'lucide-react';
+import { type ComponentType, useState, useRef } from 'react';
+import { Lock, Fish } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 
 import { CatDisplay } from '@/components/cats/CatDisplay';
+import { QuantumParticleBurst } from '@/components/features/quantum-particle-burst';
+import { playFeedback } from '@/lib/audio';
 import {
   BlackWoodenBoxIcon,
   BoxIcon,
@@ -75,10 +82,43 @@ export function QuantumCatBox({
   const BoxComponent = SKIN_COMPONENTS[selectedSkin] ?? BoxIcon;
   const isOpen = catState.outcome !== 'initial' && !isLoading;
   const isGravityCat = catState.catId === 'gravity';
+  const isSideMovingCat = catState.catId === 'alt' || catState.catId === 'paradox' || catState.catId === 'catankhamun';
 
   const [showLockFeedback, setShowLockFeedback] = useState(false);
+  const [sparkles, setSparkles] = useState<{ id: number; x: number; y: number; char: string; color: string }[]>([]);
+  const [isPetting, setIsPetting] = useState(false);
+  const sparkleCounterRef = useRef(0);
 
-  const handleClick = () => {
+  const handleCatPet = (e?: React.MouseEvent) => {
+    if (e) {
+      e.stopPropagation();
+    }
+    playFeedback('click-1');
+    setIsPetting(true);
+    setTimeout(() => setIsPetting(false), 450);
+
+    const colors = ['#A240FF', '#FF809F', '#3696C9', '#A9DB4A', '#FFD166'];
+    const chars = ['✦', '✨', '💖', '★'];
+    const newId = ++sparkleCounterRef.current;
+    const newSparkle = {
+      id: newId,
+      x: 45 + ((newId * 17) % 20) - 10,
+      y: 20 + ((newId * 13) % 15) - 8,
+      char: chars[newId % chars.length],
+      color: colors[newId % colors.length],
+    };
+
+    setSparkles((prev) => [...prev.slice(-3), newSparkle]);
+    setTimeout(() => {
+      setSparkles((prev) => prev.filter((s) => s.id !== newId));
+    }, 900);
+  };
+
+  const handleClick = (e: React.MouseEvent) => {
+    if (isOpen) {
+      handleCatPet(e);
+      return;
+    }
     if (isLocked) {
       if (onUnlockRequested) {
         onUnlockRequested();
@@ -92,61 +132,138 @@ export function QuantumCatBox({
     }
   };
 
-  return (
+  const boxButton = (
     <Button
       type="button"
       variant="ghost"
       onClick={handleClick}
-      disabled={isLoading || isOpen}
+      disabled={isLoading}
       className={cn(
-        'group relative h-52 w-52 md:h-56 md:w-56 p-0 hover:bg-transparent rounded-2xl transition-transform duration-300 ease-out focus:outline-none focus-visible:ring-4 focus-visible:ring-[#A240FF] focus-visible:ring-offset-4 focus-visible:ring-offset-background [&_svg]:size-full disabled:opacity-100',
+        'group relative h-52 w-52 md:h-56 md:w-56 p-0 hover:bg-transparent rounded-2xl transition-transform duration-300 ease-out focus:outline-none focus-visible:ring-4 focus-visible:ring-[#A240FF] focus-visible:ring-offset-4 focus-visible:ring-offset-background [&_svg]:size-full disabled:opacity-100 overflow-visible',
         !isOpen && !isLoading && !isLocked && 'hover:scale-105',
         isLoading && !reduceMotion && 'animate-shake',
         isAmbientShaking && !reduceMotion && 'animate-subtle-shake',
-        isLocked && 'cursor-default', // Changed from cursor-not-allowed to let them click
-        (isLoading || isOpen) && !isLocked && 'cursor-pointer',
-        (isLoading || isOpen) && isLocked && 'cursor-default'
+        isLocked && !isOpen && 'cursor-pointer',
+        isLocked && isOpen && 'cursor-default',
+        isOpen && 'cursor-pointer'
       )}
-      aria-label={isLocked ? 'Quantum Box locked until tomorrow' : 'Open the Quantum Box'}
-      aria-disabled={isLoading || isOpen}
+      aria-label={isLocked ? 'Quantum Box locked until tomorrow' : isOpen ? 'Pet your revealed cat' : 'Open the Quantum Box'}
+      aria-disabled={isLoading}
     >
-      <div className="relative h-full w-full flex items-center justify-center">
+      <div
+        className={cn(
+          'relative h-full w-full flex items-center justify-center overflow-visible transition-opacity duration-300 [&_svg]:size-full',
+          isLocked && !isOpen && 'opacity-50'
+        )}
+      >
         <BoxComponent className="h-full w-full" isOpen={isOpen} />
       </div>
 
+      {/* Locked Overlay Tag with Lock & Fish Cost (Clean Pill) */}
+      {isLocked && !isOpen && (
+        <div className="absolute inset-0 z-20 flex flex-col items-center justify-center pointer-events-none select-none">
+          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-black/50 text-white backdrop-blur-sm shadow-md transition-transform duration-200 group-hover:scale-110">
+            <Lock className="!h-6 !w-6 !size-6 text-white drop-shadow shrink-0" />
+          </div>
+          <div className="mt-2.5 inline-flex items-center justify-center gap-1.5 rounded-full bg-white dark:bg-card px-3.5 py-1 text-xs font-bold text-foreground shadow-lg border border-border/60 transition-transform duration-200 group-hover:scale-105">
+            <Fish className="!h-3.5 !w-3.5 !size-3.5 shrink-0 text-[#3696C9]" />
+            <span className="font-bold leading-none text-foreground">10</span>
+          </div>
+        </div>
+      )}
+
+      {/* State-Themed Quantum Particle Burst on Reveal (Phase 2) */}
+      {isOpen && catState.outcome !== 'initial' && (
+        <QuantumParticleBurst
+          key={`${catState.outcome}-${catState.catId ?? ''}`}
+          outcome={catState.outcome}
+        />
+      )}
+
       {/* Always show cat if revealed, even if locked */}
       {catState.outcome !== 'initial' && catState.catId && !isGravityCat && (
-        <div className="absolute inset-0 flex items-end justify-center">
-          <div className="h-full w-full translate-y-[25%] scale-[0.6]">
+        <div
+          onClick={handleCatPet}
+          className={cn(
+            'absolute inset-0 flex items-end justify-center select-none transition-transform overflow-visible',
+            isPetting && 'cat-pet-squish'
+          )}
+          title="Pet your cat! ✨"
+        >
+          <div
+            className={cn(
+              'h-full w-full overflow-visible transition-all duration-300 [&_svg]:size-full',
+              isSideMovingCat ? 'translate-y-[18%] scale-100' : 'translate-y-[25%] scale-[0.6]'
+            )}
+          >
             <CatDisplay state={catState} />
           </div>
+          {/* Floating pet sparkles (Phase 3) */}
+          {sparkles.map((sp) => (
+            <span
+              key={sp.id}
+              className="animate-pet-sparkle absolute text-sm font-bold pointer-events-none select-none z-50 drop-shadow-sm"
+              style={{ left: `${sp.x}%`, top: `${sp.y}%`, color: sp.color }}
+            >
+              {sp.char}
+            </span>
+          ))}
         </div>
       )}
 
       {isOpen && isGravityCat && (
         <div
+          onClick={handleCatPet}
           className={cn(
-            'absolute inset-x-0 top-0 flex justify-center transition-transform duration-300',
-            isOpen && '-translate-y-4'
+            'absolute inset-x-0 top-0 flex justify-center transition-transform duration-300 select-none overflow-visible',
+            isOpen && '-translate-y-4',
+            isPetting && 'cat-pet-squish'
           )}
+          title="Pet your cat! ✨"
         >
-          <div className="h-full w-full -translate-y-[15%] scale-[0.6]">
+          <div className="h-full w-full -translate-y-[15%] scale-[0.6] overflow-visible [&_svg]:size-full">
             <CatDisplay state={catState} />
           </div>
+          {/* Floating pet sparkles (Phase 3) */}
+          {sparkles.map((sp) => (
+            <span
+              key={sp.id}
+              className="animate-pet-sparkle absolute text-sm font-bold pointer-events-none select-none z-50 drop-shadow-sm"
+              style={{ left: `${sp.x}%`, top: `${sp.y}%`, color: sp.color }}
+            >
+              {sp.char}
+            </span>
+          ))}
         </div>
       )}
-
-      {showLockFeedback && (
-        <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 rounded-2xl bg-background/60 backdrop-blur-[2px] animate-in fade-in zoom-in duration-300">
-          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-background/90 shadow-sm">
-            <Lock className="!size-6 text-rose-500" />
-          </div>
-          <span className="rounded-xl bg-background/90 px-3 py-2 text-[10px] font-bold uppercase tracking-widest text-rose-500 shadow-sm text-center leading-tight max-w-[80%]">
-            The Box is closed for now.<br/>Come back tomorrow!
-          </span>
-        </div>
-      )}
-      
     </Button>
   );
+
+  if (isLocked && !isOpen) {
+    return (
+      <TooltipProvider delayDuration={150}>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            {boxButton}
+          </TooltipTrigger>
+          <TooltipContent
+            side="top"
+            sideOffset={14}
+            className="z-50 max-w-[240px] rounded-2xl border border-border/60 bg-popover px-4 py-3 text-center shadow-2xl backdrop-blur-md"
+          >
+            <p className="font-headline text-base font-bold text-foreground">Quantum Box Locked</p>
+            <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
+              Recharge immediately with Fish Points instead of waiting until tomorrow.
+            </p>
+            <div className="mt-2.5 flex items-center justify-center gap-1.5 text-xs font-bold text-[#A240FF]">
+              <Fish className="h-3.5 w-3.5 shrink-0 text-[#3696C9]" />
+              <span>10 Fish Points</span>
+            </div>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
+    );
+  }
+
+  return boxButton;
 }
