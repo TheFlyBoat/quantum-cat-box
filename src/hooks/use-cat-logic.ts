@@ -64,7 +64,7 @@ const getOutcomePool = (outcome: 'alive' | 'dead' | 'paradox'): OutcomePool => {
     return fallbackOutcomes[outcome];
 };
 
-const MESSAGE_GENERATION_TIMEOUT_MS = 6500;
+const MESSAGE_GENERATION_TIMEOUT_MS = 10000;
 
 type FallbackMessageEntry = string | { message: string };
 
