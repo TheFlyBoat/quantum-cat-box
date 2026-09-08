@@ -15,7 +15,7 @@ export const BreuCatIcon = ({ className }: { className?: string }) => (
                         0%, 96%, 100% { transform: scaleY(1); } 
                         98% { transform: scaleY(0.1); } 
                     } 
-                    .wag-tail { 
+                    .cat.void .wag-tail { 
                         animation: wag-nyx 8s infinite ease-in-out; 
                     } 
                     @keyframes wag-nyx { 

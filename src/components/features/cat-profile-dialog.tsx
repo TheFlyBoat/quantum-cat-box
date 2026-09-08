@@ -11,7 +11,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { useDiary } from "@/context/diary-context";
 import { Eye, HeartCrack, Swords, BookOpen, ArrowLeft } from "lucide-react";
-import { catComponentMap } from '@/lib/cat-components';
+import { catComponentMap, isCompactFullBleedCat, isAnimatedFrameCat } from '@/lib/cat-components';
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -66,7 +66,17 @@ export function CatProfileDialog({ cat, open, onOpenChange }: CatProfileDialogPr
                 <div className={cn(
                     "flex w-full items-center justify-center rounded-t-2xl bg-gradient-to-br from-primary/20 via-background to-background p-8 sm:rounded-tr-none sm:rounded-l-2xl",
                 )}>
-                     {CatComponent && <CatComponent className="h-32 w-32 sm:h-44 sm:w-44" />}
+                     {CatComponent && (
+                         <CatComponent
+                             className={cn(
+                                 isCompactFullBleedCat(cat.id)
+                                     ? "h-20 w-20 sm:h-28 sm:w-28"
+                                     : isAnimatedFrameCat(cat.id)
+                                     ? "h-24 w-24 sm:h-34 sm:w-34"
+                                     : "h-32 w-32 sm:h-44 sm:w-44"
+                             )}
+                         />
+                     )}
                 </div>
                 <div className="flex flex-col space-y-4 p-6">
                     <DialogHeader className="text-center sm:text-left">

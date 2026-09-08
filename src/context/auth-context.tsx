@@ -222,7 +222,9 @@ const mergeUserRecords = (cloud: UserData, local: UserData): UserData => {
   const streak = Math.max(cloud.streak ?? 0, local.streak ?? 0);
   const shareCount = Math.max(cloud.shareCount ?? 0, local.shareCount ?? 0);
   const lastObservationDate = cloud.lastObservationDate ?? local.lastObservationDate;
-  const lastBoxOpenDate = cloud.lastBoxOpenDate ?? local.lastBoxOpenDate;
+  // A signed-in user's daily box lock is governed solely by their cloud account,
+  // preventing temporary guest session locks from locking an account on first sign-in of the day.
+  const lastBoxOpenDate = cloud.lastBoxOpenDate;
   const revealHistory = (local.revealHistory?.length ?? 0) > (cloud.revealHistory?.length ?? 0)
     ? local.revealHistory
     : cloud.revealHistory;
@@ -411,9 +413,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       // 3. Save logic (only if we have local changes to push)
       if (hasMeaningfulProgress(localData)) {
         await saveUserData(firebaseUser.uid, mergedData);
-        // 4. CRITICAL: Only clear local data after a successful save.
-        clearLocalUserData();
       }
+      // 4. Always clean up temporary local guest data upon login to prevent stale state bleed
+      clearLocalUserData();
 
       // 5. Success path
       setUser(firebaseUser);

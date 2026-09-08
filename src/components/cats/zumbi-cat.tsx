@@ -16,7 +16,7 @@ export const ZumbiCatIcon = ({ className }: { className?: string }) => (
                         60% { transform: translate(2%, -1px) rotate(2deg); } 
                         80% { transform: translate(0, 0) rotate(0deg); } 
                     } 
-                    .wag-tail { 
+                    .cat.zombo .wag-tail { 
                         animation: wag-zombie 5s infinite ease-in-out;
                         transform-origin: 4000px 14500px;
                     } 
@@ -24,7 +24,7 @@ export const ZumbiCatIcon = ({ className }: { className?: string }) => (
                         0%, 100% { transform: rotate(2deg); } 
                         50% { transform: rotate(-2deg); } 
                     } 
-                    .head-part { 
+                    .cat.zombo .head-part { 
                         animation: head-tilt-zombie 6s infinite ease-in-out; 
                         transform-origin: 10500px 13000px; 
                     } 
@@ -33,7 +33,7 @@ export const ZumbiCatIcon = ({ className }: { className?: string }) => (
                         30% { transform: rotate(-8deg); } 
                         70% { transform: rotate(6deg); } 
                     } 
-                    .falling-eye { 
+                    .cat.zombo .falling-eye { 
                         animation: eye-fall 8s 1s ease-in-out forwards; 
                     } 
                     @keyframes eye-fall { 

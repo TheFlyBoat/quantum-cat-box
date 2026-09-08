@@ -13,6 +13,8 @@ const PARADOX_STYLES = `
     .cat.paradox {
         aspect-ratio: 21164.08 / 18861.8;
         overflow: visible !important;
+        transform: scale(0.82);
+        transform-origin: center center;
     }
 
     .paradox-container {
@@ -71,13 +73,13 @@ const PARADOX_STYLES = `
         100% { opacity: 0; }
     }
 
-    .paradox-alive-1 { z-index: 3; --transform-initial: translateX(12%) scale(0.5); --transform-final: translateX(35%) scale(0.72); animation-delay: 0s; }
-    .paradox-alive-2 { z-index: 2; --transform-initial: translateX(24%) scale(0.5); --transform-final: translateX(58%) scale(0.62); animation-delay: 0.4s; }
-    .paradox-alive-3 { z-index: 1; --transform-initial: translateX(36%) scale(0.5); --transform-final: translateX(78%) scale(0.52); animation-delay: 0.8s; }
+    .paradox-alive-1 { z-index: 3; --transform-initial: translateX(6%) scale(0.5); --transform-final: translateX(14%) scale(0.68); animation-delay: 0s; }
+    .paradox-alive-2 { z-index: 2; --transform-initial: translateX(12%) scale(0.5); --transform-final: translateX(25%) scale(0.58); animation-delay: 0.4s; }
+    .paradox-alive-3 { z-index: 1; --transform-initial: translateX(18%) scale(0.5); --transform-final: translateX(35%) scale(0.48); animation-delay: 0.8s; }
 
-    .paradox-dead-1 { z-index: 3; --transform-initial: translateX(-12%) scale(0.5); --transform-final: translateX(-35%) scale(0.72); animation-delay: 0s; }
-    .paradox-dead-2 { z-index: 2; --transform-initial: translateX(-24%) scale(0.5); --transform-final: translateX(-58%) scale(0.62); animation-delay: 0.4s; }
-    .paradox-dead-3 { z-index: 1; --transform-initial: translateX(-36%) scale(0.5); --transform-final: translateX(-78%) scale(0.52); animation-delay: 0.8s; }
+    .paradox-dead-1 { z-index: 3; --transform-initial: translateX(-6%) scale(0.5); --transform-final: translateX(-14%) scale(0.68); animation-delay: 0s; }
+    .paradox-dead-2 { z-index: 2; --transform-initial: translateX(-12%) scale(0.5); --transform-final: translateX(-25%) scale(0.58); animation-delay: 0.4s; }
+    .paradox-dead-3 { z-index: 1; --transform-initial: translateX(-18%) scale(0.5); --transform-final: translateX(-35%) scale(0.48); animation-delay: 0.8s; }
 
     .paradox-alive-1 {
         animation: paradox-shadow-appear 12s infinite, paradox-alive-1-anim 1s infinite ease-in-out 2s;

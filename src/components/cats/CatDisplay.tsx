@@ -1,7 +1,8 @@
 
 import { type CatState } from '@/lib/types';
-import { catComponentMap } from '@/lib/cat-components';
+import { catComponentMap, isCompactFullBleedCat, isAnimatedFrameCat } from '@/lib/cat-components';
 import { CosmicBackdrop } from '@/components/cats/cosmic-cat';
+import { cn } from '@/lib/utils';
 
 interface CatDisplayProps {
   state: CatState;
@@ -25,8 +26,15 @@ export function CatDisplay({ state }: CatDisplayProps) {
   return (
     <div className="animate-bounce-in relative overflow-visible flex items-center justify-center">
       {isCosmic && <CosmicBackdrop />}
-      <div className="cat-living-breathe overflow-visible flex items-center justify-center shrink-0 [&_svg]:size-full">
-        <CatComponent className="w-52 h-52 md:w-56 md:h-56 overflow-visible" />
+      <div className={cn(
+        "cat-living-breathe overflow-visible flex items-center justify-center shrink-0 [&_svg]:size-full transition-transform duration-300",
+        isCompactFullBleedCat(catId)
+          ? "w-[124px] h-[124px]"
+          : isAnimatedFrameCat(catId)
+          ? "w-[136px] h-[136px]"
+          : "w-[132px] h-[132px]"
+      )}>
+        <CatComponent className="w-full h-full overflow-visible" />
       </div>
     </div>
   );

@@ -1,4 +1,4 @@
-import type { FC } from 'react';
+import React, { type FC } from 'react';
 import { cn } from '@/lib/utils';
 
 const VampyBat: FC<{ className?: string }> = ({ className }) => (
@@ -26,7 +26,7 @@ export const VampyCatIcon = ({ className }: { className?: string }) => {
     const rightEye = '#fff';
 
     return (
-        <div className={cn('cat vampy cat--dead relative flex items-center justify-center overflow-visible w-full h-full min-w-0 min-h-0', className)}>
+        <div className={cn('cat vampy cat--dead relative flex items-center justify-center overflow-visible', className)}>
             <div className="vampy-cat-form w-full h-full flex items-center justify-center overflow-visible">
                 <svg className="w-full h-full max-w-full max-h-full overflow-visible" xmlns="http://www.w3.org/2000/svg" xmlSpace="preserve" fillRule="evenodd" clipRule="evenodd" imageRendering="optimizeQuality" shapeRendering="geometricPrecision" textRendering="geometricPrecision" viewBox="0 0 4566 3805">
                     <g>
@@ -77,3 +77,4 @@ export const VampyCatIcon = ({ className }: { className?: string }) => {
         </div>
     );
 };
+

@@ -15,7 +15,7 @@ export const BlizzardCatIcon = ({ className }: { className?: string }) => (
                         70%, 72% { transform: translate(-2px, -1px) rotate(-0.5deg); }
                         71%, 73% { transform: translate(2px, -1px) rotate(0.5deg); }
                     }
-                    .blinking-eye {
+                    .cat.blizzard .blinking-eye {
                         animation: blink-blizzard 4.5s infinite ease-in-out;
                         transform-origin: center;
                     }
@@ -23,7 +23,7 @@ export const BlizzardCatIcon = ({ className }: { className?: string }) => (
                         0%, 94%, 100% { transform: scaleY(1); }
                         97% { transform: scaleY(0.1); }
                     }
-                    .wag-tail {
+                    .cat.blizzard .wag-tail {
                         animation: flick-blizzard-tail 2.5s infinite ease-in-out;
                         transform-origin: 4000px 14500px;
                     }

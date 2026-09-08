@@ -76,3 +76,54 @@ export const catComponentMap: { [key: string]: React.ComponentType<{ className?:
     'schrodinger': SchrodingerCatIcon,
     'wormhole': WormholeCatIcon,
 };
+
+/**
+ * Set of cat IDs that have edge-to-edge / rectangular SVG drawings
+ * (their solid body fills nearly 100% of their viewBox, without wide whisker/tail margins).
+ * These need compact scaling so their body silhouette matches Domino Cat.
+ */
+export const COMPACT_FULL_BLEED_CAT_IDS = new Set<string>([
+    'shark',
+    'catankhamun',
+    'glitch',
+    'ghost',
+    'identity-crisis',
+    'bones',
+    'ginger',
+]);
+
+/**
+ * Set of cat IDs that share the standard viewBox or have animated frame/afterimage effects
+ * that need tailored sizing/scaling to visually benchmark against Domino Cat.
+ */
+export const ANIMATED_FRAME_CAT_IDS = new Set<string>([
+    'gravity',
+    'paradox',
+    'hologram',
+    'voodoo',
+    'blizzard',
+    'zumbi',
+    'breu',
+    'shadow',
+]);
+
+export function isCompactFullBleedCat(catId?: string | null): boolean {
+    return Boolean(catId && COMPACT_FULL_BLEED_CAT_IDS.has(catId));
+}
+
+export function isAnimatedFrameCat(catId?: string | null): boolean {
+    return Boolean(catId && ANIMATED_FRAME_CAT_IDS.has(catId));
+}
+
+/**
+ * Backwards-compatible union of all scaled cats.
+ */
+export const FULL_BLEED_CAT_IDS = new Set<string>([
+    ...COMPACT_FULL_BLEED_CAT_IDS,
+    ...ANIMATED_FRAME_CAT_IDS,
+]);
+
+export function isFullBleedCat(catId?: string | null): boolean {
+    return Boolean(catId && FULL_BLEED_CAT_IDS.has(catId));
+}
+

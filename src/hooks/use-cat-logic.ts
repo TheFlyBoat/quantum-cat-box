@@ -132,14 +132,29 @@ export function useCatLogic({
     const { setTheme } = useTheme();
     const { user, userData, setUserData, storageMode } = useAuth();
 
+    const [currentTime, setCurrentTime] = useState(() => Date.now());
+
+    useEffect(() => {
+        // Periodic check to cleanly transition lock status when midnight passes
+        const interval = setInterval(() => {
+            setCurrentTime(Date.now());
+        }, 30000);
+        return () => clearInterval(interval);
+    }, []);
+
     // Derive daily lock from userData with SSR hydration safety
     const { isDailyLocked, nextAvailableAt } = useMemo(() => {
         if (!isMounted || !userData?.lastBoxOpenDate) {
             return { isDailyLocked: false, nextAvailableAt: null };
         }
 
-        const now = new Date();
-        const lastOpenDateStr = new Date(userData.lastBoxOpenDate).toDateString();
+        const now = new Date(currentTime);
+        const lastOpenDate = new Date(userData.lastBoxOpenDate);
+        if (isNaN(lastOpenDate.getTime())) {
+            return { isDailyLocked: false, nextAvailableAt: null };
+        }
+
+        const lastOpenDateStr = lastOpenDate.toDateString();
         const todayStr = now.toDateString();
 
         if (lastOpenDateStr === todayStr) {
@@ -150,11 +165,11 @@ export function useCatLogic({
         }
 
         return { isDailyLocked: false, nextAvailableAt: null };
-    }, [isMounted, userData]);
+    }, [isMounted, userData, currentTime]);
 
     // Backward compatible callback
     const refreshDailyLock = useCallback(() => {
-        // Daily lock status is automatically derived from userData.lastBoxOpenDate
+        setCurrentTime(Date.now());
     }, []);
 
     // FIX: hook must be at top level of the custom hook, not inside handleBoxClick

@@ -2,11 +2,11 @@
 
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import catData from '@/lib/cat-data.json';
-import { catComponentMap } from '@/lib/cat-components';
+import { catComponentMap, isCompactFullBleedCat, isAnimatedFrameCat } from '@/lib/cat-components';
 import { useCatCollection } from '@/context/cat-collection-context';
 import { CatProfileDialog } from '@/components/features/cat-profile-dialog';
 import { useAuth } from '@/context/auth-context';
@@ -56,7 +56,7 @@ export default function GalleryPage() {
     }, [storageMode, maybeShowLoginPrompt]);
 
     const handleCatClick = (cat: CatInfo) => {
-        if (isUnlocked(cat.id)) {
+        if (isUnlocked(cat.id) || process.env.NODE_ENV === 'development') {
             setSelectedCat(cat);
         } else if (storageMode === 'local') {
             maybeShowLoginPrompt('gallery');
@@ -132,9 +132,6 @@ export default function GalleryPage() {
                                                         <CardContent className="flex flex-1 items-center justify-center bg-gradient-to-br from-muted/30 via-transparent to-transparent p-3">
                                                             {renderLockedSilhouette()}
                                                         </CardContent>
-                                                        <CardFooter className="bg-background/60 p-2 text-center">
-                                                            <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">???</p>
-                                                        </CardFooter>
                                                     </Card>
                                                 );
                                             }
@@ -142,92 +139,49 @@ export default function GalleryPage() {
                                             const cat = entry;
                                             const unlocked = isUnlocked(cat.id);
                                             const CatComponent = catComponentMap[cat.id];
+                                            const isDev = process.env.NODE_ENV === 'development';
+                                            const isCardClickable = unlocked || isDev;
+
                                             return (
-                                            <Card 
-                                                key={cat.id} 
-                                                className={cn(
-                                                    "group flex aspect-[3/4] flex-col overflow-hidden rounded-3xl border border-border/40 bg-background/80 shadow-sm transition-colors duration-300",
-                                                    unlocked ? 'cursor-pointer hover:border-primary' : 'cursor-default'
-                                                )}
-                                                onClick={() => handleCatClick(cat)}
-                                            >
-                                                <CardContent className={cn(
-                                                    "flex flex-1 items-center justify-center bg-gradient-to-br from-background via-background/70 to-background p-3 transition-colors duration-300",
-                                                    unlocked ? "from-primary/10 via-background/80 to-background" : "from-muted/40 via-muted/30 to-background group-hover:from-muted/30"
-                                                )}>
-                                                    {(() => {
-                                                        if (!CatComponent) {
-                                                            return (
-                                                                <TooltipProvider delayDuration={150}>
-                                                                    <Tooltip>
-                                                                        <TooltipTrigger asChild>
-                                                                            <div className="h-full w-full">
-                                                                                {renderLockedSilhouette()}
-                                                                            </div>
-                                                                        </TooltipTrigger>
-                                                                        <TooltipContent side="top" className="space-y-1 text-center">
-                                                                            <p className="font-medium">{cat.name}</p>
-                                                                            <p className="text-xs text-muted-foreground">Preview not available yet.</p>
-                                                                        </TooltipContent>
-                                                                    </Tooltip>
-                                                                </TooltipProvider>
-                                                            );
-                                                        }
-
-                                                        const isLocked = !unlocked;
-                                                        if (unlocked) {
-                                                            return (
-                                                                <TooltipProvider delayDuration={150}>
-                                                                    <Tooltip>
-                                                                        <TooltipTrigger asChild>
-                                                                            <div className="h-full w-full">
-                                                                                <div className="flex h-full w-full items-center justify-center">
-                                                                                    <CatComponent
-                                                                                        className={cn(
-                                                                                            "h-[88px] w-[88px] transition duration-500 ease-out sm:h-[96px] sm:w-[96px]",
-                                                                                            isLocked && "grayscale saturate-0 opacity-60 group-hover:grayscale-0 group-hover:saturate-100 group-hover:opacity-100"
-                                                                                        )}
-                                                                                    />
-                                                                                </div>
-                                                                            </div>
-                                                                        </TooltipTrigger>
-                                                                        <TooltipContent side="top" className="font-medium">
-                                                                            {cat.name}
-                                                                        </TooltipContent>
-                                                                    </Tooltip>
-                                                                </TooltipProvider>
-                                                            );
-                                                        }
-
-                                                        return (
-                                                            <TooltipProvider delayDuration={150}>
-                                                                <Tooltip>
-                                                                    <TooltipTrigger asChild>
-                                                                        <div className="h-full w-full">
-                                                                            <div className="flex h-full w-full items-center justify-center">
-                                                                                {renderLockedSilhouette()}
-                                                                            </div>
-                                                                        </div>
-                                                                    </TooltipTrigger>
-                                                                    <TooltipContent side="top" className="font-medium">
-                                                                        {cat.name}
-                                                                    </TooltipContent>
-                                                                </Tooltip>
-                                                            </TooltipProvider>
-                                                        );
-                                                    })()}
-                                                </CardContent>
-                                                <CardFooter className="bg-background/60 p-2 text-center">
-                                                    {unlocked ? (
-                                                        <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                                                <TooltipProvider key={cat.id} delayDuration={150}>
+                                                    <Tooltip>
+                                                        <TooltipTrigger asChild>
+                                                            <Card 
+                                                                className={cn(
+                                                                    "group flex aspect-[3/4] flex-col overflow-hidden rounded-3xl border border-border/40 bg-background/80 shadow-sm transition-colors duration-300",
+                                                                    isCardClickable ? 'cursor-pointer hover:border-primary' : 'cursor-default'
+                                                                )}
+                                                                onClick={() => handleCatClick(cat)}
+                                                            >
+                                                                <CardContent className={cn(
+                                                                    "flex flex-1 items-center justify-center bg-gradient-to-br from-background via-background/70 to-background p-3 transition-colors duration-300",
+                                                                    unlocked ? "from-primary/10 via-background/80 to-background" : "from-muted/40 via-muted/30 to-background group-hover:from-muted/30"
+                                                                )}>
+                                                                    <div className="flex h-full w-full items-center justify-center">
+                                                                        {unlocked && CatComponent ? (
+                                                                            <CatComponent
+                                                                                className={cn(
+                                                                                    "transition duration-500 ease-out",
+                                                                                    isCompactFullBleedCat(cat.id)
+                                                                                        ? "h-[50px] w-[50px] sm:h-[56px] sm:w-[56px]"
+                                                                                        : isAnimatedFrameCat(cat.id)
+                                                                                        ? "h-[70px] w-[70px] sm:h-[76px] sm:w-[76px]"
+                                                                                        : "h-[88px] w-[88px] sm:h-[96px] sm:w-[96px]"
+                                                                                )}
+                                                                            />
+                                                                        ) : (
+                                                                            renderLockedSilhouette()
+                                                                        )}
+                                                                    </div>
+                                                                </CardContent>
+                                                            </Card>
+                                                        </TooltipTrigger>
+                                                        <TooltipContent side="top" className="font-medium">
                                                             {cat.name}
-                                                        </p>
-                                                    ) : (
-                                                        <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">???</p>
-                                                    )}
-                                                </CardFooter>
-                                            </Card>
-                                        )
+                                                        </TooltipContent>
+                                                    </Tooltip>
+                                                </TooltipProvider>
+                                            );
                                         });
                                     })()}
                                 </div>

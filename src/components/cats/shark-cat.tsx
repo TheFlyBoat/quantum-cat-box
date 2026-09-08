@@ -16,9 +16,9 @@ const SHARK_STYLES = `
     }
 
     @keyframes shark-swim {
-        0%, 100% { transform: translate(-50%, 0); }
-        25% { transform: translate(-52%, -2px); }
-        75% { transform: translate(-48%, -2px); }
+        0%, 100% { transform: translate(0, 0); }
+        25% { transform: translate(-2px, -2px); }
+        75% { transform: translate(2px, -2px); }
     }
 
     .shark-figure {
@@ -29,12 +29,12 @@ const SHARK_STYLES = `
         justify-content: center;
     }
 
-.shark-figure-inner {
-    width: 100%;
-    height: 100%;
-    transform-origin: 55% 60%;
-    transform: translate(24%, -30%) scale(0.94);
-}
+    .shark-figure-inner {
+        width: 100%;
+        height: 100%;
+        transform-origin: center center;
+        transform: translate(0, 0);
+    }
 
     .shark-fin-side {
         animation: shark-fin-wobble 2.5s infinite ease-in-out;

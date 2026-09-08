@@ -82,7 +82,6 @@ export function QuantumCatBox({
   const BoxComponent = SKIN_COMPONENTS[selectedSkin] ?? BoxIcon;
   const isOpen = catState.outcome !== 'initial' && !isLoading;
   const isGravityCat = catState.catId === 'gravity';
-  const isSideMovingCat = catState.catId === 'alt' || catState.catId === 'paradox' || catState.catId === 'catankhamun';
 
   const [showLockFeedback, setShowLockFeedback] = useState(false);
   const [sparkles, setSparkles] = useState<{ id: number; x: number; y: number; char: string; color: string }[]>([]);
@@ -185,29 +184,26 @@ export function QuantumCatBox({
         <div
           onClick={handleCatPet}
           className={cn(
-            'absolute inset-0 flex items-end justify-center select-none transition-transform overflow-visible',
+            'absolute inset-0 flex items-center justify-center select-none transition-transform overflow-visible',
             isPetting && 'cat-pet-squish'
           )}
           title="Pet your cat! ✨"
         >
           <div
-            className={cn(
-              'h-full w-full overflow-visible transition-all duration-300 [&_svg]:size-full',
-              isSideMovingCat ? 'translate-y-[18%] scale-100' : 'translate-y-[25%] scale-[0.6]'
-            )}
+            className="relative overflow-visible transition-all duration-300 translate-y-[38%]"
           >
             <CatDisplay state={catState} />
+            {/* Floating pet sparkles (Phase 3) */}
+            {sparkles.map((sp) => (
+              <span
+                key={sp.id}
+                className="animate-pet-sparkle absolute text-sm font-bold pointer-events-none select-none z-50 drop-shadow-sm"
+                style={{ left: `${sp.x}%`, top: `${sp.y}%`, color: sp.color }}
+              >
+                {sp.char}
+              </span>
+            ))}
           </div>
-          {/* Floating pet sparkles (Phase 3) */}
-          {sparkles.map((sp) => (
-            <span
-              key={sp.id}
-              className="animate-pet-sparkle absolute text-sm font-bold pointer-events-none select-none z-50 drop-shadow-sm"
-              style={{ left: `${sp.x}%`, top: `${sp.y}%`, color: sp.color }}
-            >
-              {sp.char}
-            </span>
-          ))}
         </div>
       )}
 
@@ -215,25 +211,24 @@ export function QuantumCatBox({
         <div
           onClick={handleCatPet}
           className={cn(
-            'absolute inset-x-0 top-0 flex justify-center transition-transform duration-300 select-none overflow-visible',
-            isOpen && '-translate-y-4',
+            'absolute inset-0 flex items-center justify-center transition-transform duration-300 select-none overflow-visible',
             isPetting && 'cat-pet-squish'
           )}
           title="Pet your cat! ✨"
         >
-          <div className="h-full w-full -translate-y-[15%] scale-[0.6] overflow-visible [&_svg]:size-full">
+          <div className="relative overflow-visible transition-all duration-300 -translate-y-[28%]">
             <CatDisplay state={catState} />
+            {/* Floating pet sparkles (Phase 3) */}
+            {sparkles.map((sp) => (
+              <span
+                key={sp.id}
+                className="animate-pet-sparkle absolute text-sm font-bold pointer-events-none select-none z-50 drop-shadow-sm"
+                style={{ left: `${sp.x}%`, top: `${sp.y}%`, color: sp.color }}
+              >
+                {sp.char}
+              </span>
+            ))}
           </div>
-          {/* Floating pet sparkles (Phase 3) */}
-          {sparkles.map((sp) => (
-            <span
-              key={sp.id}
-              className="animate-pet-sparkle absolute text-sm font-bold pointer-events-none select-none z-50 drop-shadow-sm"
-              style={{ left: `${sp.x}%`, top: `${sp.y}%`, color: sp.color }}
-            >
-              {sp.char}
-            </span>
-          ))}
         </div>
       )}
     </Button>
