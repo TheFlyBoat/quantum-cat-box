@@ -13,6 +13,7 @@ Top priorities:
 * **Clean, reusable, component-first code.**
 * **Zero lint errors.**
 * **Strict adherence to this rulebook.**
+* **Command Approval Rule:** Every terminal command sent to the user for permission/approval MUST be followed by a short, plain-language explanation explaining what it does, why it is needed, and what it will affect. Never send a command for permission without this explanation.
 
 ---
 
