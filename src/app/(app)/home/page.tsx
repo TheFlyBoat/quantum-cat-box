@@ -22,15 +22,13 @@ import { playFeedback } from '@/lib/audio';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/context/auth-context';
-import { IntroOverlay } from '@/components/features/intro-overlay';
 import { usePoints } from '@/context/points-context';
 import { UnlockBoxDialog } from '@/components/features/unlock-box-dialog';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Loader2, Sparkles, Check, Copy, Download, Share2 } from 'lucide-react';
+import { Loader2, Sparkles, Check, Copy, Download, Share2, Zap } from 'lucide-react';
 import { WhatsAppIcon, XTwitterIcon, InstagramIcon } from '@/components/icons/social-icons';
 
 export default function HomePage() {
-    const [showOnboarding, setShowOnboarding] = useState(false);
     const [isAmbientShaking, setIsAmbientShaking] = useState(false);
     const [isShareDialogOpen, setIsShareDialogOpen] = useState(false);
     const [shareAsset, setShareAsset] = useState<ShareAsset | null>(null);
@@ -55,7 +53,7 @@ export default function HomePage() {
     const { toggleDiaryEntry, isMessageSaved: isDiaryMessageSaved, recordReveal } = useDiary();
     const { lastUnlockedBadgeId, triggerCelebration } = useBadges();
     const { reduceMotion } = useFeedback();
-    const { selectedSkin } = useBoxSkin();
+    const { selectedSkin, activePower } = useBoxSkin();
     const { storageMode, localProgressMessageSeen, markLocalMessageSeen, userData } = useAuth();
 
     const userNickname = userData?.nickname;
@@ -73,6 +71,7 @@ export default function HomePage() {
         setRevealedCatName,
         isDailyLocked,
         nextAvailableAt,
+        rechargeCost,
         refreshDailyLock,
         overrideDailyLock,
     } = useCatLogic({
@@ -117,18 +116,6 @@ export default function HomePage() {
         }
     }, []);
 
-    useEffect(() => {
-        try {
-            const onboardingSeen = localStorage.getItem('quantum-cat-onboarding-v2');
-            if (!onboardingSeen) {
-                setShowOnboarding(true);
-                // If showing onboarding, don't show splash
-                setShowSplash(false);
-            }
-        } catch (error) {
-            console.error('Could not access localStorage for onboarding', error);
-        }
-    }, []);
 
     useEffect(() => {
         let interval: NodeJS.Timeout;
@@ -232,14 +219,6 @@ export default function HomePage() {
         }
     };
 
-    const handleOnboardingComplete = () => {
-        setShowOnboarding(false);
-        try {
-            localStorage.setItem('quantum-cat-onboarding-v2', 'true');
-        } catch (error) {
-            console.error('Could not persist onboarding state', error);
-        }
-    };
 
     const shareUrl = 'https://thequantumcat.app';
 
@@ -265,26 +244,26 @@ export default function HomePage() {
     }, []);
 
     const handleUnlockWithPoints = useCallback(() => {
-        if (points < 10) {
+        if (points < rechargeCost) {
             playFeedback('error-1');
             toast({
                 title: 'Not enough Fish Points',
-                description: 'You need 10 Fish Points to unlock the Quantum Box.',
+                description: `You need ${rechargeCost} Fish Points to unlock the Quantum Box.`,
                 variant: 'destructive',
             });
             return;
         }
 
-        spendPoints(10);
+        spendPoints(rechargeCost);
         overrideDailyLock();
         playFeedback('celebration-magic');
         toast({
             title: 'Quantum Box Unlocked!',
-            description: 'You spent 10 Fish Points. The Quantum Box is ready to open!',
+            description: `You spent ${rechargeCost} Fish Points. The Quantum Box is ready to open!`,
         });
         setLockNotice('');
         setPendingAutoOpen(false);
-    }, [points, spendPoints, overrideDailyLock, toast]);
+    }, [points, rechargeCost, spendPoints, overrideDailyLock, toast]);
 
     const handleRequestAnotherBox = useCallback(() => {
         if (isDailyLocked) {
@@ -510,9 +489,7 @@ export default function HomePage() {
 
     return (
         <>
-            {showOnboarding ? (
-                <IntroOverlay onComplete={handleOnboardingComplete} />
-            ) : showSplash ? (
+            {showSplash ? (
                 <SplashScreen onComplete={handleSplashComplete} />
             ) : (
                 <>
@@ -538,7 +515,7 @@ export default function HomePage() {
                         )}
 
                         <div className="relative mt-6 flex h-64 w-full items-center justify-center overflow-visible">
-                            {showTutorialOverlay && !showOnboarding && !isDailyLocked && catState.outcome === 'initial' && (
+                            {showTutorialOverlay && !isDailyLocked && catState.outcome === 'initial' && (
                                 <TutorialOverlay />
                             )}
                             <QuantumCatBox
@@ -548,6 +525,7 @@ export default function HomePage() {
                                 catState={catState}
                                 isAmbientShaking={isAmbientShaking}
                                 isLocked={isDailyLocked}
+                                rechargeCost={rechargeCost}
                                 onUnlockRequested={() => setIsUnlockDialogOpen(true)}
                             />
                         </div>
@@ -617,10 +595,10 @@ export default function HomePage() {
                             <div className="p-5 pt-2 flex flex-col gap-3">
                                 <Tabs defaultValue="story" value={shareFormat} onValueChange={handleFormatChange} className="w-full">
                                     <TabsList className="grid w-full grid-cols-2 mb-3 rounded-2xl p-1 bg-muted/60">
-                                        <TabsTrigger value="story" className="rounded-xl font-semibold text-xs py-1.5 transition-all data-[state=active]:bg-background data-[state=active]:shadow-sm">
+                                        <TabsTrigger value="story" className="rounded-xl font-semibold text-xs py-1.5 transition-all text-muted-foreground hover:text-foreground data-[state=active]:bg-[#A240FF] data-[state=active]:text-white data-[state=active]:font-black data-[state=active]:shadow-sm">
                                             Story (9:16)
                                         </TabsTrigger>
-                                        <TabsTrigger value="square" className="rounded-xl font-semibold text-xs py-1.5 transition-all data-[state=active]:bg-background data-[state=active]:shadow-sm">
+                                        <TabsTrigger value="square" className="rounded-xl font-semibold text-xs py-1.5 transition-all text-muted-foreground hover:text-foreground data-[state=active]:bg-[#A240FF] data-[state=active]:text-white data-[state=active]:font-black data-[state=active]:shadow-sm">
                                             Post (1:1)
                                         </TabsTrigger>
                                     </TabsList>
@@ -742,7 +720,7 @@ export default function HomePage() {
                         open={isUnlockDialogOpen}
                         onOpenChange={setIsUnlockDialogOpen}
                         currentPoints={points}
-                        cost={10}
+                        cost={rechargeCost}
                         onConfirmUnlock={handleUnlockWithPoints}
                     />
                 </>

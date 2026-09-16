@@ -54,11 +54,11 @@ export default function AwardsPage() {
     }, [badges]);
 
     const tabBaseClass =
-        'flex-1 px-3 py-1.5 font-semibold transition transform rounded-2xl hover:scale-105 hover:shadow-md data-[state=active]:bg-white data-[state=active]:font-bold data-[state=active]:text-foreground data-[state=active]:scale-[1.08] dark:data-[state=active]:bg-white';
+        'flex-1 px-3 py-1.5 font-semibold transition transform rounded-2xl hover:scale-105 hover:shadow-md data-[state=active]:scale-[1.06] data-[state=active]:shadow-md data-[state=active]:font-black';
 
     const tabColorClasses: Record<string, string> = {
-        Badges: 'bg-pink-300/80 text-pink-900 dark:bg-pink-700 dark:text-pink-100',
-        Data: 'bg-sky-300/80 text-sky-900 dark:bg-sky-700 dark:text-sky-100',
+        Badges: 'bg-pink-100 text-pink-800 hover:bg-pink-200/70 dark:bg-pink-950/60 dark:text-pink-300 data-[state=active]:bg-[#FF809F] data-[state=active]:text-white dark:data-[state=active]:bg-[#FF809F] dark:data-[state=active]:text-white',
+        Data: 'bg-sky-100 text-sky-800 hover:bg-sky-200/70 dark:bg-sky-950/60 dark:text-sky-300 data-[state=active]:bg-[#3696C9] data-[state=active]:text-white dark:data-[state=active]:bg-[#3696C9] dark:data-[state=active]:text-white',
     };
 
     const stats = [

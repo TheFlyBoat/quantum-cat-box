@@ -16,7 +16,7 @@ import { Badge } from '@/components/ui/badge';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useBadges } from '@/context/badge-context';
 import { usePoints } from '@/context/points-context';
-import { Lock, Fish, PawPrint } from 'lucide-react';
+import { Lock, Fish, PawPrint, Zap } from 'lucide-react';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { useToast } from '@/hooks/use-toast';
 import { playFeedback } from '@/lib/audio';
@@ -241,13 +241,21 @@ export default function CustomizePage() {
                         <TabsList className="grid w-full grid-cols-2 gap-3 rounded-3xl border border-border/40 bg-background/80 p-2 text-[11px] font-semibold uppercase tracking-wide shadow-sm">
                             <TabsTrigger
                                 value="box-skins"
-                                className={cn('flex-1 px-3 py-1.5 font-semibold transition transform rounded-2xl hover:scale-105 hover:shadow-md data-[state=active]:bg-white data-[state=active]:font-bold data-[state=active]:text-foreground data-[state=active]:scale-[1.08] dark:data-[state=active]:bg-white', 'bg-sky-300/80 text-sky-900 dark:bg-sky-700 dark:text-sky-100')}
+                                className={cn(
+                                    'flex-1 px-3 py-1.5 font-semibold transition transform rounded-2xl hover:scale-105 hover:shadow-md data-[state=active]:scale-[1.06] data-[state=active]:shadow-md data-[state=active]:font-black',
+                                    'bg-sky-100 text-sky-800 hover:bg-sky-200/70 dark:bg-sky-950/60 dark:text-sky-300',
+                                    'data-[state=active]:bg-[#3696C9] data-[state=active]:text-white dark:data-[state=active]:bg-[#3696C9] dark:data-[state=active]:text-white'
+                                )}
                             >
                                 Box Skins
                             </TabsTrigger>
                             <TabsTrigger
                                 value="themes"
-                                className={cn('flex-1 px-3 py-1.5 font-semibold transition transform rounded-2xl hover:scale-105 hover:shadow-md data-[state=active]:bg-white data-[state=active]:font-bold data-[state=active]:text-foreground data-[state=active]:scale-[1.08] dark:data-[state=active]:bg-white', 'bg-pink-300/80 text-pink-900 dark:bg-pink-700 dark:text-pink-100')}
+                                className={cn(
+                                    'flex-1 px-3 py-1.5 font-semibold transition transform rounded-2xl hover:scale-105 hover:shadow-md data-[state=active]:scale-[1.06] data-[state=active]:shadow-md data-[state=active]:font-black',
+                                    'bg-pink-100 text-pink-800 hover:bg-pink-200/70 dark:bg-pink-950/60 dark:text-pink-300',
+                                    'data-[state=active]:bg-[#FF809F] data-[state=active]:text-white dark:data-[state=active]:bg-[#FF809F] dark:data-[state=active]:text-white'
+                                )}
                             >
                                 Themes
                             </TabsTrigger>
@@ -384,16 +392,38 @@ export default function CustomizePage() {
 
             {/* Purchase Skin Dialog */}
             <AlertDialog open={isPurchaseDialogOpen} onOpenChange={setIsPurchaseDialogOpen}>
-                <AlertDialogContent>
-                    <AlertDialogHeader>
-                        <AlertDialogTitle>Unlock {selectedSkinForPurchaseDialog.name} Skin?</AlertDialogTitle>
-                        <AlertDialogDescription>
-                            This will cost {getSkinCost(selectedSkinForPurchaseDialog.id)} Fish Points. You currently have {points} points.
+                <AlertDialogContent className="rounded-3xl p-6 border-border/60 bg-background/95 backdrop-blur-md">
+                    <AlertDialogHeader className="text-left sm:text-left">
+                        <AlertDialogTitle className="text-2xl font-headline font-bold text-foreground">
+                            Unlock {selectedSkinForPurchaseDialog.name} Skin?
+                        </AlertDialogTitle>
+                        <AlertDialogDescription className="text-sm text-muted-foreground">
+                            This will cost <strong className="text-foreground">{getSkinCost(selectedSkinForPurchaseDialog.id)} Fish Points</strong>. You currently have <strong className="text-foreground">{points} points</strong>.
                         </AlertDialogDescription>
                     </AlertDialogHeader>
-                    <AlertDialogFooter>
-                        <AlertDialogCancel onClick={() => playFeedback('click-2')}>Cancel</AlertDialogCancel>
+
+                    {selectedSkinForPurchaseDialog.power && (
+                        <div className="my-2 rounded-2xl border border-primary/30 bg-primary/5 p-3 text-left flex items-start gap-3">
+                            <div className="p-1.5 rounded-xl bg-primary/15 text-primary shrink-0 mt-0.5">
+                                <Zap className="h-4 w-4" />
+                            </div>
+                            <div className="flex-1">
+                                <div className="flex items-center justify-between gap-1">
+                                    <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Unlocked Power</span>
+                                    <Badge variant="outline" className="text-[9px] font-bold border-primary/40 text-primary px-1.5 py-0">
+                                        {selectedSkinForPurchaseDialog.power.badgeText}
+                                    </Badge>
+                                </div>
+                                <p className="text-xs font-bold text-foreground mt-0.5">{selectedSkinForPurchaseDialog.power.title}</p>
+                                <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">{selectedSkinForPurchaseDialog.power.description}</p>
+                            </div>
+                        </div>
+                    )}
+
+                    <AlertDialogFooter className="mt-2">
+                        <AlertDialogCancel className="rounded-2xl" onClick={() => playFeedback('click-2')}>Cancel</AlertDialogCancel>
                         <AlertDialogAction
+                            className="rounded-2xl font-bold bg-primary text-primary-foreground hover:opacity-95"
                             onClick={handlePurchaseSkin}
                             disabled={points < getSkinCost(selectedSkinForPurchaseDialog.id)}
                         >

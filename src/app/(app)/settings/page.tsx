@@ -3,12 +3,14 @@
 import Link from 'next/link';
 import * as React from 'react';
 import Image from 'next/image';
+import { useSearchParams } from 'next/navigation';
 import { useAuth } from '@/context/auth-context';
 import { useFeedback } from '@/context/feedback-context';
 import { useTheme } from 'next-themes';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { cn } from '@/lib/utils';
+import { SettingsHowGuide } from '@/components/features/settings-how-guide';
 
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
@@ -22,20 +24,18 @@ import {
     Accessibility,
     Vibrate,
     MessageSquare,
-    Fish,
-    Medal,
-    Cat,
     Heart,
-    BoxIcon,
-    GemIcon,
     ChevronRight,
 } from 'lucide-react';
-import type { LucideIcon } from 'lucide-react';
 import { playFeedback } from '@/lib/audio';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
 
-export default function SettingsPage() {
+function SettingsContent() {
+    const searchParams = useSearchParams();
+    const initialTab = searchParams.get('tab') === 'how' ? 'how' : searchParams.get('tab') === 'info' ? 'info' : 'system';
+    const [currentTab, setCurrentTab] = React.useState(initialTab);
+
     const { reset } = useAuth();
     const { soundEnabled, setSoundEnabled, vibrationEnabled, setVibrationEnabled, volume, setVolume, reduceMotion, setReduceMotion } = useFeedback();
     const { theme, setTheme } = useTheme();
@@ -69,91 +69,7 @@ export default function SettingsPage() {
     const rowTextClass = "text-sm font-medium text-foreground";
     const bodyTextClass = "text-sm text-foreground";
 
-    type HowTip = {
-        text: string;
-        icon?: LucideIcon;
-        iconColorClass?: string;
-        iconBgClass?: string;
-    };
 
-    const howCards: Array<{
-        key: string;
-        icon: LucideIcon;
-        title: string;
-        summary: string;
-        tips: HowTip[];
-        borderClass: string;
-        iconColorClass: string;
-        iconBgClass: string;
-        bulletClass: string;
-    }> = [
-            {
-                key: 'observe',
-                icon: BoxIcon,
-                title: 'Open the Box',
-                summary: 'Tap to open the box and let the universe decide your reality.',
-                tips: [
-                    {
-                        icon: Cat,
-                        text: 'Reality Reveal: Alive, Dead, or Paradox Cat appears with a message meant only for you.',
-                        iconColorClass: 'text-[#7C3AED]',
-                    },
-                    {
-                        icon: Heart,
-                        text: 'Save the Moment: Tap the heart right after the reveal to save your message in the Cat’s Diary..',
-                        iconColorClass: 'text-[#EC4899]',
-                    },
-                ],
-                borderClass: 'border-rose-200/70 dark:border-rose-400/40',
-                iconColorClass: 'text-[#EC4899]',
-                iconBgClass: 'bg-rose-100 dark:bg-rose-900/30',
-                bulletClass: 'bg-rose-400/70',
-            },
-            {
-                key: 'fish',
-                icon: Fish,
-                title: 'Fish Points',
-                summary: 'Fish Points are your universal currency, trade them for new experiments, box skins and unlock new dimensions.',
-                tips: [
-                    { text: 'Each cat state worth fish points.' },
-                    { text: 'Share the outcome to earn +10 Fish Points instantly.' },
-                    { text: 'Some timelines drop mystery gifts after celebrations.' },
-                ],
-                borderClass: 'border-teal-200/70 dark:border-teal-400/40',
-                iconColorClass: 'text-[#0F766E]',
-                iconBgClass: 'bg-teal-100 dark:bg-teal-900/30',
-                bulletClass: 'bg-teal-400/70',
-            },
-            {
-                key: 'badges',
-                icon: Medal,
-                title: 'Badges',
-                summary: 'Earn shiny badges for your achievements.',
-                tips: [
-                    { text: 'Reveal the same cat three times in a row to chase the Quantum Echo legend.' },
-                    { text: 'Keep a 3-day streak to win the Curious Kitten badge.' },
-                ],
-                borderClass: 'border-amber-200/70 dark:border-amber-400/40',
-                iconColorClass: 'text-[#D97706]',
-                iconBgClass: 'bg-amber-100 dark:bg-amber-900/30',
-                bulletClass: 'bg-amber-400/70',
-            },
-            {
-                key: 'streaks',
-                icon: GemIcon,
-                title: 'Hidden Gem',
-                summary: 'An Infinite box is hidden somewhere in the app.',
-                tips: [
-                    { text: 'The fish points will be useful for the next features.' },
-                    { text: 'The app is currently in development. Check in for new features soon' },
-                    { text: 'Send us feedback on: hello@thequantumcat.app.' },
-                ],
-                borderClass: 'border-lime-200/70 dark:border-lime-400/40',
-                iconColorClass: 'text-[#3F6212]',
-                iconBgClass: 'bg-lime-100 dark:bg-lime-900/30',
-                bulletClass: 'bg-lime-400/70',
-            },
-        ];
 
     return (
         <Card className="border-none bg-transparent shadow-none">
@@ -161,10 +77,10 @@ export default function SettingsPage() {
                 <CardTitle className="page-title text-teal-500">Settings</CardTitle>
             </CardHeader>
             <CardContent>
-                <Tabs defaultValue="system" className="w-full" onValueChange={() => playFeedback('click-3')}>
+                <Tabs value={currentTab} onValueChange={(val) => { playFeedback('click-3'); setCurrentTab(val); }} className="w-full">
                     {(() => {
                         const tabBaseClass =
-                            'flex-1 px-3 py-1.5 font-semibold transition transform rounded-2xl hover:scale-105 hover:shadow-md data-[state=active]:bg-white data-[state=active]:font-bold data-[state=active]:text-foreground data-[state=active]:scale-[1.08] dark:data-[state=active]:bg-white';
+                            'flex-1 px-3 py-1.5 font-semibold transition transform rounded-2xl hover:scale-105 hover:shadow-md data-[state=active]:scale-[1.06] data-[state=active]:shadow-md data-[state=active]:font-black';
 
                         return (
                             <TabsList className="grid w-full grid-cols-3 gap-3 rounded-3xl border border-border/40 bg-background/80 p-2 text-[11px] font-semibold uppercase tracking-wide shadow-sm">
@@ -172,7 +88,7 @@ export default function SettingsPage() {
                                     value="system"
                                     className={cn(
                                         tabBaseClass,
-                                        'bg-sky-300/80 text-sky-900 dark:bg-sky-700 dark:text-sky-100'
+                                        'bg-sky-100 text-sky-800 hover:bg-sky-200/70 dark:bg-sky-950/60 dark:text-sky-300 data-[state=active]:bg-[#3696C9] data-[state=active]:text-white dark:data-[state=active]:bg-[#3696C9] dark:data-[state=active]:text-white'
                                     )}
                                 >
                                     System
@@ -181,7 +97,7 @@ export default function SettingsPage() {
                                     value="info"
                                     className={cn(
                                         tabBaseClass,
-                                        'bg-lime-300/80 text-lime-900 dark:bg-lime-700 dark:text-lime-100'
+                                        'bg-emerald-100 text-emerald-800 hover:bg-emerald-200/70 dark:bg-emerald-950/60 dark:text-emerald-300 data-[state=active]:bg-emerald-600 data-[state=active]:text-white dark:data-[state=active]:bg-emerald-600 dark:data-[state=active]:text-white'
                                     )}
                                 >
                                     Info
@@ -190,7 +106,7 @@ export default function SettingsPage() {
                                     value="how"
                                     className={cn(
                                         tabBaseClass,
-                                        'bg-pink-300/80 text-pink-900 dark:bg-pink-700 dark:text-pink-100'
+                                        'bg-pink-100 text-pink-800 hover:bg-pink-200/70 dark:bg-pink-950/60 dark:text-pink-300 data-[state=active]:bg-[#FF809F] data-[state=active]:text-white dark:data-[state=active]:bg-[#FF809F] dark:data-[state=active]:text-white'
                                     )}
                                 >
                                     How
@@ -366,65 +282,18 @@ export default function SettingsPage() {
                         </div>
                     </TabsContent>
                     <TabsContent value="how">
-                        <div className="relative space-y-8 pt-4 pl-4">
-                            {/* Vertical Timeline Line */}
-                            <div className="absolute left-[27px] top-6 bottom-6 w-0.5 bg-gradient-to-b from-sky-200 via-purple-200 to-transparent opacity-50" />
-
-                            {howCards.map((card, index) => {
-                                const CardIcon = card.icon;
-                                return (
-                                    <div key={card.key} className="relative flex gap-6">
-                                        {/* Timeline Node */}
-                                        <div className={cn(
-                                            "relative z-10 flex h-6 w-6 shrink-0 items-center justify-center rounded-full border-2 bg-background ring-4 ring-background",
-                                            card.borderClass.replace('border-', 'border-').replace('/70', '').replace('/40', '')
-                                        )}>
-                                            <div className={cn("h-2 w-2 rounded-full", card.bulletClass.replace('/70', ''))} />
-                                        </div>
-
-                                        {/* Card Content */}
-                                        <div className={cn(
-                                            "flex-1 space-y-3 rounded-3xl border bg-card/50 p-5 shadow-sm backdrop-blur-sm transition-all hover:bg-card/80",
-                                            card.borderClass
-                                        )}>
-                                            <div className="flex items-center gap-3">
-                                                <div className={cn("flex h-10 w-10 items-center justify-center rounded-xl", card.iconBgClass)}>
-                                                    <CardIcon className={cn("h-5 w-5", card.iconColorClass)} />
-                                                </div>
-                                                <div>
-                                                    <h3 className="font-headline text-lg font-bold text-foreground">{card.title}</h3>
-                                                </div>
-                                            </div>
-                                            
-                                            <p className="text-sm leading-relaxed text-muted-foreground">
-                                                {card.summary}
-                                            </p>
-
-                                            {card.tips.length > 0 && (
-                                                <div className="mt-3 space-y-2 rounded-2xl bg-muted/30 p-3">
-                                                    {card.tips.map((tip, i) => {
-                                                        const TipIcon = tip.icon;
-                                                        return (
-                                                            <div key={i} className="flex items-start gap-2 text-xs text-muted-foreground/90">
-                                                                {TipIcon ? (
-                                                                    <TipIcon className={cn("mt-0.5 h-3.5 w-3.5 shrink-0", tip.iconColorClass)} />
-                                                                ) : (
-                                                                    <div className={cn("mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full opacity-70", card.bulletClass)} />
-                                                                )}
-                                                                <span>{tip.text}</span>
-                                                            </div>
-                                                        )
-                                                    })}
-                                                </div>
-                                            )}
-                                        </div>
-                                    </div>
-                                );
-                            })}
-                        </div>
+                        <SettingsHowGuide />
                     </TabsContent>
                 </Tabs>
             </CardContent>
         </Card>
+    );
+}
+
+export default function SettingsPage() {
+    return (
+        <React.Suspense fallback={<div className="p-8 text-center text-muted-foreground">Loading settings...</div>}>
+            <SettingsContent />
+        </React.Suspense>
     );
 }
