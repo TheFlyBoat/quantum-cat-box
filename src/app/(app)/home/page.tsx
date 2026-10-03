@@ -22,7 +22,6 @@ import { playFeedback } from '@/lib/audio';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/context/auth-context';
-import { IntroOverlay } from '@/components/features/intro-overlay';
 import { usePoints } from '@/context/points-context';
 import { UnlockBoxDialog } from '@/components/features/unlock-box-dialog';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -32,7 +31,6 @@ import { WhatsAppIcon, XTwitterIcon, InstagramIcon } from '@/components/icons/so
 const SPLASH_SEEN_KEY = 'quantum-cat-splash-date';
 
 export default function HomePage() {
-    const [showOnboarding, setShowOnboarding] = useState(false);
     const [isAmbientShaking, setIsAmbientShaking] = useState(false);
     const [isShareDialogOpen, setIsShareDialogOpen] = useState(false);
     const [shareAsset, setShareAsset] = useState<ShareAsset | null>(null);
@@ -119,19 +117,6 @@ export default function HomePage() {
             }
         } catch (error) {
             console.warn('Unable to access localStorage for splash screen state', error);
-        }
-    }, []);
-
-    useEffect(() => {
-        try {
-            const onboardingSeen = localStorage.getItem('quantum-cat-onboarding-v2');
-            if (!onboardingSeen) {
-                setShowOnboarding(true);
-                // If showing onboarding, don't show splash
-                setShowSplash(false);
-            }
-        } catch (error) {
-            console.error('Could not access localStorage for onboarding', error);
         }
     }, []);
 
@@ -236,15 +221,6 @@ export default function HomePage() {
             console.warn('Unable to persist splash screen state', error);
         }
     }, []);
-
-    const handleOnboardingComplete = () => {
-        setShowOnboarding(false);
-        try {
-            localStorage.setItem('quantum-cat-onboarding-v2', 'true');
-        } catch (error) {
-            console.error('Could not persist onboarding state', error);
-        }
-    };
 
     const shareUrl = 'https://thequantumcat.app';
 
@@ -515,9 +491,7 @@ export default function HomePage() {
 
     return (
         <>
-            {showOnboarding ? (
-                <IntroOverlay onComplete={handleOnboardingComplete} />
-            ) : showSplash ? (
+            {showSplash ? (
                 <SplashScreen onComplete={handleSplashComplete} />
             ) : (
                 <>
@@ -543,7 +517,7 @@ export default function HomePage() {
                         )}
 
                         <div className="relative mt-6 flex h-64 w-full items-center justify-center overflow-visible">
-                            {showTutorialOverlay && !showOnboarding && !isDailyLocked && catState.outcome === 'initial' && (
+                            {showTutorialOverlay && !isDailyLocked && catState.outcome === 'initial' && (
                                 <TutorialOverlay />
                             )}
                             <QuantumCatBox

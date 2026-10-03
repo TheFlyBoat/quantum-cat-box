@@ -41,8 +41,6 @@ Schrödinger's thought experiment says a cat sealed in a box with a radioactive 
 | Storage | Firebase Storage |
 | Hosting | Firebase App Hosting |
 | Styling | Tailwind CSS, Shadcn/ui |
-| Animation | Framer Motion |
-| WebGL | OGL (box opening visuals) |
 | Forms | React Hook Form + Zod |
 | Image Export | html-to-image |
 | Date Logic | date-fns |
