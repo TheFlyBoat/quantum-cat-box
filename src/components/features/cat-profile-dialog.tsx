@@ -109,9 +109,9 @@ export function CatProfileDialog({ cat, open, onOpenChange }: CatProfileDialogPr
                                  <Card>
                                     <CardContent className="p-3">
                                         <div className="flex items-start gap-3">
-                                            <Swords className="mt-0.5 h-4 w-4 shrink-0 text-emerald-500" />
+                                            <Swords className="mt-0.5 h-4 w-4 shrink-0 text-[#A9DB4A]" />
                                             <div>
-                                                <h4 className="section-title text-xs uppercase tracking-wide text-muted-foreground/70">Strength</h4>
+                                                <h4 className="section-title text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">Strength</h4>
                                                 <p className="body-text text-sm text-muted-foreground">{cat.strength}</p>
                                             </div>
                                         </div>
@@ -122,7 +122,7 @@ export function CatProfileDialog({ cat, open, onOpenChange }: CatProfileDialogPr
                                         <div className="flex items-start gap-3">
                                             <HeartCrack className="mt-0.5 h-4 w-4 shrink-0 text-destructive" />
                                             <div>
-                                                <h4 className="section-title text-xs uppercase tracking-wide text-muted-foreground/70">Weakness</h4>
+                                                <h4 className="section-title text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">Weakness</h4>
                                                 <p className="body-text text-sm text-muted-foreground">{cat.weakness}</p>
                                             </div>
                                         </div>

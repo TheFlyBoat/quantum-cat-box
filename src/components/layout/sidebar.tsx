@@ -10,11 +10,11 @@ import { playFeedback } from '@/lib/audio';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 const navItems = [
-    { href: '/home', icon: Home, label: 'Home', hoverColorClass: 'hover:text-sky-400', activeColorClass: 'text-sky-400' },
-    { href: '/gallery', icon: Cat, label: 'Gallery', hoverColorClass: 'hover:text-fuchsia-400', activeColorClass: 'text-fuchsia-400' },
-    { href: '/awards', icon: Award, label: 'Awards', hoverColorClass: 'hover:text-pink-400', activeColorClass: 'text-pink-400' },
-    { href: '/customize', icon: BoxIcon, label: 'Customise', hoverColorClass: 'hover:text-amber-400', activeColorClass: 'text-amber-400' },
-    { href: '/settings', icon: Settings, label: 'Settings', hoverColorClass: 'hover:text-emerald-400', activeColorClass: 'text-emerald-400' },
+    { href: '/home', icon: Home, label: 'Home', hoverColorClass: 'hover:text-[#3696C9]', activeColorClass: 'text-[#3696C9]' },
+    { href: '/gallery', icon: Cat, label: 'Gallery', hoverColorClass: 'hover:text-[#A240FF]', activeColorClass: 'text-[#A240FF]' },
+    { href: '/awards', icon: Award, label: 'Awards', hoverColorClass: 'hover:text-[#FF809F]', activeColorClass: 'text-[#FF809F]' },
+    { href: '/customize', icon: BoxIcon, label: 'Customise', hoverColorClass: 'hover:text-[#D14002]', activeColorClass: 'text-[#D14002]' },
+    { href: '/settings', icon: Settings, label: 'Settings', hoverColorClass: 'hover:text-[#A9DB4A]', activeColorClass: 'text-[#A9DB4A]' },
 ];
 
 const TRIPLE_CLICK_WINDOW_MS = 800;

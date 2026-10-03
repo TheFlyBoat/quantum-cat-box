@@ -73,7 +73,7 @@ quantum-cat-box/
 │   │   └── features/             # App feature blocks:
 │   │       ├── QuantumCatBox     # The main box interaction
 │   │       ├── CatDiarySheet     # Diary overlay
-│   │       ├── BadgeCard         # Badge display
+│   │       ├── badge-card        # Badge display
 │   │       └── celebration-card  # Badge unlock celebration modal
 │   ├── context/                  # React Contexts — Auth, Points, Badges
 │   ├── lib/
@@ -199,7 +199,7 @@ The flow receives the cat's state (`alive`, `dead`, or `paradox`) and sets the m
 **Fallbacks are never silent.** Every response carries `source: 'ai' | 'fallback'`. Each fallback writes a structured log line to Cloud Logging:
 
 ```
-jsonPayload.event="quantum_message_fallback"   # reason: missing_api_key | timeout | model_error | invalid_output
+jsonPayload.event="quantum_message_fallback"   # reason: missing_api_key | timeout | model_error | invalid_output | flow_error
 jsonPayload.event="quantum_message_generated"  # includes latencyMs
 ```
 
