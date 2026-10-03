@@ -72,7 +72,7 @@ src/components/ui/         → Shadcn UI components (Button, Card, Dialog, etc.)
 src/components/layout/     → Structural layout parts (Header, Sidebar)
 src/components/auth/       → Auth components (LoginCard, NicknameDialog)
 src/components/cats/       → Individual cat components (bones-cat.tsx, etc.)
-src/components/features/   → App feature blocks (QuantumCatBox, CatDiarySheet, BadgeCard)
+src/components/features/   → App feature blocks (QuantumCatBox, CatDiarySheet, badge-card)
 ```
 
 ### **Logic & Data**
@@ -172,6 +172,6 @@ App must support **Light** and **Dark** using `next-themes`.
 | **Buttons**                | `<Button>`                          | `src/components/ui/button.tsx`          | Use for every clickable button. Never style raw `<button>`.   |
 | **Status Tags / Labels**   | `<Badge>`                           | `src/components/ui/badge.tsx`           | For cat state chips like “Alive”, “Dead”, “Paradox”.          |
 | **User Auth Badge**        | `<UserStatusLabel>`                 | `src/components/auth/user-status-label` | Guest: outline `#CDC1E1` / text `#8D52F6` (dark `#2F374C` / `#A8AEBD`); signed-in: fill `#F2BB33` / text `#1F1404`. |
-| **Awards Display**         | `<BadgeCard>`                       | `src/components/features/BadgeCard.tsx` | Used in the Awards page for unlocked milestones.              |
+| **Awards Display**         | `<BadgeCard>`                       | `src/components/features/badge-card.tsx` | Used in the Awards page for unlocked milestones.              |
 
 ---

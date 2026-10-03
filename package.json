@@ -64,7 +64,7 @@
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "eslint": "9.38.0",
-    "eslint-config-next": "16.0.0",
+    "eslint-config-next": "^15.5.7",
     "genkit-cli": "^1.14.1",
     "postcss": "^8",
     "puppeteer": "^22.13.0",

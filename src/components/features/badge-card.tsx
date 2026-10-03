@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Lock } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 interface BadgeCardProps {
     badge: {
@@ -24,11 +25,20 @@ interface BadgeCardProps {
  * @param badgeImage The image for the badge.
  */
 export function BadgeCard({ badge, unlocked, badgeImage }: BadgeCardProps) {
+    const isPlaceholder = badge.id.startsWith('placeholder-') || badge.name === '???';
+
     return (
         <TooltipProvider delayDuration={150}>
             <Tooltip>
                 <TooltipTrigger asChild>
-                    <Card className="flex aspect-square flex-col overflow-hidden rounded-3xl border border-border/40 bg-background/80 shadow-sm">
+                    <Card
+                        className={cn(
+                            "flex aspect-square flex-col overflow-hidden rounded-3xl shadow-sm",
+                            isPlaceholder
+                                ? "border border-dashed border-muted-foreground/40 bg-background/60 cursor-default"
+                                : "border border-border/40 bg-background/80"
+                        )}
+                    >
                         <CardContent className="relative flex flex-1 items-center justify-center bg-gradient-to-br from-background via-background/70 to-background p-2">
                             {unlocked && badgeImage ? (
                                 <Image
@@ -43,7 +53,7 @@ export function BadgeCard({ badge, unlocked, badgeImage }: BadgeCardProps) {
                             )}
                         </CardContent>
                         <CardFooter className="bg-background/60 p-2 text-center">
-                            <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                            <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
                                 {unlocked ? badge.name : '???'}
                             </p>
                         </CardFooter>
@@ -53,7 +63,9 @@ export function BadgeCard({ badge, unlocked, badgeImage }: BadgeCardProps) {
                     <p className="font-semibold">{badge.name}</p>
                     <p className="text-xs text-muted-foreground">{badge.description}</p>
                     {!unlocked && (
-                        <p className="text-[11px] font-medium text-primary/80">Not yet unlocked</p>
+                        <p className="text-[11px] font-medium text-primary/80">
+                            {isPlaceholder ? 'Undiscovered mystery milestone' : 'Not yet unlocked'}
+                        </p>
                     )}
                 </TooltipContent>
             </Tooltip>

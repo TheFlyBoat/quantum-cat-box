@@ -75,7 +75,7 @@ quantum-cat-box/
 │   │   └── features/             # App feature blocks:
 │   │       ├── QuantumCatBox     # The main box interaction
 │   │       ├── CatDiarySheet     # Diary overlay
-│   │       ├── BadgeCard         # Badge display
+│   │       ├── badge-card        # Badge display
 │   │       └── celebration-card  # Badge unlock celebration modal
 │   ├── context/                  # React Contexts — Auth, Points, Badges
 │   ├── lib/

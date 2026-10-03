@@ -1,7 +1,6 @@
 'use client';
 
-import type { CSSProperties } from 'react';
-import { useEffect, useMemo, useState, useSyncExternalStore } from 'react';
+import { type CSSProperties, useEffect, useMemo, useState, useSyncExternalStore } from 'react';
 import { createPortal } from 'react-dom';
 import { cn } from '@/lib/utils';
 
@@ -508,7 +507,6 @@ export function SplashScreen({ onComplete }: { onComplete?: () => void }) {
   const [particles, setParticles] = useState<Particle[]>([]);
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     setParticles(generateParticles(prefersReducedMotion ? 12 : 36));
   }, [prefersReducedMotion]);
 

@@ -5,12 +5,20 @@ import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useBoxSkin } from '@/context/box-skin-context';
-import { BoxIcon, CarbonBoxIcon, CardboardBoxIcon, BlackWoodenBoxIcon, SpecialXK6BoxIcon, StoneBoxIcon, TardisBoxIcon } from '@/components/icons';
-import { CircuitBoardBoxIcon } from '@/components/icons/circuit-board-box-icon';
-import { CrystalBoxIcon } from '@/components/icons/crystal-box-icon';
-import { GalaxyBoxIcon } from '@/components/icons/galaxy-box-icon';
-import { PlushBoxIcon } from '@/components/icons/plush-box-icon';
-import { SteampunkBoxIcon } from '@/components/icons/steampunk-box-icon';
+import {
+  BlackWoodenBoxIcon,
+  BoxIcon,
+  CarbonBoxIcon,
+  CardboardBoxIcon,
+  CircuitBoardBoxIcon,
+  CrystalBoxIcon,
+  GalaxyBoxIcon,
+  PlushBoxIcon,
+  SpecialXK6BoxIcon,
+  SteampunkBoxIcon,
+  StoneBoxIcon,
+  TardisBoxIcon,
+} from '@/components/icons';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
@@ -239,26 +247,36 @@ export default function CustomizePage() {
                 <CardContent>
                     <Tabs defaultValue="box-skins" className="w-full" onValueChange={() => playFeedback('click-3')}>
                         <TabsList className="grid w-full grid-cols-2 gap-3 rounded-3xl border border-border/40 bg-background/80 p-2 text-[11px] font-semibold uppercase tracking-wide shadow-sm">
-                            <TabsTrigger
-                                value="box-skins"
-                                className={cn(
-                                    'flex-1 px-3 py-1.5 font-semibold transition transform rounded-2xl hover:scale-105 hover:shadow-md data-[state=active]:scale-[1.06] data-[state=active]:shadow-md data-[state=active]:font-black',
-                                    'bg-sky-100 text-sky-800 hover:bg-sky-200/70 dark:bg-sky-950/60 dark:text-sky-300',
-                                    'data-[state=active]:bg-[#3696C9] data-[state=active]:text-white dark:data-[state=active]:bg-[#3696C9] dark:data-[state=active]:text-white'
-                                )}
-                            >
-                                Box Skins
-                            </TabsTrigger>
-                            <TabsTrigger
-                                value="themes"
-                                className={cn(
-                                    'flex-1 px-3 py-1.5 font-semibold transition transform rounded-2xl hover:scale-105 hover:shadow-md data-[state=active]:scale-[1.06] data-[state=active]:shadow-md data-[state=active]:font-black',
-                                    'bg-pink-100 text-pink-800 hover:bg-pink-200/70 dark:bg-pink-950/60 dark:text-pink-300',
-                                    'data-[state=active]:bg-[#FF809F] data-[state=active]:text-white dark:data-[state=active]:bg-[#FF809F] dark:data-[state=active]:text-white'
-                                )}
-                            >
-                                Themes
-                            </TabsTrigger>
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <TabsTrigger
+                                        value="box-skins"
+                                        className={cn(
+                                            'flex-1 px-3 py-1.5 font-semibold transition transform rounded-2xl hover:scale-105 hover:shadow-md data-[state=active]:scale-[1.06] data-[state=active]:shadow-md data-[state=active]:font-black',
+                                            'bg-sky-100 text-sky-800 hover:bg-sky-200/70 dark:bg-sky-950/60 dark:text-sky-300',
+                                            'data-[state=active]:bg-[#3696C9] data-[state=active]:text-[#002D41] data-[state=active]:font-semibold dark:data-[state=active]:bg-[#3696C9] dark:data-[state=active]:text-[#002D41]'
+                                        )}
+                                    >
+                                        Box Skins
+                                    </TabsTrigger>
+                                </TooltipTrigger>
+                                <TooltipContent side="top">Custom Box Skins</TooltipContent>
+                            </Tooltip>
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <TabsTrigger
+                                        value="themes"
+                                        className={cn(
+                                            'flex-1 px-3 py-1.5 font-semibold transition transform rounded-2xl hover:scale-105 hover:shadow-md data-[state=active]:scale-[1.06] data-[state=active]:shadow-md data-[state=active]:font-black',
+                                            'bg-pink-100 text-pink-800 hover:bg-pink-200/70 dark:bg-pink-950/60 dark:text-pink-300',
+                                            'data-[state=active]:bg-[#FF809F] data-[state=active]:text-[#002D41] data-[state=active]:font-semibold dark:data-[state=active]:bg-[#FF809F] dark:data-[state=active]:text-[#002D41]'
+                                        )}
+                                    >
+                                        Themes
+                                    </TabsTrigger>
+                                </TooltipTrigger>
+                                <TooltipContent side="top">Color Themes & Palettes</TooltipContent>
+                            </Tooltip>
                         </TabsList>
                         <TabsContent value="box-skins">
                             <TooltipProvider delayDuration={200}>
@@ -301,7 +319,7 @@ export default function CustomizePage() {
                                                         )}
                                                     </CardContent>
                                                     <CardFooter className="bg-background/60 p-2 text-center">
-                                                        <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{skin.name}</p>
+                                                        <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">{skin.name}</p>
                                                     </CardFooter>
                                                 </Card>
                                             </TooltipTrigger>
@@ -318,6 +336,26 @@ export default function CustomizePage() {
                                             </Tooltip>
                                         );
                                     })}
+                                    {Array.from({ length: Math.max(0, 12 - boxSkinData.skins.length) }, (_, index) => (
+                                        <Tooltip key={`coming-soon-${index}`}>
+                                            <TooltipTrigger asChild>
+                                                <Card
+                                                    className="flex aspect-square flex-col overflow-hidden rounded-3xl border border-dashed border-muted-foreground/40 bg-background/60 shadow-inner cursor-default"
+                                                >
+                                                    <CardContent className="flex flex-1 items-center justify-center bg-gradient-to-br from-muted/30 via-transparent to-transparent p-3">
+                                                        <Lock className="h-8 w-8 text-muted-foreground/40" />
+                                                    </CardContent>
+                                                    <CardFooter className="bg-background/60 p-2 text-center">
+                                                        <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">Coming Soon</p>
+                                                    </CardFooter>
+                                                </Card>
+                                            </TooltipTrigger>
+                                            <TooltipContent className="max-w-[220px] text-center" side="top">
+                                                <p className="text-sm font-semibold text-foreground">Coming Soon</p>
+                                                <p className="mt-1 text-xs text-muted-foreground">More box skins in development</p>
+                                            </TooltipContent>
+                                        </Tooltip>
+                                    ))}
                                 </div>
                             </TooltipProvider>
                         </TabsContent>
@@ -409,7 +447,7 @@ export default function CustomizePage() {
                             </div>
                             <div className="flex-1">
                                 <div className="flex items-center justify-between gap-1">
-                                    <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Unlocked Power</span>
+                                    <span className="text-[10px] font-bold uppercase tracking-[0.16em] text-muted-foreground">Unlocked Power</span>
                                     <Badge variant="outline" className="text-[9px] font-bold border-primary/40 text-primary px-1.5 py-0">
                                         {selectedSkinForPurchaseDialog.power.badgeText}
                                     </Badge>

@@ -9,20 +9,20 @@ import {
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import {
+  BlackWoodenBoxIcon,
   BoxIcon,
   CarbonBoxIcon,
   CardboardBoxIcon,
-  BlackWoodenBoxIcon,
+  CircuitBoardBoxIcon,
+  CrystalBoxIcon,
+  GalaxyBoxIcon,
+  PlushBoxIcon,
   SpecialXK6BoxIcon,
+  SteampunkBoxIcon,
   StoneBoxIcon,
   TardisBoxIcon,
 } from '@/components/icons';
-import { CircuitBoardBoxIcon } from '@/components/icons/circuit-board-box-icon';
-import { CrystalBoxIcon } from '@/components/icons/crystal-box-icon';
-import { GalaxyBoxIcon } from '@/components/icons/galaxy-box-icon';
-import { PlushBoxIcon } from '@/components/icons/plush-box-icon';
-import { SteampunkBoxIcon } from '@/components/icons/steampunk-box-icon';
-import { ComponentType } from 'react';
+import type { ComponentType } from 'react';
 import { Zap } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 
@@ -79,7 +79,7 @@ export function BoxSkinDialog({ open, onOpenChange, skin, onApply }: BoxSkinDial
             </div>
             <div className="flex-1">
               <div className="flex items-center justify-between gap-2">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Equipped Power</span>
+                <span className="text-[10px] font-bold uppercase tracking-[0.16em] text-muted-foreground">Equipped Power</span>
                 <Badge variant="outline" className="text-[10px] font-bold border-primary/40 text-primary">
                   {skin.power.badgeText}
                 </Badge>

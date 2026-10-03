@@ -1,22 +1,23 @@
-# Node
+# Dependencies
 node_modules/
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
 dist/
 
-# Next.js
+# Next.js & Build Caches
 .next/
 out/
 .vercel/
+.turbo/
+.swc/
+*.tsbuildinfo
+tsconfig.tsbuildinfo
 
-# Firebase
+# Firebase (Exclude local emulators/cache and debug logs, KEEP .firebaserc tracked)
 .firebase/
-.firebaserc
 firebase-debug.log
 firebase-debug.*
-.firebase/
+
+# Agent Metadata
+.agents/
 
 # Environment files
 .env
@@ -35,6 +36,8 @@ logs/
 *.log
 npm-debug.log*
 yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
 lerna-debug.log*
 
 # IDE
@@ -42,4 +45,5 @@ lerna-debug.log*
 *.swp
 *.swo
 
+# GitHub Workflows
 .github/workflows/firebase-hosting.yml.save

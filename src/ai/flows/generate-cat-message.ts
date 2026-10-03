@@ -27,13 +27,22 @@ const GenerateCatMessageOutputSchema = z.object({
 export type GenerateCatMessageOutput = z.infer<typeof GenerateCatMessageOutputSchema>;
 
 export async function generateCatMessage(input: GenerateCatMessageInput): Promise<GenerateCatMessageOutput> {
-  return generateCatMessageFlow(input);
+  try {
+    return await generateCatMessageFlow(input);
+  } catch (error) {
+    console.error('[Genkit Server Action Error]:', error);
+    return buildFallbackMessage(input);
+  }
 }
 
 const prompt = ai.definePrompt({
   name: 'generateCatMessagePrompt',
   input: {schema: GenerateCatMessageInputSchema},
   output: {schema: GenerateCatMessageOutputSchema},
+  config: {
+    maxOutputTokens: 120,
+    temperature: 0.7,
+  },
   prompt: `You are a modern-day oracle. You give life advice that is mystical but uses simple, everyday language. No "thee" or "thou". Just straight talk from the universe.
 
 The user has opened a box to reveal a specific outcome. Your message is for the *human* opening the box.
@@ -61,17 +70,64 @@ Context (for tone only, do NOT mention these directly):
 Generate one short, modern, and insightful message.`,
 });
 
-async function buildFallbackMessage(input: GenerateCatMessageInput): Promise<GenerateCatMessageOutput> {
-  const fallbackModule = await import('@/lib/fallback-messages.json');
-  const fallbackPayload = fallbackModule.default as { messages: string[] } | string[];
-  const messagePool = Array.isArray(fallbackPayload) ? fallbackPayload : fallbackPayload.messages;
-  const selectedEntry = messagePool[Math.floor(Math.random() * messagePool.length)];
-  const base =
-    typeof selectedEntry === 'string'
-      ? selectedEntry
-      : (selectedEntry as { message?: string }).message ?? 'Embrace the mystery beyond the box.';
+const STATE_FALLBACK_MESSAGES: Record<'alive' | 'dead' | 'paradox', string[]> = {
+  alive: [
+    'A fresh perspective changes everything. Embrace the spark.',
+    'Life is unfolding with vibrant momentum. Step forward boldly.',
+    'Energy flows where attention goes. Awaken to today.',
+    'Every sunrise brings an unwritten story. Claim yours.',
+  ],
+  dead: [
+    'Every ending is a beginning disguised as a goodbye.',
+    'Let go of what was to make room for what will be.',
+    'In quiet stillness, wisdom finds its deepest voice.',
+    'Transformation begins when you release what was.',
+  ],
+  paradox: [
+    'Embrace the contradiction. That is where possibility lives.',
+    'Two truths can exist at once; balance is found in between.',
+    'When nothing is certain, everything becomes possible.',
+    'The mystery itself holds the answer you seek.',
+  ],
+};
 
-  return { message: base };
+const DEFAULT_FALLBACK_MESSAGE = 'Embrace the mystery beyond the box.';
+
+async function buildFallbackMessage(input: GenerateCatMessageInput): Promise<GenerateCatMessageOutput> {
+  const outcomeKey = (input?.catType || '').toLowerCase();
+  let statePool: string[] | undefined;
+  if (outcomeKey.includes('alive')) {
+    statePool = STATE_FALLBACK_MESSAGES.alive;
+  } else if (outcomeKey.includes('dead')) {
+    statePool = STATE_FALLBACK_MESSAGES.dead;
+  } else if (outcomeKey.includes('paradox')) {
+    statePool = STATE_FALLBACK_MESSAGES.paradox;
+  }
+
+  if (statePool && statePool.length > 0) {
+    const message = statePool[Math.floor(Math.random() * statePool.length)];
+    return { message };
+  }
+
+  try {
+    const fallbackModule = await import('@/lib/fallback-messages.json');
+    const fallbackPayload = fallbackModule.default as { messages: string[] } | string[];
+    const messagePool = Array.isArray(fallbackPayload) ? fallbackPayload : fallbackPayload.messages;
+    if (messagePool && messagePool.length > 0) {
+      const selectedEntry = messagePool[Math.floor(Math.random() * messagePool.length)];
+      const base =
+        typeof selectedEntry === 'string'
+          ? selectedEntry
+          : (selectedEntry as { message?: string }).message;
+      if (base && base.trim()) {
+        return { message: base.trim() };
+      }
+    }
+  } catch (err) {
+    console.error('[Genkit Server Action Error]: Failed to load fallback messages JSON:', err);
+  }
+
+  return { message: DEFAULT_FALLBACK_MESSAGE };
 }
 
 const generateCatMessageFlow = ai.defineFlow(
@@ -81,12 +137,15 @@ const generateCatMessageFlow = ai.defineFlow(
     outputSchema: GenerateCatMessageOutputSchema,
   },
   async input => {
-    const apiKey =
+    const rawApiKey =
       process.env.GEMINI_API_KEY ||
       process.env.GOOGLE_GENAI_API_KEY ||
       process.env.GOOGLE_API_KEY;
 
+    const apiKey = rawApiKey?.trim();
+
     if (!apiKey) {
+      console.warn('[Genkit Server Action]: GEMINI_API_KEY is not configured or empty. Using fallback message.');
       return buildFallbackMessage(input);
     }
 
@@ -95,12 +154,13 @@ const generateCatMessageFlow = ai.defineFlow(
       const promptOutput = response.output;
 
       if (!promptOutput || typeof promptOutput.message !== 'string' || !promptOutput.message.trim()) {
+        console.error('[Genkit Server Action Error]: Empty or invalid output structure from Gemini prompt:', promptOutput);
         return buildFallbackMessage(input);
       }
 
       return { message: promptOutput.message.trim() };
     } catch (error) {
-      console.error('generateCatMessageFlow prompt failed', error);
+      console.error('[Genkit Server Action Error]:', error);
       return buildFallbackMessage(input);
     }
   }

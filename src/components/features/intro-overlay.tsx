@@ -11,6 +11,8 @@ interface IntroOverlayProps {
     onComplete: () => void;
 }
 
+const INTRO_VIDEO_SRC = '/intro.mp4';
+
 const emptySubscribe = () => () => {};
 
 export function IntroOverlay({ onComplete }: IntroOverlayProps) {
@@ -32,7 +34,7 @@ export function IntroOverlay({ onComplete }: IntroOverlayProps) {
         const video = videoRef.current;
         if (!video || isVideoEnded) return;
 
-        video.muted = false;
+        video.muted = isMuted;
         const playPromise = video.play();
         if (playPromise !== undefined) {
             playPromise.catch(() => {
@@ -43,10 +45,15 @@ export function IntroOverlay({ onComplete }: IntroOverlayProps) {
                 video.play().catch((e) => console.error('Video autoplay error:', e));
             });
         }
-    }, [isVideoEnded]);
+    }, [isVideoEnded, isMuted]);
 
     const handleVideoEnded = () => {
         setIsVideoEnded(true);
+    };
+
+    const handleVideoError = () => {
+        console.warn('Intro video unavailable, gracefully bypassing video to enter screen.');
+        handleVideoEnded();
     };
 
     const handleSkip = () => {
@@ -124,19 +131,22 @@ export function IntroOverlay({ onComplete }: IntroOverlayProps) {
                         <div className="relative w-full max-w-4xl aspect-video rounded-3xl overflow-hidden border border-purple-500/40 shadow-[0_0_60px_rgba(162,64,255,0.35)] bg-black flex items-center justify-center">
                             <video
                                 ref={videoRef}
-                                src="/intro.mp4"
+                                src={INTRO_VIDEO_SRC}
                                 playsInline
                                 autoPlay
+                                preload="auto"
                                 className="w-full h-full object-contain sm:object-cover"
                                 onEnded={handleVideoEnded}
+                                onError={handleVideoError}
                             />
 
                             {/* Sound Toggle Button */}
-                            <button
+                            <Button
                                 type="button"
+                                variant="ghost"
                                 onClick={handleToggleMute}
                                 aria-label={isMuted ? 'Unmute audio' : 'Mute audio'}
-                                className="absolute top-4 right-4 z-20 flex items-center gap-1.5 rounded-full bg-black/60 backdrop-blur-md border border-white/20 px-3 py-1.5 text-xs font-bold text-white hover:bg-black/80 transition-all shadow-lg"
+                                className="absolute top-4 right-4 z-20 h-auto flex items-center gap-1.5 rounded-full bg-black/60 backdrop-blur-md border border-white/20 px-3 py-1.5 text-xs font-bold text-white hover:bg-black/80 hover:text-white transition-all shadow-lg"
                             >
                                 {isMuted ? (
                                     <>
@@ -149,18 +159,18 @@ export function IntroOverlay({ onComplete }: IntroOverlayProps) {
                                         <span className="hidden sm:inline">Sound On</span>
                                     </>
                                 )}
-                            </button>
+                            </Button>
 
                             {/* Unmute Prompt (if browser blocked unmuted autoplay) */}
                             {showUnmuteHint && (
-                                <button
+                                <Button
                                     type="button"
                                     onClick={handleUnmutePrompt}
-                                    className="absolute bottom-5 left-5 z-20 flex items-center gap-2 rounded-full bg-[#A240FF]/90 hover:bg-[#A240FF] px-4 py-2 text-xs font-bold text-white shadow-2xl backdrop-blur-md transition-all animate-bounce"
+                                    className="absolute bottom-5 left-5 z-20 h-auto flex items-center gap-2 rounded-full bg-[#A240FF]/90 hover:bg-[#A240FF] text-white hover:text-white px-4 py-2 text-xs font-bold shadow-2xl backdrop-blur-md transition-all animate-bounce"
                                 >
                                     <Volume2 className="h-4 w-4" />
                                     <span>Tap for Sound 🔊</span>
-                                </button>
+                                </Button>
                             )}
                         </div>
 

@@ -1,21 +1,21 @@
 'use client';
 
 import React from 'react';
-import { CatDisplay } from '@/components/cats/CatDisplay';
+import { CatDisplay } from '@/components/cats/cat-display';
 import {
   BlackWoodenBoxIcon,
   BoxIcon,
   CarbonBoxIcon,
   CardboardBoxIcon,
+  CircuitBoardBoxIcon,
+  CrystalBoxIcon,
+  GalaxyBoxIcon,
+  PlushBoxIcon,
   SpecialXK6BoxIcon,
+  SteampunkBoxIcon,
   StoneBoxIcon,
   TardisBoxIcon,
 } from '@/components/icons';
-import { CircuitBoardBoxIcon } from '@/components/icons/circuit-board-box-icon';
-import { CrystalBoxIcon } from '@/components/icons/crystal-box-icon';
-import { GalaxyBoxIcon } from '@/components/icons/galaxy-box-icon';
-import { PlushBoxIcon } from '@/components/icons/plush-box-icon';
-import { SteampunkBoxIcon } from '@/components/icons/steampunk-box-icon';
 import { type CatState } from '@/lib/types';
 import catData from '@/lib/cat-data.json';
 import type { BoxSkinId } from '@/lib/user-data';

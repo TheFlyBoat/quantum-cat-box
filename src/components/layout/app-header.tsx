@@ -39,19 +39,19 @@ export function AppHeader() {
             icon: Award,
             value: unlockedBadges.length,
             label: 'Badges unlocked',
-            iconClass: 'text-yellow-500',
+            iconClass: 'text-[#FF809F]',
         },
         {
             icon: Flame,
             value: streak,
             label: 'Daily streak',
-            iconClass: 'text-red-500',
+            iconClass: 'text-[#D14002]',
         },
         {
             icon: Fish,
             value: points,
             label: 'Fish points',
-            iconClass: 'text-sky-500',
+            iconClass: 'text-[#3696C9]',
         },
     ] as const;
 
@@ -76,16 +76,17 @@ export function AppHeader() {
                 <div className="flex items-center justify-end ml-auto">
                     <Popover open={userMenuOpen} onOpenChange={setUserMenuOpen}>
                         <PopoverTrigger asChild>
-                            <button
+                            <Button
                                 type="button"
-                                className="rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                                variant="ghost"
+                                className="h-auto p-0 rounded-full hover:bg-transparent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                             >
                                 <UserStatusLabel className="cursor-pointer select-none" />
-                            </button>
+                            </Button>
                         </PopoverTrigger>
                         <PopoverContent align="end" className="w-60 space-y-4">
                             <div className="space-y-1">
-                                <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                                <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
                                     User
                                 </p>
                                 <p className="text-sm font-semibold text-foreground break-words">
