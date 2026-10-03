@@ -22,7 +22,7 @@ Schrödinger's thought experiment says a cat sealed in a box with a radioactive 
 - **Cat Diary** — save messages that resonate and revisit them anytime
 - **Fish Points** — earned through daily observations and interactions
 - **Badges & Achievements** — unlocked through milestones and streaks
-- **Box Skins** — personalise your Quantum Box with different themes
+- **Box Skins & Powers** — customise your Quantum Box with unique visual skins (Cardboard, Mosaic, Color Blocks, Circuit Board, Steampunk, Crystal, Time Capsule, Galaxy) featuring custom open-state animations and gameplay power perks
 - **Guest Mode** — play immediately without creating an account
 - **Full accounts** — sign in to persist your collection and diary across devices
 - **Light and dark mode** — full theme support via `next-themes`
@@ -39,7 +39,7 @@ Schrödinger's thought experiment says a cat sealed in a box with a radioactive 
 | Authentication | Firebase Auth (Guest + Account) |
 | Database | Firebase Firestore |
 | Storage | Firebase Storage |
-| Hosting | Firebase App Hosting |
+| Hosting | Firebase Hosting + Cloud Functions (web frameworks) |
 | Styling | Tailwind CSS, Shadcn/ui |
 | Forms | React Hook Form + Zod |
 | Image Export | html-to-image |
@@ -62,7 +62,9 @@ quantum-cat-box/
 │   │       ├── layout.tsx        # Main layout (sidebar + header)
 │   │       ├── home/             # Quantum Box — daily opening
 │   │       ├── gallery/          # Cat collection (Alive / Dead / Paradox tabs)
-│   │       └── awards/           # Badges and achievements
+│   │       ├── awards/           # Badges and achievements
+│   │       ├── customize/        # Box Skins & Visual Themes
+│   │       └── settings/         # System, Info, and Guide settings
 │   ├── components/
 │   │   ├── ui/                   # Shadcn/ui primitives (Button, Card, Dialog, etc.)
 │   │   ├── layout/               # Header, Sidebar
@@ -84,7 +86,7 @@ quantum-cat-box/
 ├── .env.example                  # Environment variable template
 ├── .secretlintrc.json            # Secret scanning config
 ├── .husky/                       # Pre-commit hooks
-├── apphosting.yaml               # Firebase App Hosting config
+├── apphosting.yaml               # App Hosting config (not used by the current deploy)
 └── next.config.ts
 ```
 

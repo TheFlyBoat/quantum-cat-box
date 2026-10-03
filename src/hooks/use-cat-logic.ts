@@ -12,7 +12,8 @@ import { playFeedback } from '@/lib/audio';
 import { useBoxSkin } from '@/context/box-skin-context';
 import { useTheme } from 'next-themes';
 import { useAuth } from '@/context/auth-context';
-import { saveUserData } from '@/lib/user-data';
+import { saveUserData, getSkinPower } from '@/lib/user-data';
+import { useToast } from '@/hooks/use-toast';
 import { type ShareAsset } from './use-share';
 import { trackEvent } from '@/lib/analytics';
 
@@ -132,6 +133,7 @@ export function useCatLogic({
     const { selectedSkin } = useBoxSkin();
     const { resolvedTheme } = useTheme();
     const { user, userData, setUserData, storageMode } = useAuth();
+    const { toast } = useToast();
 
     const [currentTime, setCurrentTime] = useState(() => Date.now());
 
@@ -210,12 +212,39 @@ export function useCatLogic({
         setMessage('');
         setRevealedCatName(null);
 
+        const activePower = getSkinPower(selectedSkin);
+
+        // Calculate outcome probabilities based on active box skin
+        let aliveRate = 0.47;
+        let deadRate = 0.47;
+        let paradoxRate = 0.06;
+
+        if (selectedSkin === 'cardboard') {
+            // Cardboard: 64% Alive, 30% Dead, 6% Paradox (Floor guaranteed)
+            aliveRate = 0.64;
+            deadRate = 0.30;
+            paradoxRate = 0.06;
+        } else if (selectedSkin === 'tardis') {
+            // Time Capsule: 18% Paradox, 41% Alive, 41% Dead
+            paradoxRate = 0.18;
+            aliveRate = 0.41;
+            deadRate = 0.41;
+        } else if (selectedSkin === 'galaxy') {
+            // Galaxy: 15% Paradox, 42.5% Alive, 42.5% Dead
+            paradoxRate = 0.15;
+            aliveRate = 0.425;
+            deadRate = 0.425;
+        }
+
+        // Guaranteed Paradox Floor (minimum 6% across all boxes)
+        paradoxRate = Math.max(0.06, paradoxRate);
+
         const randomState = Math.random();
         let determinedOutcome: Exclude<CatOutcome, 'initial'>;
 
-        if (randomState < 0.47) {
+        if (randomState < aliveRate) {
             determinedOutcome = 'alive';
-        } else if (randomState < 0.94) {
+        } else if (randomState < aliveRate + deadRate) {
             determinedOutcome = 'dead';
         } else {
             determinedOutcome = 'paradox';
@@ -228,11 +257,26 @@ export function useCatLogic({
             setIsLoading(false);
             return;
         }
-        const totalRarity = outcomeInfo.cats.reduce((sum, cat) => sum + cat.rarity, 0);
+
+        // Apply skin-based weights (Crystal: double weight on uncollected cats; Stone: triple weight on relic cats)
+        const uncollectedSet = new Set(userData?.unlockedCats ?? []);
+        const weightedCats = outcomeInfo.cats.map(catItem => {
+            let weight = catItem.rarity;
+            if (selectedSkin === 'crystal' && !uncollectedSet.has(catItem.id)) {
+                weight *= 2;
+            } else if (selectedSkin === 'stone' && determinedOutcome === 'dead') {
+                if (catItem.id === 'catankhamun' || catItem.id === 'pharaoh') {
+                    weight *= 3;
+                }
+            }
+            return { id: catItem.id, rarity: weight };
+        });
+
+        const totalRarity = weightedCats.reduce((sum, cat) => sum + cat.rarity, 0);
         let randomRarity = Math.random() * totalRarity;
         let selectedCatId: string | undefined;
 
-        for (const cat of outcomeInfo.cats) {
+        for (const cat of weightedCats) {
             randomRarity -= cat.rarity;
             if (randomRarity <= 0) {
                 selectedCatId = cat.id;
@@ -240,7 +284,20 @@ export function useCatLogic({
             }
         }
         if (!selectedCatId) {
-            selectedCatId = outcomeInfo.cats[outcomeInfo.cats.length - 1].id;
+            selectedCatId = weightedCats[weightedCats.length - 1].id;
+        }
+
+        // Check for Double Cat (Time Capsule / TARDIS 3% timeline split)
+        let secondaryCatId: string | undefined;
+        let secondaryCat: typeof allCats[number] | undefined;
+        if (selectedSkin === 'tardis' && Math.random() < 0.03) {
+            const alternateCats = outcomeInfo.cats.filter(c => c.id !== selectedCatId);
+            const candidatePool = alternateCats.length > 0 ? alternateCats : allCats;
+            const pick = candidatePool[Math.floor(Math.random() * candidatePool.length)];
+            if (pick) {
+                secondaryCatId = pick.id;
+                secondaryCat = allCats.find(c => c.id === secondaryCatId);
+            }
         }
 
         recordObservation(selectedCatId, determinedOutcome);
@@ -248,6 +305,48 @@ export function useCatLogic({
         if (cat) {
             unlockCat(cat.id, { celebrateImmediately: false });
         }
+
+        if (secondaryCatId && secondaryCat) {
+            recordObservation(secondaryCatId, determinedOutcome);
+            unlockCat(secondaryCat.id, { celebrateImmediately: false });
+        }
+
+        // Calculate Fish Points with active box powers
+        const basePoints = (cat?.points ?? 1) + (secondaryCat?.points ?? 0);
+        let bonusPoints = 0;
+        let powerNotification: string | null = null;
+
+        if (selectedSkin === 'black-wooden' && determinedOutcome === 'dead') {
+            bonusPoints = cat?.points ?? 2; // Doubles Dead Cat points (2 -> 4)
+            powerNotification = 'Necro Harvest: Extra Dead Cat Points!';
+        } else if (selectedSkin === 'plush' && determinedOutcome === 'alive') {
+            bonusPoints = 3; // +3 on Alive Cat (1 -> 4)
+            powerNotification = 'Cozy Comfort: Extra Alive Cat Points!';
+        } else if (selectedSkin === 'stone' && determinedOutcome === 'dead') {
+            bonusPoints = 3; // +3 on Dead Cat (2 -> 5)
+            powerNotification = 'Ancient Preservation: Extra Dead Cat Points!';
+        } else if (selectedSkin === 'circuit-board') {
+            bonusPoints = 3; // +3 flat on all reveals
+            powerNotification = 'Algorithmic Yield: Bonus Fish Points!';
+        } else if (selectedSkin === 'special-xk6' && Math.random() < 0.25) {
+            bonusPoints = 5; // 25% Critical +5 points
+            powerNotification = 'Quantum Overclock: Critical Collapse!';
+        } else if (selectedSkin === 'galaxy' && determinedOutcome === 'paradox') {
+            bonusPoints = 5; // +5 on Paradox reveals (5 -> 10)
+            powerNotification = 'Cosmic Singularity: Extra Paradox Points!';
+        } else if (selectedSkin === 'crystal' && cat && !uncollectedSet.has(cat.id)) {
+            bonusPoints = 3; // +3 on discovering new cat
+            powerNotification = 'Collector’s Clairvoyance: New Cat Discovery!';
+        }
+
+        if (secondaryCat) {
+            powerNotification = powerNotification
+                ? `${powerNotification} & Double Cat Timeline Rift!`
+                : 'Temporal Rift: Double Cat Timeline Split!';
+        }
+
+        const totalEarnedPoints = basePoints + bonusPoints;
+        const isCarbonFreeReroll = selectedSkin === 'carbon' && Math.random() < 0.20;
 
         const messageInput = {
             catId: selectedCatId!,
@@ -272,6 +371,7 @@ export function useCatLogic({
             trackEvent('box_open', {
                 outcome: determinedOutcome,
                 cat_id: resolvedCatId,
+                box_skin: selectedSkin,
                 message_source: trimmed.length ? source : 'fallback',
                 fallback_reason: reason ?? (trimmed.length ? undefined : 'empty_message'),
             });
@@ -314,15 +414,37 @@ export function useCatLogic({
                 setCatState({ outcome: determinedOutcome, catId: undefined });
 
                 setTimeout(() => {
-                    setCatState({ outcome: determinedOutcome, catId: selectedCatId });
+                    setCatState({
+                        outcome: determinedOutcome,
+                        catId: selectedCatId,
+                        secondaryCatId: secondaryCatId,
+                        powerTriggered: powerNotification ?? undefined,
+                    });
                 }, 300);
 
                 setTimeout(() => {
                     if (cat) {
-                        setRevealedCatName(cat.name);
-                        addPoints(cat.points);
+                        const displayName = secondaryCat ? `${cat.name} & ${secondaryCat.name}` : cat.name;
+                        setRevealedCatName(displayName);
+                        addPoints(totalEarnedPoints);
                     }
-                    if (!options?.ignoreLock) {
+
+                    if (powerNotification) {
+                        toast({
+                            title: '⚡ Box Power Activated!',
+                            description: `${powerNotification} (+${totalEarnedPoints} Fish Points earned!)`,
+                        });
+                    }
+
+                    if (isCarbonFreeReroll) {
+                        playFeedback('celebration-magic');
+                        toast({
+                            title: '⚡ Kinetic Momentum!',
+                            description: 'The Carbon box prevented lockdown! Enjoy a free second reveal!',
+                        });
+                    }
+
+                    if (!options?.ignoreLock && !isCarbonFreeReroll) {
                         const now = new Date();
                         const isoDate = now.toISOString();
                         setUserData(prev => ({ ...prev, lastBoxOpenDate: isoDate }));
@@ -368,6 +490,8 @@ export function useCatLogic({
         resetState();
     }, [resetState, setUserData, storageMode, user]);
 
+    const rechargeCost = selectedSkin === 'steampunk' ? 5 : 10;
+
     return {
         catState,
         message,
@@ -381,6 +505,7 @@ export function useCatLogic({
         setRevealedCatName,
         isDailyLocked,
         nextAvailableAt,
+        rechargeCost,
         refreshDailyLock,
         overrideDailyLock,
     };

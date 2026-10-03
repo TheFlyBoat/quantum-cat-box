@@ -5,6 +5,14 @@ import type { CatOutcome } from '@/lib/types';
 import boxSkinData from '@/lib/box-skin-data.json';
 
 export type BoxSkinId = (typeof boxSkinData.skins)[number]['id'];
+export type BoxSkinData = (typeof boxSkinData.skins)[number];
+export type BoxSkinPower = BoxSkinData['power'];
+
+export const getSkinData = (id: BoxSkinId): BoxSkinData | undefined =>
+  boxSkinData.skins.find(skin => skin.id === id);
+
+export const getSkinPower = (id: BoxSkinId): BoxSkinPower | undefined =>
+  getSkinData(id)?.power;
 
 const starterSkins = boxSkinData.skins
   .filter(skin => skin.cost === 0)

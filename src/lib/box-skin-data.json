@@ -4,73 +4,162 @@
       "id": "default",
       "name": "Wooden",
       "description": "Classic wooden crate tuned for baseline collapses.",
-      "cost": 0
+      "cost": 0,
+      "power": {
+        "title": "Baseline Resonance",
+        "description": "The classic container in perfect balance. Pure, unaltered quantum possibilities.",
+        "badgeText": "Balanced",
+        "type": "baseline"
+      }
     },
     {
       "id": "carbon",
       "name": "Carbon",
       "description": "A sleek, dark carbon fiber box.",
-      "cost": 0
+      "cost": 0,
+      "power": {
+        "title": "Kinetic Momentum",
+        "description": "Stores kinetic energy to occasionally grant an immediate free bonus reveal without daily cooldown.",
+        "badgeText": "Bonus Rerolls",
+        "type": "free_reroll",
+        "value": 0.2
+      }
     },
     {
       "id": "cardboard",
       "name": "Cardboard",
       "description": "Recycled timelines keep things whimsically unpredictable.",
-      "cost": 0
+      "cost": 0,
+      "power": {
+        "title": "Feline Magnetism",
+        "description": "Cats simply cannot resist cardboard! Greatly attracts warm, living cats.",
+        "badgeText": "Attracts Alive Cats",
+        "type": "outcome_rate",
+        "targetOutcome": "alive"
+      }
     },
     {
       "id": "black-wooden",
       "name": "Black Wooden",
-      "description": "A dark, mysterious wooden box.",
-      "cost": 10
+      "description": "A dark, mysterious wooden box steeped in shadow.",
+      "cost": 15,
+      "power": {
+        "title": "Necro Harvest",
+        "description": "Surrounded by a shadowy dark aura, it harvests extra Fish Points whenever a Dead cat appears.",
+        "badgeText": "Dead Cat Points",
+        "type": "state_multiplier",
+        "targetOutcome": "dead",
+        "multiplier": 2
+      }
+    },
+    {
+      "id": "plush",
+      "name": "Color Blocks",
+      "description": "A vibrant, playful box built with colorful geometric blocks.",
+      "cost": 15,
+      "power": {
+        "title": "Creative Spark",
+        "description": "Soft and inviting. Radiates a sparkle burst and rewards extra Fish Points whenever an Alive cat cuddles inside.",
+        "badgeText": "Alive Cat Points",
+        "type": "state_bonus",
+        "targetOutcome": "alive",
+        "bonusPoints": 3
+      }
+    },
+    {
+      "id": "stone",
+      "name": "Mosaic",
+      "description": "An intricate Mediterranean mosaic box crafted from glazed ceramic tiles.",
+      "cost": 20,
+      "power": {
+        "title": "Ancient Preservation",
+        "description": "Ancient mosaic energy. Grants extra Fish Points on Dead cats and helps discover antique relic cats.",
+        "badgeText": "Ancient Spirits",
+        "type": "state_bonus",
+        "targetOutcome": "dead",
+        "bonusPoints": 3
+      }
     },
     {
       "id": "special-xk6",
       "name": "Special XK6",
-      "description": "A special edition box with a unique design.",
-      "cost": 10
-    },
-    {
-      "id": "stone",
-      "name": "Stone",
-      "description": "A heavy, stone box that feels ancient.",
-      "cost": 10
-    },
-    {
-      "id": "tardis",
-      "name": "Time Capsule",
-      "description": "Temporal shielding for cats who open boxes before they exist.",
-      "cost": 20
+      "description": "A special edition box with an experimental overclocked design.",
+      "cost": 25,
+      "power": {
+        "title": "Quantum Overclock",
+        "description": "Experimental overclocking that can trigger a lucky Critical Collapse for a surge of bonus Fish Points!",
+        "badgeText": "Critical Collapses",
+        "type": "critical",
+        "value": 0.25,
+        "bonusPoints": 5
+      }
     },
     {
       "id": "circuit-board",
       "name": "Circuit Board",
-      "description": "A box made of glowing circuit boards.",
-      "cost": 20
+      "description": "A high-tech PCB with gold traces, Q-CAT processor, and cyber data beams.",
+      "cost": 25,
+      "power": {
+        "title": "Algorithmic Yield",
+        "description": "Optimized cyber circuitry that adds bonus Fish Points to every single reveal.",
+        "badgeText": "All Reveals Boost",
+        "type": "flat_bonus",
+        "bonusPoints": 3
+      }
+    },
+    {
+      "id": "steampunk",
+      "name": "Steampunk",
+      "description": "An intricate Victorian clockwork machine with interlocking brass gears and steam pressure gauge.",
+      "cost": 30,
+      "power": {
+        "title": "Steam Pressure Valve",
+        "description": "Precision brass gears regulate quantum time, offering a major discount when recharging the box early.",
+        "badgeText": "Cheaper Recharges",
+        "type": "recharge_discount",
+        "value": 5
+      }
     },
     {
       "id": "crystal",
       "name": "Crystal",
       "description": "A box made of shimmering crystal.",
-      "cost": 20
+      "cost": 30,
+      "power": {
+        "title": "Collector's Clairvoyance",
+        "description": "Shimmering facets guide fate toward cats missing from your collection, granting bonus Fish Points for new discoveries.",
+        "badgeText": "New Cat Seeker",
+        "type": "new_cat_bias",
+        "bonusPoints": 3
+      }
+    },
+    {
+      "id": "tardis",
+      "name": "Time Capsule",
+      "description": "Temporal shielding for cats who open boxes before they exist.",
+      "cost": 40,
+      "power": {
+        "title": "Temporal Distortion",
+        "description": "Bends spacetime to attract rare Paradox cats, and can even trigger a timeline split.",
+        "badgeText": "Paradox & Double Cats",
+        "type": "temporal_distortion",
+        "value": 0.18
+      }
     },
     {
       "id": "galaxy",
       "name": "Galaxy",
       "description": "A box that contains a swirling galaxy.",
-      "cost": 20
-    },
-    {
-      "id": "plush",
-      "name": "Plush",
-      "description": "A soft, plush box that's perfect for napping on.",
-      "cost": 20
-    },
-    {
-      "id": "steampunk",
-      "name": "Steampunk",
-      "description": "A box made of brass gears and pipes.",
-      "cost": 20
+      "cost": 50,
+      "power": {
+        "title": "Cosmic Singularity",
+        "description": "Harnesses deep cosmic energy to draw out mysterious Paradox cats and shower you with extra Fish Points.",
+        "badgeText": "Cosmic Paradoxes",
+        "type": "state_bonus",
+        "targetOutcome": "paradox",
+        "bonusPoints": 5,
+        "value": 0.15
+      }
     }
   ]
 }

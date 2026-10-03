@@ -40,6 +40,7 @@ interface QuantumCatBoxProps {
   catState: CatState;
   isLocked?: boolean;
   lockMessage?: string;
+  rechargeCost?: number;
   onUnlockRequested?: () => void;
 }
 
@@ -74,6 +75,7 @@ export function QuantumCatBox({
   isAmbientShaking,
   isLocked = false,
   lockMessage,
+  rechargeCost = 10,
   onUnlockRequested,
 }: QuantumCatBoxProps) {
   const { selectedSkin } = useBoxSkin();
@@ -166,7 +168,7 @@ export function QuantumCatBox({
           </div>
           <div className="mt-2.5 inline-flex items-center justify-center gap-1.5 rounded-full bg-white dark:bg-card px-3.5 py-1 text-xs font-bold text-foreground shadow-lg border border-border/60 transition-transform duration-200 group-hover:scale-105">
             <Fish className="!h-3.5 !w-3.5 !size-3.5 shrink-0 text-[#3696C9]" />
-            <span className="font-bold leading-none text-foreground">10</span>
+            <span className="font-bold leading-none text-foreground">{rechargeCost}</span>
           </div>
         </div>
       )}
