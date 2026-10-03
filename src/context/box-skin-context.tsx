@@ -3,7 +3,7 @@
 
 import React, { createContext, useContext, ReactNode, useCallback, useMemo } from 'react';
 import { useAuth } from './auth-context';
-import { defaultUserData, saveUserData, type BoxSkinId } from '@/lib/user-data';
+import { defaultUserData, saveUserData, type BoxSkinId, type BoxSkinPower, getSkinPower } from '@/lib/user-data';
 import boxSkinData from '@/lib/box-skin-data.json';
 import { usePoints } from './points-context';
 import { useToast } from '@/hooks/use-toast';
@@ -12,10 +12,12 @@ type SkinId = BoxSkinId;
 
 interface BoxSkinContextType {
   selectedSkin: SkinId;
+  activePower?: BoxSkinPower;
   selectSkin: (skin: SkinId) => void;
   unlockedSkins: SkinId[];
   unlockSkin: (skinId: SkinId) => boolean;
   getSkinCost: (skinId: SkinId) => number;
+  getSkinPower: (skinId: SkinId) => BoxSkinPower | undefined;
   isSkinUnlocked: (skinId: SkinId) => boolean;
 }
 
@@ -115,8 +117,23 @@ export const BoxSkinProvider = ({ children }: { children: ReactNode }) => {
     return true;
   }, [unlockedSkins, isSkinUnlocked, getSkinCost, points, spendPoints, setUserData, storageMode, user, toast]);
 
+  const activePower = useMemo(() => getSkinPower(selectedSkin), [selectedSkin]);
+
+  const getSkinPowerCallback = useCallback((skinId: SkinId) => {
+    return getSkinPower(skinId);
+  }, []);
+
   return (
-    <BoxSkinContext.Provider value={{ selectedSkin, selectSkin, unlockedSkins, unlockSkin, getSkinCost, isSkinUnlocked }}>
+    <BoxSkinContext.Provider value={{
+      selectedSkin,
+      activePower,
+      selectSkin,
+      unlockedSkins,
+      unlockSkin,
+      getSkinCost,
+      getSkinPower: getSkinPowerCallback,
+      isSkinUnlocked,
+    }}>
       {children}
     </BoxSkinContext.Provider>
   );

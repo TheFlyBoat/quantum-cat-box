@@ -11,6 +11,7 @@ const firebaseConfig = {
   storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET || 'thequantumcatbox.firebasestorage.app',
   messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID || '258085757068',
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID || '1:258085757068:web:7e88b7cfd3e4bf73261ba9',
+  measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
 };
 
 // Initialize Firebase

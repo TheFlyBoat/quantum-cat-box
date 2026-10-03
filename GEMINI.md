@@ -13,6 +13,7 @@ Top priorities:
 * **Clean, reusable, component-first code.**
 * **Zero lint errors.**
 * **Strict adherence to this rulebook.**
+* **Command Approval Rule:** Every terminal command sent to the user for permission/approval MUST be followed by a short, plain-language explanation explaining what it does, why it is needed, and what it will affect. Never send a command for permission without this explanation.
 
 ---
 
@@ -142,9 +143,9 @@ App must support **Light** and **Dark** using `next-themes`.
 
 2. **Tabs**
    - `TabsList` wrapper: `rounded-3xl border border-border/40 bg-background/80 p-2 shadow-sm`, grid with 2–4 columns and `gap-3`.
-   - Tab trigger base class: `px-3 py-1.5 font-semibold rounded-2xl transition transform hover:scale-105 hover:shadow-md data-[state=active]:bg-white data-[state=active]:font-bold data-[state=active]:text-foreground data-[state=active]:scale-[1.08] dark:data-[state=active]:bg-white`.
+   - Tab trigger base class: `px-3 py-1.5 font-semibold rounded-2xl transition transform hover:scale-105 hover:shadow-md data-[state=active]:scale-[1.06] data-[state=active]:shadow-md data-[state=active]:font-black`.
    - Assign brand-aligned background/text colors per tab (Sky `#3696C9`, Pink `#FF809F`, Emerald `#A9DB4A`, Violet `#A240FF`, Orange `#D14002`).
-   - All menu tabs honor tooltips; active states must remain colored + enlarged after selection.
+   - Active state MUST remain richly brand-colored with bold white text (`font-black`) — NEVER plain white background (`bg-white`). All menu tabs honor tooltips; active states must remain colored + enlarged after selection.
 
 3. **Card Shells**
    - Primary content cards use `rounded-3xl border border-border/60 bg-background/80 p-6 shadow-sm`.

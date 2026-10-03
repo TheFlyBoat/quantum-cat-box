@@ -75,11 +75,11 @@ export function UnlockBoxDialog({
             Unlock Quantum Box?
           </DialogTitle>
           <DialogDescription className="text-sm text-muted-foreground text-center">
-            This will cost <strong className="text-foreground">{cost} Fish Points</strong>. You currently have <strong className="text-foreground">{currentPoints} points</strong>.
+            You have <strong className="text-foreground">{currentPoints} Fish Points</strong>.
           </DialogDescription>
         </DialogHeader>
 
-        {/* Box Component Preview with Price Tag (Box Skin style) */}
+        {/* Box Component Preview with Single Clear Price Tag */}
         <div className="flex flex-col items-center justify-center p-4 my-2">
           <div className="relative flex items-center justify-center h-32 w-32 drop-shadow-md">
             <BoxComponent className="h-full w-full" />
@@ -95,7 +95,7 @@ export function UnlockBoxDialog({
 
         {!hasEnoughPoints && (
           <p className="text-xs text-rose-500 font-medium text-center -mt-1 mb-2">
-            You need {cost - currentPoints} more Fish Points to unlock. Observe cats or share to earn more!
+            Need {cost - currentPoints} more points to unlock.
           </p>
         )}
 
@@ -116,14 +116,14 @@ export function UnlockBoxDialog({
             }}
             disabled={!hasEnoughPoints}
             className={cn(
-              'rounded-2xl font-bold px-5 text-white shadow-md transition transform active:scale-95',
+              'rounded-2xl font-bold px-6 text-white shadow-md transition transform active:scale-95',
               hasEnoughPoints
                 ? 'bg-gradient-to-r from-[#A240FF] to-[#3696C9] hover:opacity-95 hover:shadow-lg'
                 : 'bg-muted-foreground/30 cursor-not-allowed'
             )}
           >
             <Fish className="mr-1.5 h-4 w-4" />
-            Unlock for {cost} Points
+            Unlock
           </Button>
         </DialogFooter>
       </DialogContent>

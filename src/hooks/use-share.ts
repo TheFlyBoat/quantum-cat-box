@@ -1,12 +1,14 @@
 
 'use client';
 
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback } from 'react';
 import * as htmlToImage from 'html-to-image';
 import { usePoints } from '@/context/points-context';
 import { useBadges } from '@/context/badge-context';
 import { useAuth } from '@/context/auth-context';
-import { defaultUserData, saveUserData } from '@/lib/user-data';
+import { defaultUserData, saveUserData, type UserData } from '@/lib/user-data';
+
+export const SHARE_REWARD_POINTS = 10;
 
 export interface ShareAsset {
     dataUrl: string;
@@ -17,12 +19,6 @@ export function useShare(message: string) {
     const { addPoints } = usePoints();
     const { isBadgeUnlocked, unlockBadge } = useBadges();
     const { user, setUserData, storageMode, userData } = useAuth();
-    const sessionShareCountRef = useRef(0);
-
-    useEffect(() => {
-        sessionShareCountRef.current = userData?.shareCount ?? 0;
-    }, [userData]);
-
     const createShareAsset = useCallback(async (ref: React.RefObject<HTMLDivElement>): Promise<ShareAsset> => {
         if (!ref.current || !message) {
             throw new Error('Share content is not ready yet.');
@@ -43,22 +39,28 @@ export function useShare(message: string) {
         return { dataUrl, file };
     }, [message]);
 
-    const rewardShare = useCallback(() => {
-        let newShareCount = 0;
+    /**
+     * Counts a share and awards Fish Points for the first share of the day only.
+     * Returns whether points were awarded, so the UI can say so.
+     */
+    const rewardShare = useCallback((): boolean => {
+        const base = userData ?? defaultUserData;
+        const today = new Date().toDateString();
+        const isRewarded = base.lastShareRewardDate !== today;
+        const newShareCount = (base.shareCount ?? 0) + 1;
+        const updates: Partial<UserData> = isRewarded
+            ? { shareCount: newShareCount, lastShareRewardDate: today }
+            : { shareCount: newShareCount };
 
-        setUserData(prevData => {
-            const base = prevData ?? defaultUserData;
-            newShareCount = (base.shareCount ?? 0) + 1;
-            return { ...base, shareCount: newShareCount };
-        });
+        setUserData(prevData => ({ ...(prevData ?? defaultUserData), ...updates }));
 
         if (storageMode === 'cloud' && user && user !== 'guest') {
-            void saveUserData(user.uid, { shareCount: newShareCount });
-        } else {
-            sessionShareCountRef.current = newShareCount;
+            void saveUserData(user.uid, updates);
         }
 
-        addPoints(10);
+        if (isRewarded) {
+            addPoints(SHARE_REWARD_POINTS);
+        }
 
         if (newShareCount === 1 && !isBadgeUnlocked('storyteller')) {
             unlockBadge('storyteller');
@@ -67,7 +69,11 @@ export function useShare(message: string) {
         if (newShareCount >= 5 && !isBadgeUnlocked('viral-cat')) {
             unlockBadge('viral-cat');
         }
-    }, [addPoints, isBadgeUnlocked, unlockBadge, setUserData, storageMode, user]);
 
-    return { createShareAsset, rewardShare };
+        return isRewarded;
+    }, [addPoints, isBadgeUnlocked, unlockBadge, setUserData, storageMode, user, userData]);
+
+    const isShareRewardAvailable = (userData?.lastShareRewardDate ?? '') !== new Date().toDateString();
+
+    return { createShareAsset, rewardShare, isShareRewardAvailable };
 }

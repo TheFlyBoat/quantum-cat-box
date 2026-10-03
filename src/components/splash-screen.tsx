@@ -1,7 +1,7 @@
 'use client';
 
 import type { CSSProperties } from 'react';
-import { useEffect, useMemo, useState, useSyncExternalStore } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
 import { createPortal } from 'react-dom';
 import { cn } from '@/lib/utils';
 
@@ -524,30 +524,30 @@ export function SplashScreen({ onComplete }: { onComplete?: () => void }) {
     return () => mediaQuery.removeEventListener?.('change', updateMotionPreference);
   }, []);
 
+  // Keep the latest callback in a ref so a parent re-render never restarts the timers.
+  const onCompleteRef = useRef(onComplete);
   useEffect(() => {
-    if (!isActive) {
-      return;
-    }
+    onCompleteRef.current = onComplete;
+  }, [onComplete]);
 
-    const displayDuration = prefersReducedMotion ? 3200 : 6200;
-    const fadeDuration = prefersReducedMotion ? 450 : 1100;
+  const isFinishingRef = useRef(false);
+  const fadeDuration = prefersReducedMotion ? 300 : 700;
 
-    let fadeTimer: ReturnType<typeof setTimeout> | undefined;
-    const showTimer = setTimeout(() => {
-      setIsFadingOut(true);
-      fadeTimer = setTimeout(() => {
-        setIsActive(false);
-        onComplete?.();
-      }, fadeDuration);
-    }, displayDuration);
+  const finish = useCallback(() => {
+    if (isFinishingRef.current) return;
+    isFinishingRef.current = true;
+    setIsFadingOut(true);
+    setTimeout(() => {
+      setIsActive(false);
+      onCompleteRef.current?.();
+    }, fadeDuration);
+  }, [fadeDuration]);
 
-    return () => {
-      clearTimeout(showTimer);
-      if (fadeTimer) {
-        clearTimeout(fadeTimer);
-      }
-    };
-  }, [isActive, prefersReducedMotion, onComplete]);
+  useEffect(() => {
+    const displayDuration = prefersReducedMotion ? 1500 : 3000;
+    const showTimer = setTimeout(finish, displayDuration);
+    return () => clearTimeout(showTimer);
+  }, [prefersReducedMotion, finish]);
 
   const isMounted = useSyncExternalStore(
     () => () => {},
@@ -561,8 +561,15 @@ export function SplashScreen({ onComplete }: { onComplete?: () => void }) {
 
   return createPortal(
     <div
+      role="button"
+      tabIndex={0}
+      aria-label="Skip intro"
+      onClick={finish}
+      onKeyDown={(event) => {
+        if (event.key === 'Enter' || event.key === ' ' || event.key === 'Escape') finish();
+      }}
       className={cn(
-        'quantum-splash fixed inset-0 z-[100] flex items-center justify-center overflow-hidden transition-opacity duration-700 ease-out',
+        'quantum-splash fixed inset-0 z-[100] flex cursor-pointer items-center justify-center overflow-hidden transition-opacity duration-700 ease-out',
         isFadingOut && 'pointer-events-none opacity-0',
       )}
     >

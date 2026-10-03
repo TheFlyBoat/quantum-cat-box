@@ -77,12 +77,12 @@ export default function GalleryPage() {
     );
 
     const tabBaseClass =
-        'flex-1 px-3 py-1.5 font-semibold transition transform rounded-2xl hover:scale-105 hover:shadow-md data-[state=active]:bg-white data-[state=active]:font-bold data-[state=active]:text-foreground data-[state=active]:scale-[1.08] dark:data-[state=active]:bg-white';
+        'flex-1 px-3 py-1.5 font-semibold transition transform rounded-2xl hover:scale-105 hover:shadow-md data-[state=active]:scale-[1.06] data-[state=active]:shadow-md data-[state=active]:font-black';
 
     const tabColorClasses: Record<string, string> = {
-        Alive: 'bg-emerald-300/80 text-emerald-900 dark:bg-emerald-700 dark:text-emerald-100',
-        Dead: 'bg-orange-300/80 text-orange-900 dark:bg-orange-700 dark:text-orange-100',
-        Paradox: 'bg-violet-300/80 text-violet-900 dark:bg-violet-700 dark:text-violet-100',
+        Alive: 'bg-emerald-100 text-emerald-800 hover:bg-emerald-200/70 dark:bg-emerald-950/60 dark:text-emerald-300 data-[state=active]:bg-emerald-600 data-[state=active]:text-white dark:data-[state=active]:bg-emerald-600 dark:data-[state=active]:text-white',
+        Dead: 'bg-orange-100 text-orange-800 hover:bg-orange-200/70 dark:bg-orange-950/60 dark:text-orange-300 data-[state=active]:bg-[#D14002] data-[state=active]:text-white dark:data-[state=active]:bg-[#D14002] dark:data-[state=active]:text-white',
+        Paradox: 'bg-purple-100 text-purple-800 hover:bg-purple-200/70 dark:bg-purple-950/60 dark:text-purple-300 data-[state=active]:bg-[#A240FF] data-[state=active]:text-white dark:data-[state=active]:bg-[#A240FF] dark:data-[state=active]:text-white',
     };
 
     return (

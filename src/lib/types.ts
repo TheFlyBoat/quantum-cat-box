@@ -19,8 +19,42 @@ export interface CatData {
 export interface CatState {
     outcome: CatOutcome;
     catId?: string;
+    secondaryCatId?: string;
     // revealedMessage is often handled separately, but tracking it here can be useful
     revealedMessage?: string;
+    powerTriggered?: string;
+}
+
+export type BoxSkinPowerType =
+  | 'baseline'
+  | 'outcome_rate'
+  | 'free_reroll'
+  | 'state_multiplier'
+  | 'flat_bonus'
+  | 'state_bonus'
+  | 'critical'
+  | 'recharge_discount'
+  | 'new_cat_bias'
+  | 'temporal_distortion';
+
+export interface BoxSkinPower {
+  title: string;
+  description: string;
+  badgeText: string;
+  type: BoxSkinPowerType;
+  value?: number;
+  bonusPoints?: number;
+  multiplier?: number;
+  targetOutcome?: 'alive' | 'dead' | 'paradox';
+}
+
+export interface BoxSkin {
+  id: string;
+  name: string;
+  description: string;
+  cost: number;
+  power: BoxSkinPower;
+  unlockCondition?: string;
 }
 
 // --- Badge/Achievement Types ---
@@ -29,7 +63,7 @@ export interface Badge {
   id: string;
   name: string;
   description: string;
-  icon: string; // The key used to look up the icon component
+  icon: string;
   condition: string;
   secret?: boolean;
 }
@@ -37,10 +71,10 @@ export interface Badge {
 // --- User/Progress Types ---
 
 export interface UserProgress {
-  catsCollected: string[]; // List of cat IDs
-  badgesUnlocked: string[]; // List of badge IDs
-  diary: Record<string, string[]>; // catId -> list of messages
-  lastDailyBox?: string; // ISO Date string of last open
+  catsCollected: string[];
+  badgesUnlocked: string[];
+  diary: Record<string, string[]>;
+  lastDailyBox?: string;
   points: number;
 }
 
@@ -50,15 +84,8 @@ export type CelebrationState = 'idle' | 'celebrating' | 'spotlight' | 'finished'
 export type DialogTab = 'settings' | 'info';
 
 export interface ShareAsset {
-    file: File;
-    dataUrl: string;
-}
-
-export interface BoxSkin {
-    id: string;
-    name: string;
-    description: string;
-    unlockCondition?: string;
+  file: File;
+  dataUrl: string;
 }
 
 // --- Context Types (Generic) ---
