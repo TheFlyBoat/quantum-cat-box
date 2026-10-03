@@ -43,3 +43,6 @@ lerna-debug.log*
 *.swo
 
 .github/workflows/firebase-hosting.yml.save
+
+# TypeScript incremental build cache
+*.tsbuildinfo

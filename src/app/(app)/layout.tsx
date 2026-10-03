@@ -14,6 +14,7 @@ import { cn } from '@/lib/utils';
 import { InfiniteBoxGame, type InfiniteBoxGameResult } from '@/components/features/infinite-box-game';
 import { usePoints } from '@/context/points-context';
 import { useToast } from '@/hooks/use-toast';
+import { initAnalytics } from '@/lib/analytics';
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
     const { celebrationBadgeId, collectBadge, isBadgeUnlocked, unlockBadge } = useBadges();
@@ -23,6 +24,10 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
     const { addPoints } = usePoints();
     const { toast } = useToast();
+
+    React.useEffect(() => {
+        initAnalytics();
+    }, []);
 
     const closeCelebration = React.useCallback(() => {
         if (celebrationBadgeId) {

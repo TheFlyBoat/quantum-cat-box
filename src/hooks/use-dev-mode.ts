@@ -8,6 +8,10 @@ import { CatState, CatOutcome } from '@/lib/types';
 
 const allCats = catData.cats as {id: string, name: string, description: string, type: string, points: number}[];
 
+// The title-tap dev panel is for local testing only. Set NEXT_PUBLIC_ENABLE_DEV_MODE=true to allow it elsewhere.
+const isDevModeAllowed =
+    process.env.NODE_ENV !== 'production' || process.env.NEXT_PUBLIC_ENABLE_DEV_MODE === 'true';
+
 export function useDevMode({
     handleReset,
     setCatState,
@@ -26,6 +30,7 @@ export function useDevMode({
     const { toast } = useToast();
 
     const handleTitleClick = () => {
+        if (!isDevModeAllowed) return;
         const newCount = devModeClickCount + 1;
         setDevModeClickCount(newCount);
         if (newCount >= 7) {

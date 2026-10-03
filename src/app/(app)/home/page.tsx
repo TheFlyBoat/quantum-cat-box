@@ -12,7 +12,7 @@ import { TitleDisplay } from '@/components/title-display';
 import { SplashScreen } from '@/components/splash-screen';
 import { useCatLogic } from '@/hooks/use-cat-logic';
 import { useDevMode } from '@/hooks/use-dev-mode';
-import { useShare, type ShareAsset } from '@/hooks/use-share';
+import { useShare, SHARE_REWARD_POINTS, type ShareAsset } from '@/hooks/use-share';
 import { useDiary } from '@/context/diary-context';
 import { useBadges } from '@/context/badge-context';
 import { useFeedback } from '@/context/feedback-context';
@@ -28,6 +28,8 @@ import { UnlockBoxDialog } from '@/components/features/unlock-box-dialog';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Loader2, Sparkles, Check, Copy, Download, Share2 } from 'lucide-react';
 import { WhatsAppIcon, XTwitterIcon, InstagramIcon } from '@/components/icons/social-icons';
+
+const SPLASH_SEEN_KEY = 'quantum-cat-splash-date';
 
 export default function HomePage() {
     const [showOnboarding, setShowOnboarding] = useState(false);
@@ -90,7 +92,12 @@ export default function HomePage() {
         }
     });
 
-    const { createShareAsset, rewardShare } = useShare(message);
+    const { createShareAsset, rewardShare, isShareRewardAvailable } = useShare(message);
+
+    const shareRewardNote = (isRewarded: boolean) =>
+        isRewarded
+            ? `+${SHARE_REWARD_POINTS} Fish Points awarded!`
+            : 'Thanks for sharing! Share rewards come once a day.';
 
     const { isDevMode, handleTitleClick, handleDevCatSelect, allCats } = useDevMode({
         handleReset,
@@ -106,14 +113,12 @@ export default function HomePage() {
 
     useEffect(() => {
         try {
-            if (typeof window !== 'undefined') {
-                const alreadySeen = sessionStorage.getItem('quantum-cat-splash') === 'seen';
-                if (alreadySeen) {
-                    setShowSplash(false);
-                }
+            // The splash plays at most once per day.
+            if (localStorage.getItem(SPLASH_SEEN_KEY) === new Date().toDateString()) {
+                setShowSplash(false);
             }
         } catch (error) {
-            console.warn('Unable to access sessionStorage for splash screen state', error);
+            console.warn('Unable to access localStorage for splash screen state', error);
         }
     }, []);
 
@@ -223,14 +228,14 @@ export default function HomePage() {
         });
     };
 
-    const handleSplashComplete = () => {
+    const handleSplashComplete = useCallback(() => {
         setShowSplash(false);
         try {
-            sessionStorage.setItem('quantum-cat-splash', 'seen');
+            localStorage.setItem(SPLASH_SEEN_KEY, new Date().toDateString());
         } catch (error) {
             console.warn('Unable to persist splash screen state', error);
         }
-    };
+    }, []);
 
     const handleOnboardingComplete = () => {
         setShowOnboarding(false);
@@ -344,12 +349,12 @@ export default function HomePage() {
                 window.open(shareAsset.dataUrl, '_blank', 'noopener,noreferrer');
             }
 
-            rewardShare();
+            const isRewarded = rewardShare();
             setHasShared(true);
             playFeedback('celebration-magic');
             toast({
                 title: 'Card saved! 📥',
-                description: '10 Fish Points awarded. Share it with your friends!',
+                description: shareRewardNote(isRewarded),
             });
         } catch (error) {
             console.error('Failed to download share card:', error);
@@ -386,24 +391,24 @@ export default function HomePage() {
         const text = `${shareText}\n${shareUrl}`;
         const whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
         window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
-        rewardShare();
+        const isRewarded = rewardShare();
         setHasShared(true);
         playFeedback('celebration-magic');
         toast({
             title: 'Opening WhatsApp! 💬',
-            description: '+10 Fish Points awarded!',
+            description: shareRewardNote(isRewarded),
         });
     }, [shareText, rewardShare, toast]);
 
     const handleXShare = useCallback(() => {
         const xUrl = `https://x.com/intent/post?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}&hashtags=${encodeURIComponent('TheQuantumCat,SchrodingersCat')}`;
         window.open(xUrl, '_blank', 'noopener,noreferrer');
-        rewardShare();
+        const isRewarded = rewardShare();
         setHasShared(true);
         playFeedback('celebration-magic');
         toast({
             title: 'Opening X (Twitter)! 🐦',
-            description: '+10 Fish Points awarded!',
+            description: shareRewardNote(isRewarded),
         });
     }, [shareText, rewardShare, toast]);
 
@@ -417,12 +422,12 @@ export default function HomePage() {
                         text: shareText,
                         url: shareUrl,
                     });
-                    rewardShare();
+                    const isRewarded = rewardShare();
                     setHasShared(true);
                     playFeedback('celebration-magic');
                     toast({
                         title: 'Shared!',
-                        description: '+10 Fish Points awarded!',
+                        description: shareRewardNote(isRewarded),
                     });
                     return;
                 }
@@ -480,12 +485,12 @@ export default function HomePage() {
                 });
             }
 
-            rewardShare();
+            const isRewarded = rewardShare();
             setHasShared(true);
             playFeedback('celebration-magic');
             toast({
                 title: 'Shared successfully! 🎉',
-                description: '10 Fish Points awarded.',
+                description: shareRewardNote(isRewarded),
             });
             setIsShareDialogOpen(false);
             setShareAsset(null);
@@ -610,7 +615,11 @@ export default function HomePage() {
                                     Share Your Destiny
                                 </DialogTitle>
                                 <DialogDescription className="text-xs text-muted-foreground">
-                                    Share your Quantum Message and earn <strong className="text-primary font-bold">+10 Fish Points</strong>! 🐟
+                                    {isShareRewardAvailable ? (
+                                        <>Share your Quantum Message and earn <strong className="text-primary font-bold">+{SHARE_REWARD_POINTS} Fish Points</strong>! 🐟</>
+                                    ) : (
+                                        <>Share your Quantum Message with friends. Today&apos;s share reward is already collected. 🐟</>
+                                    )}
                                 </DialogDescription>
                             </DialogHeader>
 

@@ -13,7 +13,8 @@ import { useBoxSkin } from '@/context/box-skin-context';
 import { useTheme } from 'next-themes';
 import { useAuth } from '@/context/auth-context';
 import { saveUserData } from '@/lib/user-data';
-import { useShare, type ShareAsset } from './use-share';
+import { type ShareAsset } from './use-share';
+import { trackEvent } from '@/lib/analytics';
 
 type OutcomePool = { title: string; cats: { id: string; rarity: number }[] };
 
@@ -129,7 +130,7 @@ export function useCatLogic({
     const { unlockCat } = useCatCollection();
     const { addPoints } = usePoints();
     const { selectedSkin } = useBoxSkin();
-    const { setTheme } = useTheme();
+    const { resolvedTheme } = useTheme();
     const { user, userData, setUserData, storageMode } = useAuth();
 
     const [currentTime, setCurrentTime] = useState(() => Date.now());
@@ -179,20 +180,18 @@ export function useCatLogic({
         if (setRevealedCatId) {
             setRevealedCatId(catState.catId || null);
         }
-        if (catState.catId === 'breu') {
-            setTheme('dark');
-        } else {
-            const storedTheme = typeof window !== 'undefined' ? localStorage.getItem('theme') : null;
-            if (storedTheme !== 'dark') {
-                setTheme(storedTheme || 'light');
-            }
-        }
-    }, [catState.catId, setRevealedCatId, setTheme]);
+    }, [catState.catId, setRevealedCatId]);
+
+    // Dudu (breu) Cat is revealed in the dark. Toggle the class directly instead of calling
+    // setTheme, which would persist 'dark' as the user's own preference.
+    useEffect(() => {
+        if (catState.catId !== 'breu' || resolvedTheme === 'dark') return;
+        const root = document.documentElement;
+        root.classList.add('dark');
+        return () => root.classList.remove('dark');
+    }, [catState.catId, resolvedTheme]);
 
     const handleBoxClick = async (options?: { ignoreLock?: boolean }) => {
-        console.log('handleBoxClick called');
-        console.log({ isLoading, outcome: catState.outcome, isRevealing });
-
         if (isDailyLocked && !options?.ignoreLock) {
             onDailyLock?.();
             playFeedback('error-1');
@@ -200,11 +199,8 @@ export function useCatLogic({
         }
 
         if (isLoading || catState.outcome !== 'initial' || isRevealing) {
-            console.log('Box click blocked by loading/revealing state');
             return;
         }
-
-        console.log('Box click proceeding');
 
         onInteraction?.();
 
@@ -265,7 +261,7 @@ export function useCatLogic({
         // reset ref for this interaction
         messageReportedRef.current = false;
 
-        const reportMessage = (candidate?: string) => {
+        const reportMessage = (candidate: string | undefined, source: 'ai' | 'fallback', reason?: string) => {
             if (messageReportedRef.current) return;
             messageReportedRef.current = true;
 
@@ -273,25 +269,28 @@ export function useCatLogic({
             const finalMessage = trimmed.length ? trimmed : pickFallbackMessage();
             setMessage(finalMessage);
             onCatReveal(resolvedCatId, finalMessage);
+            trackEvent('box_open', {
+                outcome: determinedOutcome,
+                cat_id: resolvedCatId,
+                message_source: trimmed.length ? source : 'fallback',
+                fallback_reason: reason ?? (trimmed.length ? undefined : 'empty_message'),
+            });
         };
 
+        // Last-resort client fallback for network failures; the server answers or falls back sooner.
         const fallbackTimer = setTimeout(() => {
-            reportMessage();
+            reportMessage(undefined, 'fallback', 'client_timeout');
         }, MESSAGE_GENERATION_TIMEOUT_MS);
 
         generateCatMessage(messageInput)
             .then(response => {
                 clearTimeout(fallbackTimer);
-                if (response && typeof response.message === 'string') {
-                    reportMessage(response.message);
-                } else {
-                    reportMessage();
-                }
+                reportMessage(response?.message, response?.source ?? 'fallback', response?.reason);
             })
             .catch(error => {
                 clearTimeout(fallbackTimer);
                 console.error('AI message generation failed:', error);
-                reportMessage();
+                reportMessage(undefined, 'fallback', 'network_error');
             });
 
         setTimeout(() => {
@@ -340,14 +339,10 @@ export function useCatLogic({
         if (setRevealedCatId) {
             setRevealedCatId(null);
         }
-        if (typeof window !== 'undefined' && document.documentElement.classList.contains('dark')) {
-            const storedTheme = localStorage.getItem('theme');
-            setTheme(storedTheme || 'light');
-        }
         setCatState({ outcome: 'initial' });
         setMessage('');
         setRevealedCatName(null);
-    }, [setRevealedCatId, setTheme]);
+    }, [setRevealedCatId]);
 
     const handleReset = useCallback(
         (options?: { ignoreLock?: boolean }) => {

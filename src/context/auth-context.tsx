@@ -364,8 +364,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         ? (value as (prevState: UserData | null) => UserData | null)(prev)
         : value;
 
-      console.log('updateUserData', next);
-
       if (!next) {
         if (storageMode === 'local') {
           clearLocalUserData();

@@ -36,6 +36,8 @@ export interface UserData {
   points?: number;
   revealHistory?: RevealHistoryEntry[];
   shareCount?: number;
+  /** Local date string (Date.toDateString) of the last share that earned Fish Points. */
+  lastShareRewardDate?: string;
   settings?: UserSettings;
 }
 
