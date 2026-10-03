@@ -80,9 +80,9 @@ export default function GalleryPage() {
         'flex-1 px-3 py-1.5 font-semibold transition transform rounded-2xl hover:scale-105 hover:shadow-md data-[state=active]:scale-[1.06] data-[state=active]:shadow-md data-[state=active]:font-black';
 
     const tabColorClasses: Record<string, string> = {
-        Alive: 'bg-emerald-100 text-emerald-800 hover:bg-emerald-200/70 dark:bg-emerald-950/60 dark:text-emerald-300 data-[state=active]:bg-emerald-600 data-[state=active]:text-white dark:data-[state=active]:bg-emerald-600 dark:data-[state=active]:text-white',
-        Dead: 'bg-orange-100 text-orange-800 hover:bg-orange-200/70 dark:bg-orange-950/60 dark:text-orange-300 data-[state=active]:bg-[#D14002] data-[state=active]:text-white dark:data-[state=active]:bg-[#D14002] dark:data-[state=active]:text-white',
-        Paradox: 'bg-purple-100 text-purple-800 hover:bg-purple-200/70 dark:bg-purple-950/60 dark:text-purple-300 data-[state=active]:bg-[#A240FF] data-[state=active]:text-white dark:data-[state=active]:bg-[#A240FF] dark:data-[state=active]:text-white',
+        Alive: 'bg-emerald-100 text-emerald-800 hover:bg-emerald-200/70 dark:bg-emerald-950/60 dark:text-emerald-300 data-[state=active]:bg-[#A9DB4A] data-[state=active]:text-[#002D41] data-[state=active]:font-semibold dark:data-[state=active]:bg-[#A9DB4A] dark:data-[state=active]:text-[#002D41]',
+        Dead: 'bg-orange-100 text-orange-800 hover:bg-orange-200/70 dark:bg-orange-950/60 dark:text-orange-300 data-[state=active]:bg-[#D14002] data-[state=active]:text-white data-[state=active]:font-black dark:data-[state=active]:bg-[#D14002] dark:data-[state=active]:text-white',
+        Paradox: 'bg-purple-100 text-purple-800 hover:bg-purple-200/70 dark:bg-purple-950/60 dark:text-purple-300 data-[state=active]:bg-[#A240FF] data-[state=active]:text-white data-[state=active]:font-black dark:data-[state=active]:bg-[#A240FF] dark:data-[state=active]:text-white',
     };
 
     return (
@@ -94,16 +94,22 @@ export default function GalleryPage() {
                 <Tabs defaultValue="Alive" className="w-full">
                     <TabsList className="grid w-full grid-cols-3 gap-3 rounded-3xl border border-border/40 bg-background/80 p-2 text-[11px] font-semibold uppercase tracking-wide shadow-sm">
                         {groupOrder.map(groupName => (
-                            <TabsTrigger
-                                key={groupName}
-                                value={groupName}
-                                className={cn(
-                                    tabBaseClass,
-                                    tabColorClasses[groupName] ?? 'bg-muted/60 text-muted-foreground'
-                                )}
-                            >
-                                {groupName}
-                            </TabsTrigger>
+                            <Tooltip key={groupName}>
+                                <TooltipTrigger asChild>
+                                    <TabsTrigger
+                                        value={groupName}
+                                        className={cn(
+                                            tabBaseClass,
+                                            tabColorClasses[groupName] ?? 'bg-muted/60 text-muted-foreground'
+                                        )}
+                                    >
+                                        {groupName}
+                                    </TabsTrigger>
+                                </TooltipTrigger>
+                                <TooltipContent side="top">
+                                    {groupName} Cats
+                                </TooltipContent>
+                            </Tooltip>
                         ))}
                     </TabsList>
                     {groupOrder.map(groupName => (
@@ -125,14 +131,20 @@ export default function GalleryPage() {
                                         return displayEntries.map((entry) => {
                                             if (isPlaceholderEntry(entry)) {
                                                 return (
-                                                    <Card
-                                                        key={entry.id}
-                                                        className="flex aspect-[3/4] flex-col overflow-hidden rounded-3xl border border-dashed border-muted-foreground/40 bg-background/60 shadow-inner"
-                                                    >
-                                                        <CardContent className="flex flex-1 items-center justify-center bg-gradient-to-br from-muted/30 via-transparent to-transparent p-3">
-                                                            {renderLockedSilhouette()}
-                                                        </CardContent>
-                                                    </Card>
+                                                    <Tooltip key={entry.id}>
+                                                        <TooltipTrigger asChild>
+                                                            <Card
+                                                                className="flex aspect-[3/4] flex-col overflow-hidden rounded-3xl border border-dashed border-muted-foreground/40 bg-background/60 shadow-inner cursor-default"
+                                                            >
+                                                                <CardContent className="flex flex-1 items-center justify-center bg-gradient-to-br from-muted/30 via-transparent to-transparent p-3">
+                                                                    {renderLockedSilhouette()}
+                                                                </CardContent>
+                                                            </Card>
+                                                        </TooltipTrigger>
+                                                        <TooltipContent side="top" className="font-medium">
+                                                            Locked Cat
+                                                        </TooltipContent>
+                                                    </Tooltip>
                                                 );
                                             }
 

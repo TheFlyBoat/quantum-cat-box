@@ -10,10 +10,11 @@ import { useDiary } from '@/context/diary-context';
 import { usePoints } from '@/context/points-context';
 import badgeData from '@/lib/badge-data.json';
 import catData from '@/lib/cat-data.json';
-import { BadgeCard } from '@/components/features/BadgeCard';
+import { BadgeCard } from '@/components/features/badge-card';
 import { badgeImageMap, defaultBadgeImage } from '@/lib/badge-images';
 import { cn } from '@/lib/utils';
 import { Box, Cat, Fish, ScrollText, Skull, Sparkles } from 'lucide-react';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 
 const allCats = catData.cats as { id: string; name: string; description: string; type: string }[];
 
@@ -57,8 +58,8 @@ export default function AwardsPage() {
         'flex-1 px-3 py-1.5 font-semibold transition transform rounded-2xl hover:scale-105 hover:shadow-md data-[state=active]:scale-[1.06] data-[state=active]:shadow-md data-[state=active]:font-black';
 
     const tabColorClasses: Record<string, string> = {
-        Badges: 'bg-pink-100 text-pink-800 hover:bg-pink-200/70 dark:bg-pink-950/60 dark:text-pink-300 data-[state=active]:bg-[#FF809F] data-[state=active]:text-white dark:data-[state=active]:bg-[#FF809F] dark:data-[state=active]:text-white',
-        Data: 'bg-sky-100 text-sky-800 hover:bg-sky-200/70 dark:bg-sky-950/60 dark:text-sky-300 data-[state=active]:bg-[#3696C9] data-[state=active]:text-white dark:data-[state=active]:bg-[#3696C9] dark:data-[state=active]:text-white',
+        Badges: 'bg-pink-100 text-pink-800 hover:bg-pink-200/70 dark:bg-pink-950/60 dark:text-pink-300 data-[state=active]:bg-[#FF809F] data-[state=active]:text-[#002D41] data-[state=active]:font-semibold dark:data-[state=active]:bg-[#FF809F] dark:data-[state=active]:text-[#002D41]',
+        Data: 'bg-sky-100 text-sky-800 hover:bg-sky-200/70 dark:bg-sky-950/60 dark:text-sky-300 data-[state=active]:bg-[#3696C9] data-[state=active]:text-[#002D41] data-[state=active]:font-semibold dark:data-[state=active]:bg-[#3696C9] dark:data-[state=active]:text-[#002D41]',
     };
 
     const stats = [
@@ -78,8 +79,18 @@ export default function AwardsPage() {
             <CardContent>
                 <Tabs defaultValue="Badges" className="w-full">
                     <TabsList className="grid w-full grid-cols-2 gap-3 rounded-3xl border border-border/40 bg-background/80 p-2 text-[11px] font-semibold uppercase tracking-wide shadow-sm">
-                        <TabsTrigger value="Badges" className={cn(tabBaseClass, tabColorClasses['Badges'])}>Badges</TabsTrigger>
-                        <TabsTrigger value="Data" className={cn(tabBaseClass, tabColorClasses['Data'])}>Data</TabsTrigger>
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <TabsTrigger value="Badges" className={cn(tabBaseClass, tabColorClasses['Badges'])}>Badges</TabsTrigger>
+                            </TooltipTrigger>
+                            <TooltipContent side="top">Badges & Achievements</TooltipContent>
+                        </Tooltip>
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <TabsTrigger value="Data" className={cn(tabBaseClass, tabColorClasses['Data'])}>Data</TabsTrigger>
+                            </TooltipTrigger>
+                            <TooltipContent side="top">Observation Statistics</TooltipContent>
+                        </Tooltip>
                     </TabsList>
                     <TabsContent value="Badges">
                         <div className="grid grid-cols-3 gap-3">
@@ -121,7 +132,7 @@ export default function AwardsPage() {
                                         )}>
                                             {stat.value}
                                         </p>
-                                        <p className="mt-1 text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+                                        <p className="mt-1 text-[10px] font-bold uppercase tracking-[0.16em] text-muted-foreground">
                                             {stat.label}
                                         </p>
                                     </div>

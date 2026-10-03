@@ -12,19 +12,19 @@ import {
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import {
+  BlackWoodenBoxIcon,
   BoxIcon,
   CarbonBoxIcon,
   CardboardBoxIcon,
-  BlackWoodenBoxIcon,
+  CircuitBoardBoxIcon,
+  CrystalBoxIcon,
+  GalaxyBoxIcon,
+  PlushBoxIcon,
   SpecialXK6BoxIcon,
+  SteampunkBoxIcon,
   StoneBoxIcon,
   TardisBoxIcon,
 } from '@/components/icons';
-import { CircuitBoardBoxIcon } from '@/components/icons/circuit-board-box-icon';
-import { CrystalBoxIcon } from '@/components/icons/crystal-box-icon';
-import { GalaxyBoxIcon } from '@/components/icons/galaxy-box-icon';
-import { PlushBoxIcon } from '@/components/icons/plush-box-icon';
-import { SteampunkBoxIcon } from '@/components/icons/steampunk-box-icon';
 import { useBoxSkin } from '@/context/box-skin-context';
 import { cn } from '@/lib/utils';
 import type { ComponentType } from 'react';
@@ -94,7 +94,7 @@ export function UnlockBoxDialog({
         </div>
 
         {!hasEnoughPoints && (
-          <p className="text-xs text-rose-500 font-medium text-center -mt-1 mb-2">
+          <p className="text-xs text-destructive font-medium text-center -mt-1 mb-2">
             Need {cost - currentPoints} more points to unlock.
           </p>
         )}

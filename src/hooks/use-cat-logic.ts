@@ -10,6 +10,7 @@ import fallbackMessages from '@/lib/fallback-messages.json';
 import catData from '@/lib/cat-data.json';
 import { playFeedback } from '@/lib/audio';
 import { useBoxSkin } from '@/context/box-skin-context';
+import { catComponentMap } from '@/lib/cat-components';
 import { useTheme } from 'next-themes';
 import { useAuth } from '@/context/auth-context';
 import { saveUserData, getSkinPower } from '@/lib/user-data';
@@ -19,7 +20,47 @@ import { trackEvent } from '@/lib/analytics';
 
 type OutcomePool = { title: string; cats: { id: string; rarity: number }[] };
 
-const allCats = catData.cats as { id: string; name: string; description: string; type: string; points: number }[];
+export interface CatDebugInfo {
+    index: number;
+    id: string;
+    name: string;
+    type: string;
+    outcome: 'alive' | 'dead' | 'paradox';
+    points: number;
+    description: string;
+    tagline?: string;
+    hasComponent: boolean;
+    toString: () => string;
+}
+
+export interface DebugCycleApi {
+    readonly total: number;
+    readonly allCats: ReadonlyArray<CatDebugInfo>;
+    enabled: boolean;
+    currentIndex: number;
+    targetCatId?: string | null;
+    next: (immediate?: boolean) => CatDebugInfo;
+    prev: (immediate?: boolean) => CatDebugInfo;
+    setCat: (idOrIndex: string | number, immediate?: boolean) => CatDebugInfo | null;
+    list: () => CatDebugInfo[];
+    setSequentialMode: (enabled?: boolean) => boolean;
+    open: (idOrIndex?: string | number) => Promise<void>;
+    cycleAll: (intervalMs?: number, loop?: boolean) => void;
+    stop: () => void;
+    status: () => Record<string, unknown>;
+    reset: () => void;
+    help: () => void;
+    toggle: () => boolean;
+    bypassDailyLock: (bypass?: boolean) => boolean;
+}
+
+declare global {
+    interface Window {
+        __DEBUG_CYCLE_CATS__?: DebugCycleApi;
+    }
+}
+
+const allCats = catData.cats as { id: string; name: string; description: string; type: string; points: number; tagline?: string }[];
 
 const normalizeOutcome = (type: string | undefined): 'alive' | 'dead' | 'paradox' | null => {
     if (!type) return null;
@@ -42,7 +83,9 @@ const fallbackOutcomes: Record<'alive', OutcomePool> & Record<'dead', OutcomePoo
         if (!normalized) {
             return;
         }
-        const rarity = Number.isFinite(cat.points) && cat.points > 0 ? cat.points : 1;
+        // Base selection rarity is decoupled from cat points: uniform base weight of 1 for all variants.
+        // Dynamic skin multipliers (Crystal, Stone) apply on top of this uniform base.
+        const rarity = 1;
         base[normalized].cats.push({ id: cat.id, rarity });
     });
 
@@ -145,8 +188,21 @@ export function useCatLogic({
         return () => clearInterval(interval);
     }, []);
 
+    // -------------------------------------------------------------------------
+    // Developer Override & Debug Cycle State (Development Only)
+    // -------------------------------------------------------------------------
+    const debugIndexRef = useRef(0);
+    const debugOverrideCatIdRef = useRef<string | null>(null);
+    const debugSequentialModeRef = useRef(false);
+    const debugCycleIntervalRef = useRef<NodeJS.Timeout | null>(null);
+    const [isDebugModeActive, setIsDebugModeActive] = useState(false);
+
     // Derive daily lock from userData with SSR hydration safety
     const { isDailyLocked, nextAvailableAt } = useMemo(() => {
+        if (process.env.NODE_ENV === 'development' && isDebugModeActive) {
+            return { isDailyLocked: false, nextAvailableAt: null };
+        }
+
         if (!isMounted || !userData?.lastBoxOpenDate) {
             return { isDailyLocked: false, nextAvailableAt: null };
         }
@@ -168,7 +224,7 @@ export function useCatLogic({
         }
 
         return { isDailyLocked: false, nextAvailableAt: null };
-    }, [isMounted, userData, currentTime]);
+    }, [isMounted, userData, currentTime, isDebugModeActive]);
 
     // Backward compatible callback
     const refreshDailyLock = useCallback(() => {
@@ -177,6 +233,266 @@ export function useCatLogic({
 
     // FIX: hook must be at top level of the custom hook, not inside handleBoxClick
     const messageReportedRef = useRef(false);
+
+    const resetState = useCallback(() => {
+        if (setRevealedCatId) {
+            setRevealedCatId(null);
+        }
+        setCatState({ outcome: 'initial' });
+        setMessage('');
+        setRevealedCatName(null);
+    }, [setRevealedCatId]);
+
+    const getCatDebugInfo = useCallback((index: number): CatDebugInfo => {
+        const cat = allCats[index];
+        const outcome = normalizeOutcome(cat.type) ?? 'alive';
+        return {
+            index,
+            id: cat.id,
+            name: cat.name,
+            type: cat.type,
+            outcome,
+            points: cat.points,
+            description: cat.description,
+            tagline: cat.tagline ?? cat.description,
+            hasComponent: Boolean(catComponentMap[cat.id]),
+            toString() {
+                return this.id;
+            },
+        };
+    }, []);
+
+    const displayCatInstantly = useCallback(
+        (cat: (typeof allCats)[number], index: number) => {
+            const outcome = normalizeOutcome(cat.type) ?? 'alive';
+            setIsLoading(false);
+            setIsRevealing(false);
+            setCatState({ outcome, catId: cat.id });
+            setRevealedCatName(cat.name);
+            if (setRevealedCatId) {
+                setRevealedCatId(cat.id);
+            }
+            const tagline = cat.tagline ?? cat.description;
+            const debugMsg = `[Debug ${index + 1}/${allCats.length}] ${cat.name} (${cat.type}) — ${tagline}`;
+            setMessage(debugMsg);
+            onCatReveal(cat.id, debugMsg);
+            unlockCat(cat.id, { celebrateImmediately: false });
+            recordObservation(cat.id, outcome);
+            playFeedback('click-1');
+            console.log(
+                `%c[DEBUG CATS]%c [${index + 1}/${allCats.length}] %c${cat.name}%c (${cat.id}) | State: ${outcome.toUpperCase()} | Points: ${cat.points} | Component: ${catComponentMap[cat.id] ? '✅' : '❌'}`,
+                'background: #A240FF; color: white; padding: 2px 6px; border-radius: 4px; font-weight: bold;',
+                'color: inherit;',
+                'color: #FF809F; font-weight: bold;',
+                'color: inherit;',
+            );
+        },
+        [onCatReveal, recordObservation, setRevealedCatId, unlockCat],
+    );
+
+    const debugNext = useCallback(
+        (immediate?: boolean): CatDebugInfo => {
+            debugIndexRef.current = (debugIndexRef.current + 1) % allCats.length;
+            const target = allCats[debugIndexRef.current];
+            debugOverrideCatIdRef.current = target.id;
+            setIsDebugModeActive(true);
+            const shouldDisplay = immediate ?? (catState.outcome !== 'initial');
+            if (shouldDisplay) {
+                displayCatInstantly(target, debugIndexRef.current);
+            }
+            console.log(`[DEBUG CATS] Next cat #${debugIndexRef.current + 1}/${allCats.length}: ${target.name} (${target.id}) [${target.type}]`);
+            return getCatDebugInfo(debugIndexRef.current);
+        },
+        [catState.outcome, displayCatInstantly, getCatDebugInfo],
+    );
+
+    const debugPrev = useCallback(
+        (immediate?: boolean): CatDebugInfo => {
+            debugIndexRef.current = (debugIndexRef.current - 1 + allCats.length) % allCats.length;
+            const target = allCats[debugIndexRef.current];
+            debugOverrideCatIdRef.current = target.id;
+            setIsDebugModeActive(true);
+            const shouldDisplay = immediate ?? (catState.outcome !== 'initial');
+            if (shouldDisplay) {
+                displayCatInstantly(target, debugIndexRef.current);
+            }
+            console.log(`[DEBUG CATS] Prev cat #${debugIndexRef.current + 1}/${allCats.length}: ${target.name} (${target.id}) [${target.type}]`);
+            return getCatDebugInfo(debugIndexRef.current);
+        },
+        [catState.outcome, displayCatInstantly, getCatDebugInfo],
+    );
+
+    const debugSetCat = useCallback(
+        (idOrIndex: string | number, immediate?: boolean): CatDebugInfo | null => {
+            let targetIndex = -1;
+            if (typeof idOrIndex === 'number') {
+                if (idOrIndex >= 0 && idOrIndex < allCats.length) {
+                    targetIndex = idOrIndex;
+                } else if (idOrIndex === allCats.length) {
+                    targetIndex = allCats.length - 1;
+                } else {
+                    targetIndex = ((idOrIndex % allCats.length) + allCats.length) % allCats.length;
+                }
+            } else if (typeof idOrIndex === 'string') {
+                const query = idOrIndex.trim().toLowerCase();
+                targetIndex = allCats.findIndex(c => c.id.toLowerCase() === query);
+                if (targetIndex === -1) {
+                    targetIndex = allCats.findIndex(c => c.name.toLowerCase() === query);
+                }
+                if (targetIndex === -1) {
+                    const parsed = parseInt(query, 10);
+                    if (!isNaN(parsed) && parsed >= 0 && parsed < allCats.length) {
+                        targetIndex = parsed;
+                    }
+                }
+            }
+
+            if (targetIndex === -1) {
+                console.warn(`[DEBUG CATS] Unknown cat identifier: "${idOrIndex}". Call __DEBUG_CYCLE_CATS__.list() for available IDs.`);
+                return null;
+            }
+
+            debugIndexRef.current = targetIndex;
+            const target = allCats[targetIndex];
+            debugOverrideCatIdRef.current = target.id;
+            setIsDebugModeActive(true);
+
+            const shouldDisplay = immediate ?? (catState.outcome !== 'initial');
+            if (shouldDisplay) {
+                displayCatInstantly(target, targetIndex);
+            }
+            console.log(`[DEBUG CATS] Queued cat #${targetIndex + 1}/${allCats.length}: ${target.name} (${target.id}) [${target.type}]`);
+            return getCatDebugInfo(targetIndex);
+        },
+        [catState.outcome, displayCatInstantly, getCatDebugInfo],
+    );
+
+    const debugSetSequentialMode = useCallback((enabled?: boolean): boolean => {
+        if (enabled === undefined) {
+            debugSequentialModeRef.current = !debugSequentialModeRef.current;
+        } else {
+            debugSequentialModeRef.current = Boolean(enabled);
+        }
+        setIsDebugModeActive(debugSequentialModeRef.current);
+        console.log(
+            `[DEBUG CATS] Sequential opening mode is now ${
+                debugSequentialModeRef.current
+                    ? 'ENABLED (next: #' + (debugIndexRef.current + 1) + ' ' + allCats[debugIndexRef.current].name + ')'
+                    : 'DISABLED (normal random distribution)'
+            }`,
+        );
+        return debugSequentialModeRef.current;
+    }, []);
+
+    const debugList = useCallback((): CatDebugInfo[] => {
+        console.log('%cQuantum Cat Box — All 36 Cat Variants', 'font-size: 14px; font-weight: bold; color: #A240FF;');
+        console.table(
+            allCats.map((cat, i) => ({
+                '#': i + 1,
+                ID: cat.id,
+                Name: cat.name,
+                Type: cat.type,
+                Points: cat.points,
+                Component: catComponentMap[cat.id] ? '✅ OK' : '❌ MISSING',
+            })),
+        );
+        return allCats.map((_, i) => getCatDebugInfo(i));
+    }, [getCatDebugInfo]);
+
+    const debugStop = useCallback(() => {
+        if (debugCycleIntervalRef.current) {
+            clearInterval(debugCycleIntervalRef.current);
+            debugCycleIntervalRef.current = null;
+            console.log('[DEBUG CATS] Auto-cycle stopped.');
+        }
+    }, []);
+
+    const debugCycleAll = useCallback(
+        (intervalMs = 1500, loop = false) => {
+            debugStop();
+            let count = 0;
+            console.log(`[DEBUG CATS] Starting auto-cycle through all ${allCats.length} cats (${intervalMs}ms interval, loop=${loop})...`);
+            setIsDebugModeActive(true);
+            debugSetCat(debugIndexRef.current, true);
+
+            debugCycleIntervalRef.current = setInterval(() => {
+                count++;
+                if (!loop && count >= allCats.length) {
+                    debugStop();
+                    console.log(`%c[DEBUG CATS] Completed cycle of all ${allCats.length} cats!`, 'color: #A9DB4A; font-weight: bold;');
+                    return;
+                }
+                debugNext(true);
+            }, intervalMs);
+        },
+        [debugNext, debugSetCat, debugStop],
+    );
+
+    const debugReset = useCallback(() => {
+        debugStop();
+        debugSequentialModeRef.current = false;
+        debugOverrideCatIdRef.current = null;
+        debugIndexRef.current = 0;
+        setIsDebugModeActive(false);
+        resetState();
+        console.log('[DEBUG CATS] Reset debug cycle state and closed box.');
+    }, [debugStop, resetState]);
+
+    const debugToggle = useCallback((): boolean => {
+        const nextVal = !isDebugModeActive;
+        setIsDebugModeActive(nextVal);
+        if (!nextVal) {
+            debugSequentialModeRef.current = false;
+            debugOverrideCatIdRef.current = null;
+        }
+        console.log(`[DEBUG CATS] Developer override ${nextVal ? 'ENABLED' : 'DISABLED'}`);
+        return nextVal;
+    }, [isDebugModeActive]);
+
+    const debugBypassDailyLock = useCallback((bypass?: boolean): boolean => {
+        const nextVal = bypass === undefined ? !isDebugModeActive : Boolean(bypass);
+        setIsDebugModeActive(nextVal);
+        console.log(`[DEBUG CATS] Daily lock bypass is now ${nextVal ? 'ENABLED' : 'DISABLED'}`);
+        return nextVal;
+    }, [isDebugModeActive]);
+
+    const debugStatus = useCallback(() => {
+        return {
+            isDev: process.env.NODE_ENV === 'development',
+            enabled: isDebugModeActive || debugSequentialModeRef.current || debugOverrideCatIdRef.current !== null,
+            currentIndex: debugIndexRef.current,
+            currentCat: getCatDebugInfo(debugIndexRef.current),
+            sequentialMode: debugSequentialModeRef.current,
+            queuedCatId: debugOverrideCatIdRef.current,
+            isAutoCycling: debugCycleIntervalRef.current !== null,
+            isDailyLocked,
+            totalCats: allCats.length,
+        };
+    }, [getCatDebugInfo, isDailyLocked, isDebugModeActive]);
+
+    const debugHelp = useCallback(() => {
+        console.log(
+            `%c🐈 Quantum Cat Box — Developer Debug Cycle API 🐈%c
+Available globally on window.__DEBUG_CYCLE_CATS__:
+
+  __DEBUG_CYCLE_CATS__.next()                 Advance to next cat (0..35)
+  __DEBUG_CYCLE_CATS__.prev()                 Step back to previous cat
+  __DEBUG_CYCLE_CATS__.setCat('schrodinger')  Set next cat by ID or index (0..35)
+  __DEBUG_CYCLE_CATS__.open('schrodinger')    Full box-opening simulation (sound, points, reveal)
+  __DEBUG_CYCLE_CATS__.setSequentialMode(true) Force box clicks in UI to cycle sequentially
+  __DEBUG_CYCLE_CATS__.cycleAll(1500)         Auto-cycle through all 36 cats every 1.5s
+  __DEBUG_CYCLE_CATS__.stop()                 Stop auto-cycling
+  __DEBUG_CYCLE_CATS__.list()                 Print table of all 36 cats & component status
+  __DEBUG_CYCLE_CATS__.status()               Inspect current debug cycle state
+  __DEBUG_CYCLE_CATS__.toggle()               Toggle developer override on/off
+  __DEBUG_CYCLE_CATS__.bypassDailyLock(true)  Bypass isDailyLocked in dev mode
+  __DEBUG_CYCLE_CATS__.reset()                Reset box to closed initial state
+  __DEBUG_CYCLE_CATS__.help()                 Print this guide
+`,
+            'color: #A240FF; font-weight: bold; font-size: 13px;',
+            'color: inherit;',
+        );
+    }, []);
 
     useEffect(() => {
         if (setRevealedCatId) {
@@ -194,7 +510,15 @@ export function useCatLogic({
     }, [catState.catId, resolvedTheme]);
 
     const handleBoxClick = async (options?: { ignoreLock?: boolean }) => {
-        if (isDailyLocked && !options?.ignoreLock) {
+        const isDev = process.env.NODE_ENV === 'development';
+        const isDebugActive = isDev && (
+            isDebugModeActive ||
+            debugSequentialModeRef.current ||
+            debugOverrideCatIdRef.current !== null ||
+            (typeof window !== 'undefined' && Boolean(window.__DEBUG_CYCLE_CATS__?.enabled))
+        );
+
+        if (isDailyLocked && !options?.ignoreLock && !isDebugActive) {
             onDailyLock?.();
             playFeedback('error-1');
             return;
@@ -203,6 +527,7 @@ export function useCatLogic({
         if (isLoading || catState.outcome !== 'initial' || isRevealing) {
             return;
         }
+
 
         onInteraction?.();
 
@@ -214,40 +539,64 @@ export function useCatLogic({
 
         const activePower = getSkinPower(selectedSkin);
 
-        // Calculate outcome probabilities based on active box skin
-        let aliveRate = 0.47;
-        let deadRate = 0.47;
-        let paradoxRate = 0.06;
-
-        if (selectedSkin === 'cardboard') {
-            // Cardboard: 64% Alive, 30% Dead, 6% Paradox (Floor guaranteed)
-            aliveRate = 0.64;
-            deadRate = 0.30;
-            paradoxRate = 0.06;
-        } else if (selectedSkin === 'tardis') {
-            // Time Capsule: 18% Paradox, 41% Alive, 41% Dead
-            paradoxRate = 0.18;
-            aliveRate = 0.41;
-            deadRate = 0.41;
-        } else if (selectedSkin === 'galaxy') {
-            // Galaxy: 15% Paradox, 42.5% Alive, 42.5% Dead
-            paradoxRate = 0.15;
-            aliveRate = 0.425;
-            deadRate = 0.425;
+        // In development mode: check for explicit cat override or sequential mode
+        let forcedCat: (typeof allCats)[number] | null = null;
+        if (isDev) {
+            if (debugOverrideCatIdRef.current) {
+                const found = allCats.find(c => c.id.toLowerCase() === debugOverrideCatIdRef.current?.toLowerCase());
+                if (found) {
+                    forcedCat = found;
+                }
+                if (!debugSequentialModeRef.current) {
+                    debugOverrideCatIdRef.current = null;
+                }
+            } else if (debugSequentialModeRef.current) {
+                forcedCat = allCats[debugIndexRef.current];
+                debugIndexRef.current = (debugIndexRef.current + 1) % allCats.length;
+            }
         }
 
-        // Guaranteed Paradox Floor (minimum 6% across all boxes)
-        paradoxRate = Math.max(0.06, paradoxRate);
-
-        const randomState = Math.random();
         let determinedOutcome: Exclude<CatOutcome, 'initial'>;
+        let selectedCatId: string | undefined;
 
-        if (randomState < aliveRate) {
-            determinedOutcome = 'alive';
-        } else if (randomState < aliveRate + deadRate) {
-            determinedOutcome = 'dead';
+        if (forcedCat) {
+            determinedOutcome = normalizeOutcome(forcedCat.type) ?? 'alive';
+            selectedCatId = forcedCat.id;
         } else {
-            determinedOutcome = 'paradox';
+            // Calculate outcome probabilities based on active box skin
+            let aliveRate = 0.47;
+            let deadRate = 0.47;
+            let paradoxRate = 0.06;
+
+            if (selectedSkin === 'cardboard') {
+                // Cardboard: 64% Alive, 30% Dead, 6% Paradox (Floor guaranteed)
+                aliveRate = 0.64;
+                deadRate = 0.30;
+                paradoxRate = 0.06;
+            } else if (selectedSkin === 'tardis') {
+                // Time Capsule: 18% Paradox, 41% Alive, 41% Dead
+                paradoxRate = 0.18;
+                aliveRate = 0.41;
+                deadRate = 0.41;
+            } else if (selectedSkin === 'galaxy') {
+                // Galaxy: 15% Paradox, 42.5% Alive, 42.5% Dead
+                paradoxRate = 0.15;
+                aliveRate = 0.425;
+                deadRate = 0.425;
+            }
+
+            // Guaranteed Paradox Floor (minimum 6% across all boxes)
+            paradoxRate = Math.max(0.06, paradoxRate);
+
+            const randomState = Math.random();
+
+            if (randomState < aliveRate) {
+                determinedOutcome = 'alive';
+            } else if (randomState < aliveRate + deadRate) {
+                determinedOutcome = 'dead';
+            } else {
+                determinedOutcome = 'paradox';
+            }
         }
 
         const outcomeInfo = getOutcomePool(determinedOutcome);
@@ -258,39 +607,41 @@ export function useCatLogic({
             return;
         }
 
-        // Apply skin-based weights (Crystal: double weight on uncollected cats; Stone: triple weight on relic cats)
         const uncollectedSet = new Set(userData?.unlockedCats ?? []);
-        const weightedCats = outcomeInfo.cats.map(catItem => {
-            let weight = catItem.rarity;
-            if (selectedSkin === 'crystal' && !uncollectedSet.has(catItem.id)) {
-                weight *= 2;
-            } else if (selectedSkin === 'stone' && determinedOutcome === 'dead') {
-                if (catItem.id === 'catankhamun' || catItem.id === 'pharaoh') {
-                    weight *= 3;
+
+        if (!selectedCatId) {
+            // Apply skin-based weights (Crystal: double weight on uncollected cats; Stone: triple weight on relic cats)
+            const weightedCats = outcomeInfo.cats.map(catItem => {
+                let weight = catItem.rarity;
+                if (selectedSkin === 'crystal' && !uncollectedSet.has(catItem.id)) {
+                    weight *= 2;
+                } else if (selectedSkin === 'stone' && determinedOutcome === 'dead') {
+                    if (catItem.id === 'catankhamun' || catItem.id === 'pharaoh') {
+                        weight *= 3;
+                    }
+                }
+                return { id: catItem.id, rarity: weight };
+            });
+
+            const totalRarity = weightedCats.reduce((sum, cat) => sum + cat.rarity, 0);
+            let randomRarity = Math.random() * totalRarity;
+
+            for (const cat of weightedCats) {
+                randomRarity -= cat.rarity;
+                if (randomRarity <= 0) {
+                    selectedCatId = cat.id;
+                    break;
                 }
             }
-            return { id: catItem.id, rarity: weight };
-        });
-
-        const totalRarity = weightedCats.reduce((sum, cat) => sum + cat.rarity, 0);
-        let randomRarity = Math.random() * totalRarity;
-        let selectedCatId: string | undefined;
-
-        for (const cat of weightedCats) {
-            randomRarity -= cat.rarity;
-            if (randomRarity <= 0) {
-                selectedCatId = cat.id;
-                break;
+            if (!selectedCatId) {
+                selectedCatId = weightedCats[weightedCats.length - 1].id;
             }
-        }
-        if (!selectedCatId) {
-            selectedCatId = weightedCats[weightedCats.length - 1].id;
         }
 
         // Check for Double Cat (Time Capsule / TARDIS 3% timeline split)
         let secondaryCatId: string | undefined;
         let secondaryCat: typeof allCats[number] | undefined;
-        if (selectedSkin === 'tardis' && Math.random() < 0.03) {
+        if (!forcedCat && selectedSkin === 'tardis' && Math.random() < 0.03) {
             const alternateCats = outcomeInfo.cats.filter(c => c.id !== selectedCatId);
             const candidatePool = alternateCats.length > 0 ? alternateCats : allCats;
             const pick = candidatePool[Math.floor(Math.random() * candidatePool.length)];
@@ -444,7 +795,7 @@ export function useCatLogic({
                         });
                     }
 
-                    if (!options?.ignoreLock && !isCarbonFreeReroll) {
+                    if (!options?.ignoreLock && !isCarbonFreeReroll && !isDebugActive) {
                         const now = new Date();
                         const isoDate = now.toISOString();
                         setUserData(prev => ({ ...prev, lastBoxOpenDate: isoDate }));
@@ -457,24 +808,134 @@ export function useCatLogic({
         }, 1500);
     };
 
-    const resetState = useCallback(() => {
-        if (setRevealedCatId) {
-            setRevealedCatId(null);
+    // handleBoxClick is recreated every render; read it through a ref so debugOpen stays stable.
+    const handleBoxClickRef = useRef(handleBoxClick);
+    useEffect(() => {
+        handleBoxClickRef.current = handleBoxClick;
+    });
+
+    const debugOpen = useCallback(
+        async (idOrIndex?: string | number) => {
+            if (idOrIndex !== undefined) {
+                debugSetCat(idOrIndex, false);
+            }
+            if (catState.outcome !== 'initial' || isDailyLocked) {
+                resetState();
+                await new Promise(resolve => setTimeout(resolve, 50));
+            }
+            await handleBoxClickRef.current?.({ ignoreLock: true });
+        },
+        [catState.outcome, debugSetCat, isDailyLocked, resetState],
+    );
+
+    const debugCycle = useMemo<DebugCycleApi | undefined>(() => {
+        if (typeof window === 'undefined') {
+            return undefined;
         }
-        setCatState({ outcome: 'initial' });
-        setMessage('');
-        setRevealedCatName(null);
-    }, [setRevealedCatId]);
+        // Development builds only: the API can unlock cats, so it must never ship to players.
+        if (process.env.NODE_ENV !== 'development') {
+            return undefined;
+        }
+
+        const api: DebugCycleApi = {
+            total: allCats.length,
+            allCats: allCats.map((_, i) => getCatDebugInfo(i)),
+            next: debugNext,
+            prev: debugPrev,
+            setCat: debugSetCat,
+            list: debugList,
+            setSequentialMode: debugSetSequentialMode,
+            open: debugOpen,
+            cycleAll: debugCycleAll,
+            stop: debugStop,
+            status: debugStatus,
+            reset: debugReset,
+            help: debugHelp,
+            toggle: debugToggle,
+            bypassDailyLock: debugBypassDailyLock,
+            get enabled() {
+                return isDebugModeActive || debugSequentialModeRef.current || debugOverrideCatIdRef.current !== null;
+            },
+            set enabled(val: boolean) {
+                setIsDebugModeActive(Boolean(val));
+                if (!val) {
+                    debugSequentialModeRef.current = false;
+                    debugOverrideCatIdRef.current = null;
+                }
+            },
+            get currentIndex() {
+                return debugIndexRef.current;
+            },
+            set currentIndex(val: number) {
+                if (typeof val === 'number' && !isNaN(val)) {
+                    debugIndexRef.current = ((val % allCats.length) + allCats.length) % allCats.length;
+                }
+            },
+            get targetCatId() {
+                return debugOverrideCatIdRef.current;
+            },
+            set targetCatId(val: string | null | undefined) {
+                debugOverrideCatIdRef.current = val ?? null;
+                if (val) setIsDebugModeActive(true);
+            },
+        };
+
+        return api;
+    }, [
+        debugBypassDailyLock,
+        debugCycleAll,
+        debugHelp,
+        debugList,
+        debugNext,
+        debugOpen,
+        debugPrev,
+        debugReset,
+        debugSetCat,
+        debugSetSequentialMode,
+        debugStatus,
+        debugStop,
+        debugToggle,
+        getCatDebugInfo,
+        isDebugModeActive,
+    ]);
+
+    useEffect(() => {
+        if (typeof window === 'undefined') return;
+        // Development builds only: the API can unlock cats, so it must never ship to players.
+        if (process.env.NODE_ENV !== 'development') {
+            return;
+        }
+
+        if (debugCycle) {
+            window.__DEBUG_CYCLE_CATS__ = debugCycle;
+        }
+
+        return () => {
+            if (debugCycleIntervalRef.current) {
+                clearInterval(debugCycleIntervalRef.current);
+                debugCycleIntervalRef.current = null;
+            }
+            if (window.__DEBUG_CYCLE_CATS__ === debugCycle) {
+                delete window.__DEBUG_CYCLE_CATS__;
+            }
+        };
+    }, [debugCycle]);
 
     const handleReset = useCallback(
         (options?: { ignoreLock?: boolean }) => {
             onInteraction?.();
             playFeedback('click-2');
-            if (!isDailyLocked || options?.ignoreLock) {
+            const isDev = process.env.NODE_ENV === 'development';
+            const isDebugActive = isDev && (
+                isDebugModeActive ||
+                debugSequentialModeRef.current ||
+                debugOverrideCatIdRef.current !== null
+            );
+            if (!isDailyLocked || options?.ignoreLock || isDebugActive) {
                 resetState();
             }
         },
-        [onInteraction, resetState, isDailyLocked],
+        [onInteraction, resetState, isDailyLocked, isDebugModeActive],
     );
 
     const overrideDailyLock = useCallback(() => {
@@ -508,5 +969,6 @@ export function useCatLogic({
         rechargeCost,
         refreshDailyLock,
         overrideDailyLock,
+        debugCycle,
     };
 }

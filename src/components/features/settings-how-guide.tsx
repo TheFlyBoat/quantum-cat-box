@@ -1,6 +1,6 @@
 'use client';
 
-import * as React from 'react';
+import React, { type ComponentType } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import {
@@ -19,7 +19,6 @@ import {
     CheckCircle2,
     Lock,
 } from 'lucide-react';
-import type { ComponentType } from 'react';
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
@@ -154,14 +153,16 @@ export function SettingsHowGuide() {
     // Sub-header back button
     const renderBackButton = (title: string) => (
         <div className="flex items-center justify-between pb-3 border-b border-border/40 mb-4">
-            <button
+            <Button
                 type="button"
+                variant="ghost"
+                size="sm"
                 onClick={handleBack}
-                className="inline-flex items-center gap-1.5 text-xs font-bold text-muted-foreground hover:text-foreground transition-colors px-2.5 py-1.5 rounded-xl hover:bg-muted/40"
+                className="h-auto inline-flex items-center gap-1.5 text-xs font-bold text-muted-foreground hover:text-foreground transition-colors px-2.5 py-1.5 rounded-xl hover:bg-muted/40"
             >
                 <ChevronLeft className="h-4 w-4" />
                 <span>Back to Guide</span>
-            </button>
+            </Button>
             <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">{title}</span>
         </div>
     );
@@ -188,10 +189,11 @@ export function SettingsHowGuide() {
                     <div className="rounded-3xl border border-border/60 bg-background/50 p-1 shadow-sm backdrop-blur-sm">
                         <div className="flex flex-col divide-y divide-border/40">
                             {/* How to Play */}
-                            <button
+                            <Button
                                 type="button"
+                                variant="ghost"
                                 onClick={() => handleNavigate('how-to-play')}
-                                className="flex items-center justify-between p-4 text-left transition-colors hover:bg-muted/30 w-full group rounded-t-2xl"
+                                className="h-auto w-full justify-between p-4 text-left font-normal whitespace-normal transition-colors hover:bg-muted/30 group rounded-t-2xl rounded-b-none"
                             >
                                 <div className="flex items-center gap-3">
                                     <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-sky-100 text-[#3696C9] dark:bg-sky-950 dark:text-sky-400">
@@ -203,16 +205,17 @@ export function SettingsHowGuide() {
                                     </div>
                                 </div>
                                 <ChevronRight className="h-4 w-4 text-muted-foreground group-hover:text-foreground transition-colors" />
-                            </button>
+                            </Button>
 
                             {/* Fish Points */}
-                            <button
+                            <Button
                                 type="button"
+                                variant="ghost"
                                 onClick={() => handleNavigate('points')}
-                                className="flex items-center justify-between p-4 text-left transition-colors hover:bg-muted/30 w-full group"
+                                className="h-auto w-full justify-between p-4 text-left font-normal whitespace-normal transition-colors hover:bg-muted/30 group rounded-none"
                             >
                                 <div className="flex items-center gap-3">
-                                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-teal-100 text-[#0F766E] dark:bg-teal-950 dark:text-teal-400">
+                                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-emerald-100 text-[#A9DB4A] dark:bg-emerald-950 dark:text-[#A9DB4A]">
                                         <Fish className="h-5 w-5" />
                                     </div>
                                     <div>
@@ -221,16 +224,17 @@ export function SettingsHowGuide() {
                                     </div>
                                 </div>
                                 <ChevronRight className="h-4 w-4 text-muted-foreground group-hover:text-foreground transition-colors" />
-                            </button>
+                            </Button>
 
                             {/* Badges */}
-                            <button
+                            <Button
                                 type="button"
+                                variant="ghost"
                                 onClick={() => handleNavigate('badges')}
-                                className="flex items-center justify-between p-4 text-left transition-colors hover:bg-muted/30 w-full group"
+                                className="h-auto w-full justify-between p-4 text-left font-normal whitespace-normal transition-colors hover:bg-muted/30 group rounded-none"
                             >
                                 <div className="flex items-center gap-3">
-                                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-amber-100 text-[#D97706] dark:bg-amber-950 dark:text-amber-400">
+                                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-amber-100 text-[#D14002] dark:bg-amber-950 dark:text-[#D14002]">
                                         <Medal className="h-5 w-5" />
                                     </div>
                                     <div>
@@ -239,13 +243,14 @@ export function SettingsHowGuide() {
                                     </div>
                                 </div>
                                 <ChevronRight className="h-4 w-4 text-muted-foreground group-hover:text-foreground transition-colors" />
-                            </button>
+                            </Button>
 
                             {/* Quantum Boxes */}
-                            <button
+                            <Button
                                 type="button"
+                                variant="ghost"
                                 onClick={() => handleNavigate('boxes')}
-                                className="flex items-center justify-between p-4 text-left transition-colors hover:bg-muted/30 w-full group"
+                                className="h-auto w-full justify-between p-4 text-left font-normal whitespace-normal transition-colors hover:bg-muted/30 group rounded-none"
                             >
                                 <div className="flex items-center gap-3">
                                     <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-purple-100 text-[#A240FF] dark:bg-purple-950 dark:text-purple-400">
@@ -257,13 +262,14 @@ export function SettingsHowGuide() {
                                     </div>
                                 </div>
                                 <ChevronRight className="h-4 w-4 text-muted-foreground group-hover:text-foreground transition-colors" />
-                            </button>
+                            </Button>
 
                             {/* Schrödinger's Cat Experiment */}
-                            <button
+                            <Button
                                 type="button"
+                                variant="ghost"
                                 onClick={() => handleNavigate('experiment')}
-                                className="flex items-center justify-between p-4 text-left transition-colors hover:bg-muted/30 w-full group rounded-b-2xl"
+                                className="h-auto w-full justify-between p-4 text-left font-normal whitespace-normal transition-colors hover:bg-muted/30 group rounded-b-2xl rounded-t-none"
                             >
                                 <div className="flex items-center gap-3">
                                     <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-pink-100 text-[#FF809F] dark:bg-pink-950 dark:text-pink-400">
@@ -275,7 +281,7 @@ export function SettingsHowGuide() {
                                     </div>
                                 </div>
                                 <ChevronRight className="h-4 w-4 text-muted-foreground group-hover:text-foreground transition-colors" />
-                            </button>
+                            </Button>
                         </div>
                     </div>
                 </div>
@@ -328,19 +334,19 @@ export function SettingsHowGuide() {
                             <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-1">
                                 <div className="rounded-2xl border border-sky-300/40 bg-background/80 p-3 text-center space-y-1">
                                     <span className="text-base">🐱</span>
-                                    <p className="text-xs font-bold text-[#3696C9]">Alive Cat</p>
+                                    <p className="text-xs font-bold text-muted-foreground"><span className="text-[#3696C9]">Alive Cat</span></p>
                                     <p className="text-[11px] text-muted-foreground">Common • +1 🐟</p>
                                     <p className="text-[10px] text-muted-foreground/80">Vitality, warmth & playful optimism.</p>
                                 </div>
                                 <div className="rounded-2xl border border-pink-300/40 bg-background/80 p-3 text-center space-y-1">
                                     <span className="text-base">💀</span>
-                                    <p className="text-xs font-bold text-[#FF809F]">Dead Cat</p>
+                                    <p className="text-xs font-bold text-muted-foreground"><span className="text-[#FF809F]">Dead Cat</span></p>
                                     <p className="text-[11px] text-muted-foreground">Common • +2 🐟</p>
                                     <p className="text-[10px] text-muted-foreground/80">Ghostly wisdom, change & rebirth.</p>
                                 </div>
                                 <div className="rounded-2xl border border-purple-300/40 bg-background/80 p-3 text-center space-y-1">
                                     <span className="text-base">🌀</span>
-                                    <p className="text-xs font-bold text-[#A240FF]">Paradox Cat</p>
+                                    <p className="text-xs font-bold text-muted-foreground"><span className="text-[#A240FF]">Paradox Cat</span></p>
                                     <p className="text-[11px] text-muted-foreground">Rare • +5 🐟</p>
                                     <p className="text-[10px] text-muted-foreground/80">Multiverse glitch, superposition alive & dead.</p>
                                 </div>
@@ -351,10 +357,10 @@ export function SettingsHowGuide() {
                         <div className="rounded-3xl border border-amber-200/70 bg-amber-50/50 dark:border-amber-900/40 dark:bg-amber-950/20 p-5 shadow-sm space-y-2">
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-2.5">
-                                    <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-amber-100 text-[#D97706] dark:bg-amber-900/50 dark:text-amber-400">
+                                    <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-amber-100 text-[#D14002] dark:bg-amber-900/50 dark:text-[#D14002]">
                                         <Sparkles className="h-4 w-4" />
                                     </div>
-                                    <span className="text-xs font-bold uppercase tracking-wider text-[#D97706]">Step 3</span>
+                                    <span className="text-xs font-bold uppercase tracking-wider text-[#D14002]">Step 3</span>
                                 </div>
                                 <span className="text-xs font-bold text-muted-foreground">AI Wisdom</span>
                             </div>
@@ -390,10 +396,10 @@ export function SettingsHowGuide() {
                         <div className="rounded-3xl border border-emerald-200/70 bg-emerald-50/50 dark:border-emerald-900/40 dark:bg-emerald-950/20 p-5 shadow-sm space-y-2.5">
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-2.5">
-                                    <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-emerald-100 text-[#0F766E] dark:bg-emerald-900/50 dark:text-emerald-400">
+                                    <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-emerald-100 text-[#A9DB4A] dark:bg-emerald-900/50 dark:text-[#A9DB4A]">
                                         <Zap className="h-4 w-4" />
                                     </div>
-                                    <span className="text-xs font-bold uppercase tracking-wider text-[#0F766E]">Step 5</span>
+                                    <span className="text-xs font-bold uppercase tracking-wider text-[#A9DB4A]">Step 5</span>
                                 </div>
                                 <span className="text-xs font-bold text-muted-foreground">Cooldown & Unlock</span>
                             </div>
@@ -418,7 +424,7 @@ export function SettingsHowGuide() {
 
                     {/* Intro */}
                     <div className="rounded-3xl border border-border/60 bg-background/80 p-5 shadow-sm space-y-2">
-                        <div className="flex items-center gap-2 text-[#0F766E]">
+                        <div className="flex items-center gap-2 text-[#A9DB4A]">
                             <Fish className="h-5 w-5" />
                             <h4 className="font-headline text-xl font-bold text-foreground">Fish Points Economy</h4>
                         </div>
@@ -431,20 +437,20 @@ export function SettingsHowGuide() {
                     <div className="space-y-3">
                         {/* Earning */}
                         <div className="rounded-3xl border border-teal-200/70 bg-background/80 p-5 shadow-sm space-y-3">
-                            <span className="text-[10px] font-bold uppercase tracking-wider text-[#0F766E]">Earnings Breakdown</span>
+                            <span className="text-[10px] font-bold uppercase tracking-[0.16em] text-muted-foreground">Earnings Breakdown</span>
                             <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
                                 <div className="rounded-2xl border border-border/40 bg-teal-50/30 dark:bg-teal-950/20 p-3 text-center">
-                                    <p className="font-headline font-bold text-lg text-[#3696C9]">+1 🐟</p>
+                                    <p className="font-headline font-bold text-lg text-foreground"><span className="text-[#3696C9]">+1 🐟</span></p>
                                     <p className="text-xs font-bold text-foreground">Alive Cat</p>
                                     <p className="text-[10px] text-muted-foreground">Standard vital collapse</p>
                                 </div>
                                 <div className="rounded-2xl border border-border/40 bg-teal-50/30 dark:bg-teal-950/20 p-3 text-center">
-                                    <p className="font-headline font-bold text-lg text-[#FF809F]">+2 🐟</p>
+                                    <p className="font-headline font-bold text-lg text-foreground"><span className="text-[#FF809F]">+2 🐟</span></p>
                                     <p className="text-xs font-bold text-foreground">Dead Cat</p>
                                     <p className="text-[10px] text-muted-foreground">Ghostly reflection</p>
                                 </div>
                                 <div className="rounded-2xl border border-border/40 bg-teal-50/30 dark:bg-teal-950/20 p-3 text-center">
-                                    <p className="font-headline font-bold text-lg text-[#A240FF]">+5 🐟</p>
+                                    <p className="font-headline font-bold text-lg text-foreground"><span className="text-[#A240FF]">+5 🐟</span></p>
                                     <p className="text-xs font-bold text-foreground">Paradox Cat</p>
                                     <p className="text-[10px] text-muted-foreground">Superposition rarity</p>
                                 </div>
@@ -454,7 +460,7 @@ export function SettingsHowGuide() {
                         {/* Passive Boosts */}
                         <div className="rounded-3xl border border-purple-200/70 bg-background/80 p-5 shadow-sm space-y-3">
                             <div className="flex items-center justify-between">
-                                <span className="text-[10px] font-bold uppercase tracking-wider text-[#A240FF]">Box Powers & Point Boosts</span>
+                                <span className="text-[10px] font-bold uppercase tracking-[0.16em] text-muted-foreground">Box Powers & Point Boosts</span>
                                 <Badge variant="outline" className="text-[10px] font-bold border-purple-300 text-purple-600">Passive Boosts</Badge>
                             </div>
                             <div className="space-y-2 text-xs text-muted-foreground">
@@ -487,7 +493,7 @@ export function SettingsHowGuide() {
 
                         {/* Spending */}
                         <div className="rounded-3xl border border-emerald-200/70 bg-background/80 p-5 shadow-sm space-y-3">
-                            <span className="text-[10px] font-bold uppercase tracking-wider text-[#0F766E]">Where to Spend Fish Points</span>
+                            <span className="text-[10px] font-bold uppercase tracking-[0.16em] text-muted-foreground">Where to Spend Fish Points</span>
                             <div className="space-y-2 text-xs text-muted-foreground">
                                 <div className="p-3 rounded-2xl border border-border/40 bg-background space-y-1">
                                     <div className="flex items-center justify-between">
@@ -520,7 +526,7 @@ export function SettingsHowGuide() {
 
                     {/* Intro */}
                     <div className="rounded-3xl border border-border/60 bg-background/80 p-5 shadow-sm space-y-2">
-                        <div className="flex items-center gap-2 text-[#D97706]">
+                        <div className="flex items-center gap-2 text-[#D14002]">
                             <Medal className="h-5 w-5" />
                             <h4 className="font-headline text-xl font-bold text-foreground">Badges & Achievements</h4>
                         </div>
@@ -765,7 +771,7 @@ export function SettingsHowGuide() {
 
                                     {/* Exact Rule Card */}
                                     <div className="space-y-2 rounded-2xl border border-amber-300/40 bg-amber-50/30 dark:bg-amber-950/20 p-4">
-                                        <span className="text-[10px] font-bold uppercase tracking-wider text-amber-700 dark:text-amber-300 flex items-center gap-1.5">
+                                        <span className="text-[10px] font-bold uppercase tracking-[0.16em] text-muted-foreground flex items-center gap-1.5">
                                             <Medal className="h-3.5 w-3.5" />
                                             Award Rule
                                         </span>
@@ -826,7 +832,7 @@ export function SettingsHowGuide() {
                                         </div>
                                         <div className="flex-1 space-y-1">
                                             <div className="flex items-center justify-between gap-2">
-                                                <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Box Power</span>
+                                                <span className="text-[10px] font-bold uppercase tracking-[0.16em] text-muted-foreground">Box Power</span>
                                                 <Badge variant="outline" className="text-[10px] font-bold border-primary/40 text-primary">
                                                     {selectedBox.power.badgeText}
                                                 </Badge>

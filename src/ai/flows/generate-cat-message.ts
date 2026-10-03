@@ -30,7 +30,13 @@ const GenerateCatMessageOutputSchema = z.object({
 export type GenerateCatMessageOutput = z.infer<typeof GenerateCatMessageOutputSchema>;
 
 export async function generateCatMessage(input: GenerateCatMessageInput): Promise<GenerateCatMessageOutput> {
-  return generateCatMessageFlow(input);
+  try {
+    return await generateCatMessageFlow(input);
+  } catch (error) {
+    // Schema validation or an unexpected flow error must never reach the player.
+    console.error('[Genkit Server Action Error]:', error);
+    return fallback('flow_error', input);
+  }
 }
 
 // Must stay below the client's 10s fallback timer so the server's answer always arrives first.
@@ -95,9 +101,36 @@ const cleanMessage = (raw: string | undefined): string | null => {
   return text;
 };
 
-const pickFallbackMessage = (): string => {
-  const pool = (fallbackMessages as {messages?: string[]}).messages ?? [];
-  return pool[Math.floor(Math.random() * pool.length)] ?? 'Embrace the mystery beyond the box.';
+const STATE_FALLBACK_MESSAGES: Record<'alive' | 'dead' | 'paradox', string[]> = {
+  alive: [
+    'A fresh perspective changes everything. Embrace the spark.',
+    'Life is unfolding with vibrant momentum. Step forward boldly.',
+    'Energy flows where attention goes. Awaken to today.',
+    'Every sunrise brings an unwritten story. Claim yours.',
+  ],
+  dead: [
+    'Every ending is a beginning disguised as a goodbye.',
+    'Let go of what was to make room for what will be.',
+    'In quiet stillness, wisdom finds its deepest voice.',
+    'Transformation begins when you release what was.',
+  ],
+  paradox: [
+    'Embrace the contradiction. That is where possibility lives.',
+    'Two truths can exist at once; balance is found in between.',
+    'When nothing is certain, everything becomes possible.',
+    'The mystery itself holds the answer you seek.',
+  ],
+};
+
+const pickRandom = (pool: string[]) => pool[Math.floor(Math.random() * pool.length)];
+
+/** Prefers a message matching the outcome's mood, then the general pool. */
+const pickFallbackMessage = (input: GenerateCatMessageInput): string => {
+  const outcome = input.catType.toLowerCase() as keyof typeof STATE_FALLBACK_MESSAGES;
+  const statePool = STATE_FALLBACK_MESSAGES[outcome];
+  const generalPool = (fallbackMessages as {messages?: string[]}).messages ?? [];
+  const pool = statePool ? [...statePool, ...generalPool] : generalPool;
+  return pickRandom(pool) ?? 'Embrace the mystery beyond the box.';
 };
 
 const fallback = (reason: string, input: GenerateCatMessageInput): GenerateCatMessageOutput => {
@@ -108,7 +141,7 @@ const fallback = (reason: string, input: GenerateCatMessageInput): GenerateCatMe
     model: QUANTUM_MESSAGE_MODEL,
     catId: input.catId,
   }));
-  return {message: pickFallbackMessage(), source: 'fallback', reason};
+  return {message: pickFallbackMessage(input), source: 'fallback', reason};
 };
 
 const withTimeout = <T,>(promise: Promise<T>, ms: number) =>
@@ -124,10 +157,11 @@ const generateCatMessageFlow = ai.defineFlow(
     outputSchema: GenerateCatMessageOutputSchema,
   },
   async (input): Promise<GenerateCatMessageOutput> => {
-    const apiKey =
+    const apiKey = (
       process.env.GEMINI_API_KEY ||
       process.env.GOOGLE_API_KEY ||
-      process.env.GOOGLE_GENAI_API_KEY;
+      process.env.GOOGLE_GENAI_API_KEY
+    )?.trim();
 
     if (!apiKey) {
       return fallback('missing_api_key', input);

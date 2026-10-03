@@ -11,6 +11,7 @@ import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { cn } from '@/lib/utils';
 import { SettingsHowGuide } from '@/components/features/settings-how-guide';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
@@ -65,16 +66,16 @@ function SettingsContent() {
         reset();
     };
 
-    const sectionLabelClass = "text-[10px] font-semibold uppercase tracking-[0.16em] text-foreground";
+    const sectionLabelClass = "text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground";
     const rowTextClass = "text-sm font-medium text-foreground";
-    const bodyTextClass = "text-sm text-foreground";
+    const bodyTextClass = "text-sm text-muted-foreground";
 
 
 
     return (
         <Card className="border-none bg-transparent shadow-none">
             <CardHeader>
-                <CardTitle className="page-title text-teal-500">Settings</CardTitle>
+                <CardTitle className="page-title text-primary">Settings</CardTitle>
             </CardHeader>
             <CardContent>
                 <Tabs value={currentTab} onValueChange={(val) => { playFeedback('click-3'); setCurrentTab(val); }} className="w-full">
@@ -84,33 +85,48 @@ function SettingsContent() {
 
                         return (
                             <TabsList className="grid w-full grid-cols-3 gap-3 rounded-3xl border border-border/40 bg-background/80 p-2 text-[11px] font-semibold uppercase tracking-wide shadow-sm">
-                                <TabsTrigger
-                                    value="system"
-                                    className={cn(
-                                        tabBaseClass,
-                                        'bg-sky-100 text-sky-800 hover:bg-sky-200/70 dark:bg-sky-950/60 dark:text-sky-300 data-[state=active]:bg-[#3696C9] data-[state=active]:text-white dark:data-[state=active]:bg-[#3696C9] dark:data-[state=active]:text-white'
-                                    )}
-                                >
-                                    System
-                                </TabsTrigger>
-                                <TabsTrigger
-                                    value="info"
-                                    className={cn(
-                                        tabBaseClass,
-                                        'bg-emerald-100 text-emerald-800 hover:bg-emerald-200/70 dark:bg-emerald-950/60 dark:text-emerald-300 data-[state=active]:bg-emerald-600 data-[state=active]:text-white dark:data-[state=active]:bg-emerald-600 dark:data-[state=active]:text-white'
-                                    )}
-                                >
-                                    Info
-                                </TabsTrigger>
-                                <TabsTrigger
-                                    value="how"
-                                    className={cn(
-                                        tabBaseClass,
-                                        'bg-pink-100 text-pink-800 hover:bg-pink-200/70 dark:bg-pink-950/60 dark:text-pink-300 data-[state=active]:bg-[#FF809F] data-[state=active]:text-white dark:data-[state=active]:bg-[#FF809F] dark:data-[state=active]:text-white'
-                                    )}
-                                >
-                                    How
-                                </TabsTrigger>
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <TabsTrigger
+                                            value="system"
+                                            className={cn(
+                                                tabBaseClass,
+                                                'bg-sky-100 text-sky-800 hover:bg-sky-200/70 dark:bg-sky-950/60 dark:text-sky-300 data-[state=active]:bg-[#3696C9] data-[state=active]:text-[#002D41] data-[state=active]:font-semibold dark:data-[state=active]:bg-[#3696C9] dark:data-[state=active]:text-[#002D41]'
+                                            )}
+                                        >
+                                            System
+                                        </TabsTrigger>
+                                    </TooltipTrigger>
+                                    <TooltipContent side="top">System Preferences</TooltipContent>
+                                </Tooltip>
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <TabsTrigger
+                                            value="info"
+                                            className={cn(
+                                                tabBaseClass,
+                                                'bg-emerald-100 text-emerald-800 hover:bg-emerald-200/70 dark:bg-emerald-950/60 dark:text-emerald-300 data-[state=active]:bg-[#A9DB4A] data-[state=active]:text-[#002D41] data-[state=active]:font-semibold dark:data-[state=active]:bg-[#A9DB4A] dark:data-[state=active]:text-[#002D41]'
+                                            )}
+                                        >
+                                            Info
+                                        </TabsTrigger>
+                                    </TooltipTrigger>
+                                    <TooltipContent side="top">About & Information</TooltipContent>
+                                </Tooltip>
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <TabsTrigger
+                                            value="how"
+                                            className={cn(
+                                                tabBaseClass,
+                                                'bg-pink-100 text-pink-800 hover:bg-pink-200/70 dark:bg-pink-950/60 dark:text-pink-300 data-[state=active]:bg-[#FF809F] data-[state=active]:text-[#002D41] data-[state=active]:font-semibold dark:data-[state=active]:bg-[#FF809F] dark:data-[state=active]:text-[#002D41]'
+                                            )}
+                                        >
+                                            How
+                                        </TabsTrigger>
+                                    </TooltipTrigger>
+                                    <TooltipContent side="top">How to Play Guide</TooltipContent>
+                                </Tooltip>
                             </TabsList>
                         );
                     })()}

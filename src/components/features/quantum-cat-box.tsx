@@ -10,7 +10,7 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 
-import { CatDisplay } from '@/components/cats/CatDisplay';
+import { CatDisplay } from '@/components/cats/cat-display';
 import { QuantumParticleBurst } from '@/components/features/quantum-particle-burst';
 import { playFeedback } from '@/lib/audio';
 import {
