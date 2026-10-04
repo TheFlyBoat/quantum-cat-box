@@ -14,7 +14,7 @@
       "buildServiceAccount": "258085757068@cloudbuild.gserviceaccount.com",
       "secrets": ["GEMINI_API_KEY"],
       "memory": "512MiB",
-      "minInstances": 1,
+      "minInstances": 0,
       "maxInstances": 10,
       "timeoutSeconds": 60
     }

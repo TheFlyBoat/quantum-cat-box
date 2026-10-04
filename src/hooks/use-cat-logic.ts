@@ -109,7 +109,8 @@ const getOutcomePool = (outcome: 'alive' | 'dead' | 'paradox'): OutcomePool => {
     return fallbackOutcomes[outcome];
 };
 
-const MESSAGE_GENERATION_TIMEOUT_MS = 10000;
+// Generous enough to cover a server cold start (no warm instance is kept) plus generation.
+const MESSAGE_GENERATION_TIMEOUT_MS = 15000;
 
 type FallbackMessageEntry = string | { message: string };
 

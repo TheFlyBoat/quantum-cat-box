@@ -39,7 +39,7 @@ export async function generateCatMessage(input: GenerateCatMessageInput): Promis
   }
 }
 
-// Must stay below the client's 10s fallback timer so the server's answer always arrives first.
+// Must stay below the client's 15s fallback timer so the server's answer always arrives first.
 const GENERATION_TIMEOUT_MS = 7000;
 const MAX_WORDS = 20;
 
